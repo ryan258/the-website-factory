@@ -1,0 +1,7 @@
+budget_help: "Illustrative ranges in USD."
+budgets:
+  - "Under $2,400"
+  - "$2,400–$6,800"
+  - "$6,800–$15,000"
+  - "$15,000+"
+  - "Not sure yet"

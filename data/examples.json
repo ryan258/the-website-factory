@@ -1,0 +1,306 @@
+{
+  "hero": {
+    "label": "Independent thinking. Thoughtful work.",
+    "title": "Good ideas deserve a better website.",
+    "intro": "Clear words, considered design, and a useful next step. A small-business website with room to grow.",
+    "action": {
+      "label": "Start a conversation",
+      "url": "/contact/"
+    },
+    "secondary": {
+      "label": "Explore our services",
+      "url": "/services/"
+    },
+    "note": "Fictional business • Sample composition",
+    "art": "factory"
+  },
+  "services": {
+    "label": "What we do",
+    "title": "The right help, in the right place.",
+    "intro": "A focused set of services, shaped around what your business needs next.",
+    "items": [
+      {
+        "title": "Websites with purpose",
+        "text": "A clear, accessible home for your business, built around the people using it."
+      },
+      {
+        "title": "Brand foundations",
+        "text": "A consistent visual language, from typography and color to the details that make you recognizable."
+      },
+      {
+        "title": "Content that helps",
+        "text": "Useful pages that explain your work and make the next step feel straightforward."
+      }
+    ]
+  },
+  "work": {
+    "label": "Selected work",
+    "title": "Different businesses. Considered solutions.",
+    "intro": "Four fictional projects showing how a shared foundation can take on its own character.",
+    "items": [
+      {
+        "title": "Fieldwork",
+        "text": "An approachable home for a neighborhood studio.",
+        "image": "images/fieldwork.png",
+        "url": "/work/fieldwork/"
+      },
+      {
+        "title": "Forma",
+        "text": "A calm, structured portfolio for a design practice.",
+        "image": "images/forma.png",
+        "url": "/work/forma/"
+      },
+      {
+        "title": "Common Ground",
+        "text": "A welcoming digital space for a community business.",
+        "image": "images/common-ground.png",
+        "url": "/work/common-ground/"
+      },
+      {
+        "title": "Northline",
+        "text": "A direct, purposeful site for a growing service business.",
+        "image": "images/northline.png",
+        "url": "/work/northline/"
+      }
+    ],
+    "notice": "Sample projects. All businesses and results are fictional."
+  },
+  "process": {
+    "label": "How it works",
+    "title": "A little clarity at every step.",
+    "items": [
+      {
+        "title": "Listen",
+        "text": "Start with your goals, constraints, and the people you want to reach."
+      },
+      {
+        "title": "Shape",
+        "text": "Agree on the content, scope, and a direction that feels like you."
+      },
+      {
+        "title": "Make",
+        "text": "Build the agreed site and review real pages together."
+      },
+      {
+        "title": "Refine",
+        "text": "Check the details, make the handover clear, and agree on what comes next."
+      }
+    ]
+  },
+  "about": {
+    "label": "A considered approach",
+    "title": "Small enough to care about the details.",
+    "intro": "Good work starts with understanding what matters to you.",
+    "body": "This example shows how an independent business can explain its approach without a wall of corporate language. Replace it with your own story: why the business exists, who does the work, and what clients can expect.",
+    "aside": "Clear scope. Useful conversations. Thoughtful delivery."
+  },
+  "team": {
+    "label": "The people",
+    "title": "Know who you’re working with.",
+    "items": [
+      {
+        "title": "Alex Morgan",
+        "text": "Sample profile · Strategy and client conversations",
+        "initials": "AM"
+      },
+      {
+        "title": "Sam Rivera",
+        "text": "Sample profile · Design and delivery",
+        "initials": "SR"
+      }
+    ],
+    "notice": "Fictional names and roles for layout demonstration."
+  },
+  "faq": {
+    "label": "Before we begin",
+    "title": "A few useful answers.",
+    "items": [
+      {
+        "title": "Where do we start?",
+        "text": "Start with the result you want, the pages you need, and any existing material. The first conversation should establish whether the fit is right."
+      },
+      {
+        "title": "What if the content is not ready?",
+        "text": "Identify the missing pieces early and agree who will supply them. A draft can help shape the page, but it should be reviewed before publication."
+      },
+      {
+        "title": "Can the site change later?",
+        "text": "Yes. The modular structure makes it possible to add, remove, or reorder sections as the business develops."
+      },
+      {
+        "title": "Is this a real business?",
+        "text": "No. This is a fictional demonstration of the website system. Contact delivery is disabled."
+      }
+    ]
+  },
+  "pricing": {
+    "label": "Ways to work together",
+    "title": "Start with the scope that fits.",
+    "intro": "Illustrative packages for discussing a project. Final scope and fees require a real proposal.",
+    "items": [
+      {
+        "title": "Foundation",
+        "text": "A focused first website.",
+        "value": "Scope first",
+        "bullets": [
+          "Core pages and contact path",
+          "A consistent visual foundation",
+          "Content and launch review"
+        ]
+      },
+      {
+        "title": "Growth",
+        "text": "More room for services and proof.",
+        "value": "Built around you",
+        "bullets": [
+          "Expanded service pages",
+          "Project stories and resources",
+          "A clear editing handover"
+        ]
+      },
+      {
+        "title": "Ongoing",
+        "text": "A plan for keeping things useful.",
+        "value": "By agreement",
+        "bullets": [
+          "Agreed content updates",
+          "Periodic site review",
+          "A named maintenance owner"
+        ]
+      }
+    ],
+    "notice": "Sample packages. No prices, availability, or turnaround commitments are offered."
+  },
+  "areas": {
+    "label": "Close to home",
+    "title": "Where the work happens.",
+    "items": [
+      {
+        "title": "Local projects",
+        "text": "Describe the towns or neighborhoods you actually serve."
+      },
+      {
+        "title": "Further afield",
+        "text": "Explain any travel limits and how a visitor can check their location."
+      },
+      {
+        "title": "Remote conversations",
+        "text": "Describe which parts of the process can happen remotely."
+      }
+    ],
+    "notice": "Demonstration coverage. Confirm actual service areas before publication."
+  },
+  "testimonials": {
+    "label": "Client voices",
+    "title": "Make room for real feedback.",
+    "items": [
+      {
+        "title": "Sample client · fictional",
+        "text": "“We knew what was happening, what was needed from us, and what came next.”"
+      },
+      {
+        "title": "Sample client · fictional",
+        "text": "“The finished site finally felt like the business we had built.”"
+      }
+    ],
+    "notice": "Illustrative quotations, not endorsements. Replace with approved, attributable feedback or omit this module."
+  },
+  "stats": {
+    "label": "In perspective",
+    "title": "A few details, clearly stated.",
+    "items": [
+      {
+        "title": "Core services",
+        "text": "03"
+      },
+      {
+        "title": "Steps in the process",
+        "text": "04"
+      },
+      {
+        "title": "Clear next step",
+        "text": "01"
+      }
+    ],
+    "notice": "These figures describe this demonstration, not business performance."
+  },
+  "cta": {
+    "label": "Your next chapter",
+    "title": "Let’s make something useful.",
+    "intro": "A short conversation is a good place to begin.",
+    "action": {
+      "label": "Talk about your project",
+      "url": "/contact/"
+    }
+  },
+  "contact": {
+    "label": "Start here",
+    "title": "Good projects start with a hello.",
+    "intro": "Tell us what you have in mind, what you need, and any constraints. This demonstration does not send messages.",
+    "items": [
+      {
+        "title": "Email",
+        "text": "hello@example.invalid"
+      },
+      {
+        "title": "A useful first message",
+        "text": "Your goals, the work you need, and any relevant timing."
+      },
+      {
+        "title": "What happens next",
+        "text": "Agree on a real response process before enabling contact delivery."
+      }
+    ],
+    "notice": "Fictional contact information. Message delivery is disabled."
+  },
+  "resources": {
+    "label": "Useful starting points",
+    "title": "A little preparation goes a long way.",
+    "items": [
+      {
+        "title": "Before your first conversation",
+        "text": "Gather your goals, priorities, and the questions you need answered.",
+        "url": "/contact/"
+      },
+      {
+        "title": "Find the right scope",
+        "text": "Understand the service options before deciding what you need.",
+        "url": "/services/"
+      }
+    ]
+  },
+  "comparison": {
+    "label": "Choose with confidence",
+    "title": "Different needs. Different starting points.",
+    "items": [
+      {
+        "title": "A focused start",
+        "text": "For a clear, small scope.",
+        "scope": "Core information and one contact path",
+        "best": "A new or simple business"
+      },
+      {
+        "title": "More room to grow",
+        "text": "For several services or audiences.",
+        "scope": "Service detail, project stories, and resources",
+        "best": "An established business with more to explain"
+      }
+    ],
+    "notice": "Illustrative scope comparison. A proposal defines the actual deliverables."
+  },
+  "before-after": {
+    "label": "The difference",
+    "title": "From scattered information to a clear next step.",
+    "items": [
+      {
+        "title": "Before · example",
+        "text": "A crowded page, unclear services, and no obvious way to get in touch."
+      },
+      {
+        "title": "After · example",
+        "text": "A focused introduction, useful detail, and a contact path where it belongs."
+      }
+    ],
+    "notice": "An illustrative content transformation, not a measured client result."
+  }
+}

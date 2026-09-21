@@ -1,0 +1,47 @@
+- title: "Marketing sites"
+  description: "A clear home for your business. Built to help the right people understand what you do and take the next step."
+  bullets:
+    - "Up to five core pages"
+    - "Responsive layouts"
+    - "Search-ready structure"
+  number: "01"
+
+- title: "Landing pages"
+  description: "One page with one clear purpose. Give your next campaign a focused place to turn interest into enquiries."
+  bullets:
+    - "Campaign messaging"
+    - "Focused contact forms"
+    - "Fast mobile experience"
+  number: "02"
+
+- title: "Website redesign"
+  description: "Keep what works and fix what gets in the way. We simplify your content and rebuild around the actions your visitors need."
+  bullets:
+    - "Content and navigation review"
+    - "Custom visual direction"
+    - "Redirect planning"
+  number: "03"
+
+- title: "Speed audits"
+  description: "Find out what is slowing your site down. Get a practical report with fixes ordered by their likely impact."
+  bullets:
+    - "Mobile performance checks"
+    - "Asset and script review"
+    - "Prioritized recommendations"
+  number: "04"
+
+- title: "Hosting and care plans"
+  description: "Keep your site useful after launch. Choose a defined scope for updates, checks, and ongoing maintenance."
+  bullets:
+    - "Managed static hosting"
+    - "Scheduled health checks"
+    - "Agreed update allowance"
+  number: "05"
+
+- title: "Design systems"
+  description: "Make the next page easier to build. A small, documented set of reusable components keeps your website consistent."
+  bullets:
+    - "Type and color foundations"
+    - "Accessible UI components"
+    - "Practical usage guidelines"
+  number: "06"

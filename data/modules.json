@@ -1,0 +1,224 @@
+{
+  "hero": {
+    "name": "First impression",
+    "purpose": "Choose a clear promise and a useful next step.",
+    "variants": [
+      "split",
+      "centered",
+      "compact"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "action"
+    ],
+    "dependencies": []
+  },
+  "services": {
+    "name": "Services",
+    "purpose": "Explain the work and who it helps.",
+    "variants": [
+      "cards",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
+  },
+  "work": {
+    "name": "Selected work",
+    "purpose": "Show approved project imagery and context.",
+    "variants": [
+      "gallery",
+      "editorial"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": [
+      "work"
+    ]
+  },
+  "process": {
+    "name": "Process",
+    "purpose": "Make the next steps easy to understand.",
+    "variants": [
+      "steps",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
+  },
+  "about": {
+    "name": "About",
+    "purpose": "Introduce the business in its own words.",
+    "variants": [
+      "split",
+      "editorial"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "body"
+    ],
+    "dependencies": []
+  },
+  "team": {
+    "name": "People",
+    "purpose": "Show the accountable people behind the work.",
+    "variants": [
+      "cards",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
+  },
+  "faq": {
+    "name": "Questions",
+    "purpose": "Answer real questions before the first conversation.",
+    "variants": [
+      "accordion",
+      "open"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
+  },
+  "pricing": {
+    "name": "Scope & pricing",
+    "purpose": "Explain what an engagement includes.",
+    "variants": [
+      "cards",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  },
+  "areas": {
+    "name": "Service areas",
+    "purpose": "State confirmed coverage and travel boundaries.",
+    "variants": [
+      "cards",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  },
+  "testimonials": {
+    "name": "Client voices",
+    "purpose": "Use attributed feedback only with permission.",
+    "variants": [
+      "quotes",
+      "featured"
+    ],
+    "required": [
+      "title",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  },
+  "stats": {
+    "name": "At a glance",
+    "purpose": "Give context for evidence-backed numbers.",
+    "variants": [
+      "strip",
+      "cards"
+    ],
+    "required": [
+      "title",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  },
+  "cta": {
+    "name": "Next step",
+    "purpose": "Offer one clear action at the right moment.",
+    "variants": [
+      "band",
+      "quiet"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "action"
+    ],
+    "dependencies": []
+  },
+  "contact": {
+    "name": "Get in touch",
+    "purpose": "Explain contact options and delivery state.",
+    "variants": [
+      "panel",
+      "compact"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  },
+  "resources": {
+    "name": "Useful reading",
+    "purpose": "Help visitors prepare and make decisions.",
+    "variants": [
+      "cards",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
+  },
+  "comparison": {
+    "name": "Compare options",
+    "purpose": "Make scope differences easy to scan.",
+    "variants": [
+      "table",
+      "cards"
+    ],
+    "required": [
+      "title",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  },
+  "before-after": {
+    "name": "Before & after",
+    "purpose": "Explain a transformation with visible context.",
+    "variants": [
+      "panels",
+      "stacked"
+    ],
+    "required": [
+      "title",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  }
+}
