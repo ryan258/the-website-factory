@@ -1,0 +1,8 @@
+<section class="section">
+<div class="container">{{ partial "section.html" hugo.Data.site.process }}<ol class="process">{{ range $i, $step := hugo.Data.process }}<li>
+<span class="process__number">0{{ add $i 1 }}</span>
+<h3>{{ .title }}</h3>
+<p>{{ if $.detailed }}{{ .detail }}{{ else }}{{ .description }}{{ end }}</p>
+</li>{{ end }}</ol>
+</div>
+</section>

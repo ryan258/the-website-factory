@@ -1,0 +1,7 @@
+{{ $page := . }}
+{{ range hugo.Data.site.navigation }}
+{{ $key := strings.TrimSuffix "/" (strings.TrimPrefix "/" .url) | default "home" }}
+{{ if index (index hugo.Data.presets hugo.Data.factory.preset).pages $key }}
+<a href="{{ partial "url.html" .url }}"{{ if eq $page.RelPermalink (partial "url.html" .url) }} aria-current="page"{{ end }}>{{ .label }}</a>
+{{ end }}{{ end }}
+{{ if hugo.Data.factory.workshop }}<a href="{{ "site-kit/" | relURL }}"{{ if eq $page.Section "site-kit" }} aria-current="page"{{ end }}>Site kit</a>{{ end }}

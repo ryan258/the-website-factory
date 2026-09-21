@@ -1,0 +1,20 @@
+{{ if eq .kind "work" }}{{ $p := .page }}<article class="work-card">
+<a href="{{ $p.RelPermalink }}">{{ partial "picture.html" $p }}<div class="work-card__body">
+<div>
+<p class="eyebrow">{{ $p.Params.industry }}</p>
+<h3>{{ $p.Params.heading }} <span aria-hidden="true">↗</span>
+</h3>
+</div>
+<span class="work-card__result">{{ $p.Params.metrics.after_lcp }}<small>{{ $p.Params.metric_label }}</small>
+</span>
+</div>
+</a>
+</article>{{ else if eq .kind "plan" }}{{ with .item }}<article class="plan{{ if .popular }} plan--featured{{ end }}">{{ if .popular }}<p class="plan__badge">{{ hugo.Data.site.plans.popular_badge }}</p>{{ end }}<p class="eyebrow">{{ .title }}</p>
+<h2 class="plan__price">{{ .price }}</h2>
+<p>{{ .description }}</p>
+<ul>{{ range .bullets }}<li>{{ . }}</li>{{ end }}</ul>{{ partial "button.html" (dict "url" hugo.Data.site.primary_cta.url "label" (printf "Choose %s" .title) "secondary" (not .popular)) }}<p class="plan__note">{{ hugo.Data.site.plans.timing_prefix }} {{ .timing }}</p>
+</article>{{ end }}{{ else }}{{ with .item }}<article class="card">
+<span class="card__number">{{ .number }} /</span>
+<h3>{{ .title }}</h3>
+<p>{{ .description }}</p>{{ if $.full }}<ul>{{ range .bullets }}<li>{{ . }}</li>{{ end }}</ul>{{ else }}<a class="text-link" href="{{ "services/" | relURL }}">Explore service <span aria-hidden="true">↗</span>
+</a>{{ end }}</article>{{ end }}{{ end }}

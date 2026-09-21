@@ -1,0 +1,3 @@
+{{ $base := resources.Get "images/social-base.png" }}
+{{ $filter := images.Text (printf "%s\n\n%s\n\n%s" hugo.Data.site.name hugo.Data.site.social.heading hugo.Data.site.social.caption) (dict "color" "#ffffff" "size" 44 "x" 64 "y" 64) }}
+{{ return ($base.Filter $filter) }}

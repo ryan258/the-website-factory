@@ -1,0 +1,24 @@
+{{ partial "validate-site.html" . }}
+{{ $title := printf "%s — %s" .Title hugo.Data.site.name }}
+{{ $social := partial "social-image.html" . }}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ $title }}</title>
+<meta name="description" content="{{ .Description | default hugo.Data.site.description }}">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="{{ .Permalink }}">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ .Description | default hugo.Data.site.description }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:image" content="{{ $social.Permalink }}">
+<meta property="og:image:alt" content="{{ hugo.Data.site.name }}. {{ hugo.Data.site.social.heading }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $title }}">
+<meta name="twitter:description" content="{{ .Description | default hugo.Data.site.description }}">
+<meta name="twitter:image" content="{{ $social.Permalink }}">
+<link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | relURL }}">
+<link rel="preload" href="{{ hugo.Data.site.font.file | relURL }}" as="font" type="font/woff2" crossorigin>{{ $css := resources.Get "scss/main.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/main.css" "vars" (merge hugo.Data.site.theme (dict "font_family" hugo.Data.site.font.family "font_url" (hugo.Data.site.font.file | relURL)))) | minify | fingerprint "sha384" }}<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">{{ if eq .Section "site-kit" }}{{ $kitCSS := resources.Get "scss/workshop.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/workshop.css") | minify | fingerprint "sha384" }}<link rel="stylesheet" href="{{ $kitCSS.RelPermalink }}" integrity="{{ $kitCSS.Data.Integrity }}">{{ end }}{{ if eq .Section "contact" }}{{ $js := resources.Get "js/contact.js" | minify | fingerprint "sha384" }}<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer>
+</script>{{ end }}{{ if .IsHome }}{{ $org := dict "@context" "https://schema.org" "@type" "Organization" "name" hugo.Data.site.name "url" site.BaseURL "description" hugo.Data.site.description }}<script type="application/ld+json">{{ $org | jsonify | safeJS }}</script>{{ end }}

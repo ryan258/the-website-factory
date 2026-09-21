@@ -1,0 +1,3 @@
+{{ $url := partial "url.html" .action.url }}
+{{ if .preview }}{{ with index .targets .action.url }}{{ $url = . }}{{ end }}{{ end }}
+<a class="button{{ if .secondary }} button--outline{{ end }}" href="{{ $url }}">{{ .action.label }} <span aria-hidden="true">↗</span></a>

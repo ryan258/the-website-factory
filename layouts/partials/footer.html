@@ -1,0 +1,19 @@
+<footer class="footer">
+<div class="container">
+<div class="footer__top">
+<div>
+<a class="brand" href="{{ "" | relURL }}">{{ partial "mark.html" . }}<span>{{ hugo.Data.site.wordmark }}</span>
+</a>
+<p>{{ hugo.Data.site.tagline }}</p>
+</div>
+<nav aria-label="Footer navigation">{{ partial "nav.html" . }}</nav>
+</div>
+{{ if hugo.Data.factory.workshop }}<a class="workshop-link" href="{{ "site-kit/" | relURL }}">Explore the site kit <span aria-hidden="true">↗</span></a>{{ end }}
+<div class="footer__bottom">
+<span>© {{ now.Year }} {{ hugo.Data.site.wordmark }} {{ hugo.Data.site.notice }}</span>
+<span>{{ hugo.Data.site.address }}</span>
+<a href="{{ partial "url.html" hugo.Data.site.primary_cta.url }}">{{ hugo.Data.site.footer_cta }} <span aria-hidden="true">↗</span>
+</a>
+</div>
+</div>
+</footer>

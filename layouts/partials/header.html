@@ -1,0 +1,14 @@
+<header class="header">
+<div class="container header__inner">
+<a class="brand" href="{{ "" | relURL }}" aria-label="{{ hugo.Data.site.name }} home">{{ partial "mark.html" . }}<span>{{ hugo.Data.site.wordmark }}</span>
+</a>
+<nav class="header__nav" aria-label="Main navigation">{{ partial "nav.html" . }}</nav>
+<a class="button button--small header__cta" href="{{ partial "url.html" hugo.Data.site.primary_cta.url }}">{{ hugo.Data.site.primary_cta.label }} <span aria-hidden="true">↗</span>
+</a>
+<details class="mobile-menu">
+<summary>Menu <span aria-hidden="true">＋</span>
+</summary>
+<nav aria-label="Mobile navigation">{{ partial "nav.html" . }}</nav>
+</details>
+</div>
+</header>

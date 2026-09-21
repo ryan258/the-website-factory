@@ -1,0 +1,6 @@
+{{ if not hugo.Data.site.name }}{{ errorf "data/site.yaml: name is required" }}{{ end }}
+{{ range $key, $value := hugo.Data.site.theme }}{{ if not (findRE "^#[0-9a-fA-F]{6}$" $value) }}{{ errorf "data/site.yaml: theme.%s must be a six-digit hex color" $key }}{{ end }}{{ end }}
+{{ if not (findRE "^[A-Za-z][A-Za-z0-9 -]*$" hugo.Data.site.font.family) }}{{ errorf "font.family must be a plain font family name" }}{{ end }}
+{{ if or (in hugo.Data.site.font.file "..") (not (findRE "^fonts/[A-Za-z0-9_.-]+\\.woff2$" hugo.Data.site.font.file)) }}{{ errorf "font.file must be a local fonts/*.woff2 path" }}{{ end }}
+{{ if not (os.FileExists (printf "static/%s" hugo.Data.site.font.file)) }}{{ errorf "configured local font does not exist" }}{{ end }}
+{{ range hugo.Data.site.navigation }}{{ if not (findRE "^/([^/].*)?$" .url) }}{{ errorf "navigation URL must be a local path: %s" .url }}{{ end }}{{ end }}

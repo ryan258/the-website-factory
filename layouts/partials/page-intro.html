@@ -1,0 +1,5 @@
+<section class="page-intro container">
+<p class="eyebrow">{{ .Section | humanize }} / {{ hugo.Data.site.name }}</p>
+<h1>{{ .Params.heading | default .Title }}</h1>
+<p>{{ .Params.intro }}</p>
+</section>

@@ -1,0 +1,43 @@
+{{ $m := .module }}{{ $v := .variant }}{{ $d := .data }}{{ $registry := index hugo.Data.modules $m }}
+{{ if not $registry }}{{ errorf "Unknown module %s" $m }}{{ end }}
+{{ if not (in $registry.variants $v) }}{{ errorf "%s: unsupported variant %s" $m $v }}{{ end }}
+{{ range $registry.required }}{{ if not (index $d .) }}{{ errorf "%s: required content field %s is missing" $m . }}{{ end }}{{ end }}
+<section id="{{ .id }}" class="fm fm--{{ $m }} fm--{{ $v }}{{ if .hero }} fm--lead{{ end }}" data-module="{{ $m }}" data-variant="{{ $v }}">
+<div class="container">
+{{ if eq $m "hero" }}
+<div class="fm-hero-grid"><div class="fm-hero-copy">
+<p class="eyebrow"><span class="factory-dot" aria-hidden="true"></span> {{ $d.label }}</p>
+{{ if .hero }}<h1>{{ $d.title }}</h1>{{ else }}<h2>{{ $d.title }}</h2>{{ end }}
+<p class="fm-intro">{{ $d.intro }}</p>
+{{ if ne $v "compact" }}<div class="button-group">{{ partial "factory/action.html" (dict "action" $d.action "preview" .preview "targets" .targets) }}{{ with $d.secondary }}{{ partial "factory/action.html" (dict "action" . "secondary" true "preview" $.preview "targets" $.targets) }}{{ end }}</div>{{ end }}
+{{ with $d.note }}<p class="caption">{{ . }}</p>{{ end }}</div>
+{{ if eq $v "split" }}<div class="fm-art">{{ if eq $d.art "factory" }}{{ partial "hero-art.html" .page }}{{ else }}<div class="abstract-art abstract-art--{{ $d.art }}" aria-hidden="true"><div class="abstract-art__grid"></div><span class="abstract-art__shape"></span><span class="abstract-art__shape second"></span><span class="abstract-art__line"></span><span class="abstract-art__caption">FORM / FUNCTION<br>BUILT WITH INTENTION</span><span class="abstract-art__number">01—04</span></div>{{ end }}</div>{{ end }}</div>
+{{ else if eq $m "cta" }}
+<div class="fm-cta"><div><p class="eyebrow">{{ $d.label }}</p><h2>{{ $d.title }}</h2><p>{{ $d.intro }}</p></div>{{ partial "factory/action.html" (dict "action" $d.action "preview" .preview "targets" .targets) }}</div>
+{{ else }}
+<div class="fm-heading"><p class="eyebrow">{{ $d.label }}</p><h2>{{ $d.title }}</h2>{{ with $d.intro }}<p>{{ . }}</p>{{ end }}</div>
+{{ if eq $m "about" }}
+<div class="fm-about"><p class="fm-body">{{ $d.body }}</p><aside><span aria-hidden="true">↗</span><p>{{ $d.aside }}</p></aside></div>
+{{ else if eq $m "faq" }}
+<div class="fm-faq">{{ range $d.items }}{{ if eq $v "accordion" }}<details><summary>{{ .title }}</summary><p>{{ .text }}</p></details>{{ else }}<article><h3>{{ .title }}</h3><p>{{ .text }}</p></article>{{ end }}{{ end }}</div>
+{{ else if and (eq $m "comparison") (eq $v "table") }}
+<div class="table-scroll" tabindex="0" role="region" aria-label="Compare example scopes"><table><caption>Illustrative engagement options</caption><thead><tr><th scope="col">Option</th><th scope="col">Scope</th><th scope="col">Best suited to</th></tr></thead><tbody>{{ range $d.items }}<tr><th scope="row">{{ .title }}</th><td>{{ .scope }}</td><td>{{ .best }}</td></tr>{{ end }}</tbody></table></div>
+{{ else }}
+{{ if eq $m "process" }}<ol class="fm-grid fm-list">{{ else }}<div class="fm-grid">{{ end }}
+{{ range $i, $item := $d.items }}
+{{ if eq $m "process" }}<li class="fm-card">{{ else }}<article class="fm-card">{{ end }}
+{{ if eq $m "work" }}{{ with .image }}{{ $img := resources.Get . }}{{ if not $img }}{{ errorf "Missing module image: %s" . }}{{ else }}{{ $small := $img.Resize "560x webp q80" }}{{ $large := $img.Resize "1120x webp q80" }}<img src="{{ $small.RelPermalink }}" srcset="{{ $small.RelPermalink }} 560w, {{ $large.RelPermalink }} 1120w" sizes="(min-width: 900px) 540px, 100vw" width="{{ $small.Width }}" height="{{ $small.Height }}" alt="{{ $item.title }} — fictional project design" loading="lazy" decoding="async">{{ end }}{{ end }}{{ end }}
+{{ if eq $m "team" }}<div class="fm-avatar" aria-hidden="true">{{ .initials }}</div>{{ end }}
+{{ if in (slice "services" "process" "resources") $m }}<span class="fm-index" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span>{{ end }}
+{{ if eq $m "testimonials" }}<blockquote><p>{{ .text }}</p><footer>{{ .title }}</footer></blockquote>
+{{ else if eq $m "stats" }}<p class="fm-stat">{{ .text }}</p><h3>{{ .title }}</h3>
+{{ else }}<h3>{{ .title }}</h3>{{ with .value }}<p class="fm-value">{{ . }}</p>{{ end }}<p>{{ .text }}</p>{{ with .scope }}<p>{{ . }}</p>{{ end }}{{ with .best }}<p class="caption">For: {{ . }}</p>{{ end }}
+{{ with .bullets }}<ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
+{{ with .url }}<a class="text-link" href="{{ if and $.preview (index $.targets .) }}{{ index $.targets . }}{{ else }}{{ partial "url.html" . }}{{ end }}">{{ if eq $m "work" }}View {{ $item.title }}{{ else }}Explore {{ $item.title }}{{ end }} <span aria-hidden="true">↗</span></a>{{ end }}{{ end }}
+{{ if eq $m "process" }}</li>{{ else }}</article>{{ end }}
+{{ end }}
+{{ if eq $m "process" }}</ol>{{ else }}</div>{{ end }}
+{{ end }}
+{{ with $d.notice }}<p class="fm-notice">{{ . }}</p>{{ end }}
+{{ end }}
+</div></section>

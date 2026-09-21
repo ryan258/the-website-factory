@@ -1,0 +1,54 @@
+<div>
+<div class="notice">{{ if site.Params.formEnabled }}Demo form: submissions are processed by Netlify. Do not include sensitive information.{{ else }}Local preview: message delivery is not enabled. You can explore the form; nothing will be sent.{{ end }}</div>
+<form class="contact-form" name="project-enquiry" method="POST" action="{{ "contact/received/" | relURL }}" data-netlify="true" netlify-honeypot="website" data-enabled="{{ site.Params.formEnabled }}">
+<input type="hidden" name="form-name" value="project-enquiry">
+<p hidden>
+<label>Leave this field empty <input name="website" tabindex="-1" autocomplete="off">
+</label>
+</p>
+<p class="caption">All fields are required unless marked optional.</p>
+<div class="form-grid">
+<div>
+<label for="name">Your name</label>
+<input id="name" name="name" autocomplete="name" required maxlength="120" aria-describedby="name-help">
+<small id="name-help">The name we should use in our reply.</small>
+</div>
+<div>
+<label for="email">Email address</label>
+<input id="email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="email-help">
+<small id="email-help">Use an address in the format name@example.com.</small>
+</div>
+</div>
+<label for="company">Company <span>(optional)</span>
+</label>
+<input id="company" name="company" autocomplete="organization" maxlength="160">
+<div class="form-grid">
+<div>
+<label for="project-type">Project type</label>
+<select id="project-type" name="project-type" required aria-describedby="type-help">
+<option value="">Select a project type</option>{{ range hugo.Data.services }}<option>{{ .title }}</option>{{ end }}<option>Not sure yet</option>
+</select>
+<small id="type-help">Choose the closest match.</small>
+</div>
+<div>
+<label for="budget">Budget range</label>
+<select id="budget" name="budget" required aria-describedby="budget-help">
+<option value="">Select a range</option>
+{{ range hugo.Data.contact.budgets }}<option>{{ . }}</option>{{ end }}
+</select>
+<small id="budget-help">{{ hugo.Data.contact.budget_help }}</small>
+</div>
+</div>
+<label for="message">Tell us about your project</label>
+<textarea id="message" name="message" rows="6" required maxlength="5000" aria-describedby="message-help">
+</textarea>
+<small id="message-help">What do you need help with? Include timing if you know it.</small>
+<p id="form-status" role="status" aria-live="polite" tabindex="-1">
+</p>
+<p id="form-error" role="alert" tabindex="-1" hidden>
+</p>
+<button class="button" type="submit"{{ if not site.Params.formEnabled }} disabled{{ end }}>Send project enquiry <span aria-hidden="true">↗</span>
+</button>
+<p class="caption">{{ if site.Params.formEnabled }}Your details are used to respond to this enquiry. No mailing list or tracking.{{ else }}Submission is disabled until a host and form destination are configured.{{ end }}</p>
+</form>
+</div>

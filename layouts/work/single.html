@@ -1,0 +1,35 @@
+{{ define "main" }}
+{{ $page := . }}{{ range slice "before_score" "after_score" "before_lcp" "after_lcp" "before_weight" "after_weight" }}{{ if not (isset $page.Params.metrics .) }}{{ errorf "%s: metrics.%s is required" $page.File.Path . }}{{ end }}{{ end }}{{ partial "page-intro.html" . }}<article class="container case-study">
+<p class="notice">{{ hugo.Data.site.case_notice }}</p>{{ partial "picture.html" . }}<div class="prose section">{{ .Content }}<h2>Speed, by design.</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Illustrative speed comparison">
+<table>
+<caption>Sample mobile performance comparison</caption>
+<thead>
+<tr>
+<th scope="col">Metric</th>
+<th scope="col">Before</th>
+<th scope="col">After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">Lighthouse performance</th>
+<td>{{ .Params.metrics.before_score }}</td>
+<td>{{ .Params.metrics.after_score }}</td>
+</tr>
+<tr>
+<th scope="row">Largest Contentful Paint</th>
+<td>{{ .Params.metrics.before_lcp }}</td>
+<td>{{ .Params.metrics.after_lcp }}</td>
+</tr>
+<tr>
+<th scope="row">Page weight</th>
+<td>{{ .Params.metrics.before_weight }}</td>
+<td>{{ .Params.metrics.after_weight }}</td>
+</tr>
+</tbody>
+</table>
+</div>
+<a class="text-link" href="{{ "work/" | relURL }}">← Back to all work</a>
+</div>
+</article>{{ partial "cta.html" . }}{{ end }}
