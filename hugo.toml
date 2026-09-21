@@ -1,0 +1,11 @@
+baseURL = 'https://example.invalid/'
+locale = 'en'
+enableRobotsTXT = true
+disableKinds = ['taxonomy', 'term', 'RSS']
+[params]
+  formEnabled = false
+[security.exec]
+  osEnv = ['(?i)^(PATH|PATHEXT|APPDATA|TMP|TEMP|TERM|GO\w+|HOME|USERPROFILE|SYSTEMROOT|LOCALAPPDATA)$']
+
+[caches.misc]
+  dir = ":resourceDir/_gen/misc"

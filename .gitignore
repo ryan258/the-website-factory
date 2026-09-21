@@ -1,0 +1,10 @@
+public/
+resources/
+.hugo_build.lock
+.tools/
+node_modules/
+.DS_Store
+reports/
+
+__pycache__/
+*.py[cod]

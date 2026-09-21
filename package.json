@@ -1,0 +1,16 @@
+{
+  "name": "website-client-starter",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Optional local website quality tools; not required for Hugo builds",
+  "scripts": {
+    "check:browser": "node scripts/browser-checks.cjs",
+    "audit": "node scripts/audit.mjs",
+    "test:starter": "python3 scripts/test_starter.py"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "lighthouse": "13.5.0",
+    "playwright": "1.62.1"
+  }
+}
