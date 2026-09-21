@@ -4,7 +4,7 @@ const {AxeBuilder}=require('@axe-core/playwright');
 const fs=require('node:fs');
 const path=require('node:path');
 const ROOT=path.resolve(__dirname,'..');
-const base=process.env.PREVIEW_URL||'http://127.0.0.1:14732/';
+const base=process.env.PREVIEW_URL||'http://127.0.0.1:14722/';
 (async()=>{
  const browser=await chromium.launch({headless:true});
  const results=[];const failures=[];
@@ -23,8 +23,15 @@ const base=process.env.PREVIEW_URL||'http://127.0.0.1:14732/';
     widths.push({width,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)});
    }
    const variants=await page.locator('.kit-variant').count();
-   results.push({mode,variants,violations:axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})),widths});
-   if(axe.violations.length||variants!==33||widths.some(w=>w.overflow))failures.push('expanded '+mode);
+    results.push({mode,variants,violations:axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})),widths});
+    if(axe.violations.length||variants!==41||widths.some(w=>w.overflow))failures.push('expanded '+mode);
+  }
+  await page.goto(base+'site-kit/style-guide/');
+  const sgAxe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
+  if(sgAxe.violations.length)failures.push('style guide a11y: '+sgAxe.violations.map(v=>v.id).join(','));
+  for(const width of [320,390,600,900,1200]){
+    await page.setViewportSize({width,height:900});
+    if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))failures.push(`style guide overflow at ${width}px`);
   }
   await page.setViewportSize({width:1440,height:1000});await page.emulateMedia({colorScheme:'light'});
   await page.goto(base+'site-kit/');await page.screenshot({path:path.join(out,'workshop-desktop.png'),fullPage:true});
@@ -50,8 +57,8 @@ const base=process.env.PREVIEW_URL||'http://127.0.0.1:14732/';
   await p.goto(base+'contact/received/');
   if(!await p.getByText('Message delivery is disabled', {exact:false}).isVisible())failures.push('honest receipt');
   if(errors.length)failures.push(...errors);
-  fs.writeFileSync(path.join(out,'workshop-checks.json'),JSON.stringify({results,failures,keyboard:'native catalog and FAQ',noJavaScript:'catalog and contact'},null,2));
-  console.log(`33 expanded variants, two themes, five widths, keyboard, no-JS and preview contact paths: ${failures.length?'FAILED '+failures.join(', '):'passed'}`);
+  fs.writeFileSync(path.join(out,'workshop-checks.json'),JSON.stringify({results,failures,keyboard:'native catalog and FAQ',noJavaScript:'catalog and contact',styleGuide:'zero a11y violations'},null,2));
+  console.log(`41 expanded variants, living style guide, two themes, five widths, keyboard, no-JS and preview contact paths: ${failures.length?'FAILED '+failures.join(', '):'passed'}`);
   process.exitCode=failures.length?1:0;
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
