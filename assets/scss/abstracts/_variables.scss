@@ -1,0 +1,6 @@
+@use 'hugo:vars' as brand;
+$ink: brand.$ink; $paper: brand.$paper; $mist: brand.$mist; $line: brand.$line; $accent: brand.$accent; $link: brand.$link;
+$font: brand.$font_family, Arial, sans-serif;
+$spaces: (1: 4px, 2: 8px, 3: 16px, 4: 24px, 5: 32px, 6: 48px, 7: 64px, 8: 96px);
+$breakpoints: (small: 600px, medium: 900px, large: 1200px);
+$width: 1120px; $reading: 65ch;
