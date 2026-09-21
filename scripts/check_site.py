@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""Check generated HTML, metadata, local references, and compressed asset budgets."""
+import argparse
+import gzip
+from html.parser import HTMLParser
+from pathlib import Path
+import sys
+from urllib.parse import unquote, urlparse
+
+ROOT = Path(__file__).resolve().parents[1]
+class Page(HTMLParser):
+    def __init__(self):
+        super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]
+    def handle_starttag(self, tag, attrs):
+        a=dict(attrs)
+        if tag=='h1': self.h1+=1
+        if tag=='title': self.in_title=True
+        if 'id' in a: self.ids.append(a['id'])
+        if tag=='meta': self.meta[a.get('name','')]=a.get('content','')
+        if tag=='link' and a.get('rel')=='canonical': self.canonical=a.get('href','')
+        if tag=='a' and a.get('href'): self.refs.append(a['href'])
+        if tag in ('img','script') and a.get('src'): self.refs.append(a['src'])
+        if tag=='link' and a.get('rel') in ('stylesheet','preload','icon','apple-touch-icon'): self.refs.append(a.get('href',''))
+    def handle_endtag(self, tag):
+        if tag=='title': self.in_title=False
+    def handle_data(self, value):
+        if self.in_title:self.title+=value
+
+def check(output):
+    errors=[]; pages={}
+    for file in output.rglob('*.html'):
+        p=Page();p.feed(file.read_text());pages[file.resolve()]=p
+    if not pages:return ['No generated HTML found. Run scripts/build.py first.']
+    for field in ('title','canonical'):
+        values=[getattr(p,field) for p in pages.values()]
+        if len(set(values))!=len(values) or not all(values): errors.append(f'{field}: empty or duplicate values')
+    descriptions=[p.meta.get('description','') for p in pages.values()]
+    if not all(descriptions) or len(set(descriptions))!=len(descriptions):errors.append('Descriptions: empty or duplicate values')
+    for file,p in pages.items():
+        label=str(file.relative_to(output))
+        if p.h1!=1:errors.append(f'{label}: expected one H1')
+        if len(p.title)>=60:errors.append(f'{label}: title must be under 60 characters')
+        if len(p.meta.get('description',''))>=155:errors.append(f'{label}: description must be under 155 characters')
+        if p.meta.get('robots')!='noindex':errors.append(f'{label}: noindex missing')
+        if len(set(p.ids))!=len(p.ids):errors.append(f'{label}: duplicate IDs')
+        base=urlparse(p.canonical)
+        rel=file.relative_to(output).as_posix()
+        suffix='/' if rel=='index.html' else '/'+rel.removesuffix('index.html')
+        prefix=base.path[:-len(suffix)] if base.path.endswith(suffix) else ''
+        for ref in p.refs:
+            u=urlparse(ref)
+            if u.scheme or u.netloc:continue
+            path=unquote(u.path)
+            if path.startswith('/'):
+                if prefix and not path.startswith(prefix+'/'):
+                    errors.append(f'{label}: reference escapes base path: {ref}')
+                    continue
+                if prefix:path=path[len(prefix):]
+                target=(output/path.lstrip('/')).resolve()
+            elif path:target=(file.parent/path).resolve()
+            else:target=file
+            if target.is_dir():target=target/'index.html'
+            if not target.exists():errors.append(f'{label}: missing {ref}')
+            elif u.fragment and target in pages and unquote(u.fragment) not in pages[target].ids:errors.append(f'{label}: missing anchor {ref}')
+    for directory,extension,budget in [('css','css',20000),('js','js',5000)]:
+        sizes=[len(gzip.compress(p.read_bytes())) for p in (output/directory).glob('*.'+extension)]
+        # Old content hashes may coexist in public; assess each emitted bundle.
+        if any(size>=budget for size in sizes):errors.append(f'{directory}: compressed bundle exceeds {budget} bytes')
+    return errors
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('output',nargs='?',default=str(ROOT/'public'));args=parser.parse_args()
+    errors=check(Path(args.output).resolve())
+    if errors:print('\n'.join(errors),file=sys.stderr);return 1
+    print('Static checks passed: unique metadata, H1, noindex, references, anchors, and compressed CSS/JS budgets.');return 0
+if __name__=='__main__':sys.exit(main())
