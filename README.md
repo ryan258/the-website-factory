@@ -14,7 +14,7 @@ This adopts the master-and-sculpt approach used in the sibling `jones-constructi
 
 **Client review:** open `/site-kit/` to compare the agency, contractor, consultant, and local-service compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
-See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
+See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical client plays, vertical presets, and monetization ideas. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
 
 ## The kitchen-sink master
 
