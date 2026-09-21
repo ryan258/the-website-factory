@@ -4,11 +4,11 @@
 
 **Current Baseline (2026-09-21):**
 - **Architecture & Build:** Pinned Hugo Extended 0.166.0 + Dart Sass 1.104.1 via Hugo Pipes (`@use`, css.Sass, `hugo:vars`). System-independent Python build helper (`scripts/build.py`) with manifest-based output reconciliation and unselected page pruning.
-- **Component & Module Library:** 16 module families spanning 33 variants across heroes, services, case studies, team/business credentials, process steps, FAQs, pricing, and contact modules. Contracts enforced via `data/modules.json`.
-- **Visual Workshop:** Live interactive workshop at `/site-kit/` showcasing all 33 variants with native disclosure controls, full keyboard accessibility, zero JavaScript dependencies, and live multi-preset previews.
+- **Component & Module Library:** 20 module families spanning 41 variants across heroes, services, features, case studies, logos/partners, team/business credentials, process steps, timeline/milestones, bento clusters, FAQs, pricing, comparison, and contact modules. Contracts enforced via `data/modules.json`.
+- **Visual Workshop & Living Style Guide:** Live interactive workshop at `/site-kit/` showcasing all 41 variants with native disclosure controls, plus an interactive Living Style Guide at `/site-kit/style-guide/` detailing design tokens, typography specimens, spacing scales, and atomic UI primitives.
 - **Business Presets:** 4 foundational business archetypes (`agency`, `contractor`, `consultant`, `local-service`) defined in `data/presets/*.json`.
 - **Scaffolding Engine (`scripts/new_site.py`):** Deterministic creation of independent client copies, stripping the workshop, unused presets, unselected page trees, and unreferenced project images while enforcing disabled delivery and `noindex`.
-- **Verification Harness:** Deterministic test suites (`scripts/test_factory.py`, `scripts/test_starter.py`, `scripts/check_site.py`) validating JSON schema, asset integrity, link resolution, subpath deployments, and negative edge cases. Playwright/axe browser audit scripts (`scripts/check_workshop.cjs`, `scripts/browser-checks.cjs`).
+- **Verification Harness:** Deterministic test suites (`scripts/test_factory.py`, `scripts/test_starter.py`, `scripts/check_site.py`) validating JSON schema, asset integrity, link resolution, subpath deployments, and negative edge cases. Playwright/axe browser audit scripts (`scripts/check_workshop.cjs`, `scripts/browser-checks.cjs`) verifying 41 variants, style guide accessibility, and zero overflow.
 
 ---
 
@@ -33,6 +33,11 @@
 - 4 business archetype presets (`agency`, `contractor`, `consultant`, `local-service`).
 - Selective page copying and asset tree pruning in `scripts/new_site.py` and `scripts/build.py`.
 - Manifest-tracked build output reconciliation protecting untracked and owner-modified files.
+
+### Milestone 4: Living Style Guide & Kitchen-Sink Expansion
+- Expanded component collection to 20 module families / 41 variants with additions of `features` (grid, split), `logos` (grid, inline), `timeline` (vertical, cards), and `bento` (mosaic, compact).
+- Dedicated interactive Living Style Guide at `/site-kit/style-guide/` covering color swatches (light/dark semantics and archetype tone accents), fluid typography specimens, 8-step spacing visualizer, buttons, badges, card primitives, form controls, tables, and native disclosures.
+- Automated Playwright/axe WCAG A/AA validation covering all 41 variants and the style guide page across 320px–1200px viewports with zero horizontal overflow.
 
 ---
 

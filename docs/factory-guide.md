@@ -1,6 +1,6 @@
 # Sculpt a client website
 
-The master includes four fictional business compositions and a visual catalog at `/site-kit/`. The catalog renders the same components as the client sites. It is a review surface, not an additional client page.
+The master includes four fictional business compositions, a visual catalog at `/site-kit/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are review surfaces, not additional client pages.
 
 ## Start a separate copy
 

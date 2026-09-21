@@ -10,9 +10,9 @@ The guiding principle is **broad capability, intentional defaults, easy subtract
 
 This adopts the master-and-sculpt approach used in the sibling `jones-construction` project. Shared patterns can inform this implementation; contractor-specific content, business claims, approvals, and integrations must remain specific to their client.
 
-**Available now:** 16 module families with 33 variants, a visual workshop at `/site-kit/`, four business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has six main pages, four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
+**Available now:** 20 module families with 41 variants, a visual workshop at `/site-kit/`, an interactive Living Style Guide at `/site-kit/style-guide/`, four business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has six main pages, four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
 
-**Client review:** open `/site-kit/` to compare the agency, contractor, consultant, and local-service compositions. Open a catalog row to inspect its live variants. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
+**Client review:** open `/site-kit/` to compare the agency, contractor, consultant, and local-service compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
 See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
 
@@ -26,16 +26,20 @@ The library includes these section families:
 | --- | --- |
 | Hero and introduction | Text-led, split image, project-led, and compact introductions |
 | Services | Cards, detailed service sections, comparisons, and related services |
+| Features and capabilities | 3-column feature cards with bullets and alternating split graphic rows |
 | Work and proof | Project galleries, case studies, before/after comparisons, testimonials, and supported results |
+| Social proof and logos | Partner/client grid marks and subtle inline accreditation bars |
 | People and business | About, team, values, credentials, and service areas |
 | Process and answers | Process steps, FAQs, preparation guidance, and useful resources |
+| Timeline and milestones | Connected vertical milestone spines and phase cards |
+| Bento showcase | Asymmetric mosaic clusters and compact proof cards |
 | Offers and contact | Pricing or scope guidance, calls to action, contact details, and inquiry forms |
 
 Every module has a stable identifier, a clear purpose, documented content inputs, supported variants, dependencies, and an example. Required content is validated before a build; optional copy is omitted when absent. Sample testimonials, credentials, prices, coverage, and results remain clearly fictional until replaced with supported business facts.
 
-### Visual workshop
+### Visual workshop and Living Style Guide
 
-The `/site-kit/` catalog shows the available modules and their variants with realistic example content. Each entry explains its purpose and required content and renders every supported variant using the production component. Native disclosure controls work with a keyboard and without JavaScript.
+The `/site-kit/` catalog shows the available modules and their variants with realistic example content. The living style guide at `/site-kit/style-guide/` documents design tokens (colors, fluid typography specimens, 8-step spacing scale) and atomic UI primitives (buttons, badges, marks, cards, forms, tables, and native disclosures). Native disclosure controls work with a keyboard and without JavaScript.
 
 The workshop is a development and review surface. Client copies exclude it from emitted pages, navigation, search, and sitemaps. Keep the reference homepage a deliberate composition that demonstrates the design.
 

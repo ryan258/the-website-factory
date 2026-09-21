@@ -2,18 +2,18 @@
 
 ## Ready for local client demonstrations
 
-The master now includes 16 module families, 33 rendered variants, four fictional business compositions, and a visual workshop. The agency composition has six main pages, four case studies, and a contact receipt page. The workshop adds its catalog and four composition previews: 16 HTML pages in the complete review build.
+The master now includes 20 module families, 41 rendered variants, four fictional business compositions, an interactive Living Style Guide, and a visual workshop. The agency composition has six main pages, four case studies, and a contact receipt page. The workshop adds its catalog, living style guide, and four composition previews: 17 HTML pages in the complete review build.
 
-The client-copy command selects a preset, excludes the workshop and unused presets, removes unselected page trees, resets identity/contact configuration, and retains disabled delivery and noindex. Non-agency copies omit the agency project images and case studies. This is readiness for a local design review, not approval to publish a real business website.
+The client-copy command selects a preset, excludes the workshop, style guide, and unused presets, removes unselected page trees, resets identity/contact configuration, and retains disabled delivery and noindex. Non-agency copies omit the agency project images and case studies. This is readiness for a local design review, not approval to publish a real business website.
 
 ## Measured verification
 
 - Hugo Extended 0.166.0 and Dart Sass 1.104.1: isolated production-shaped build with no warnings; all generated pages pass metadata, H1, noindex, link, anchor, duplicate-ID, and bundle-budget checks.
 - Six focused factory tests pass. They build all four client presets at both root and `/client/` URLs, test actual section reordering and omission, remove a previously generated page on rebuild, and verify workshop exclusion. Invalid module names, variants, missing content, missing dependencies, broken/unsafe links, and misplaced heroes fail without replacing the previous output. Unknown output files are preserved.
 - Four existing starter regression tests pass, including a branded copy with edited colors and case metrics, refusal to overwrite an existing destination, and intentional broken-link detection.
-- Eleven affected routes pass automated Chromium checks: Home, Services, About, Pricing, Work, Contact, the workshop, and four preset previews. Each was checked in light/dark modes at 320, 600, 900, and 1200 pixels. Axe's WCAG A/AA checks report no violations; each page has one H1 and no horizontal document overflow.
-- All 33 expanded workshop variants pass axe checks in both themes and overflow checks at 320, 390, 600, 900, and 1200 pixels. Native catalog and FAQ controls respond to Enter. The catalog and disabled contact page work with JavaScript disabled. Preview contact links stay inside their fictional composition, and the receipt page does not imply an actual submission.
-- Current compressed styles: shared main CSS approximately 4.9 KB; workshop-only CSS approximately 1.3 KB. The workshop stylesheet is not loaded by client pages. Contact remains the only page with executable application JavaScript.
+- Twelve affected routes pass automated Chromium checks: Home, Services, About, Pricing, Work, Contact, the workshop, living style guide, and four preset previews. Each was checked in light/dark modes at 320, 600, 900, and 1200 pixels. Axe's WCAG A/AA checks report no violations; each page has one H1 and no horizontal document overflow.
+- All 41 expanded workshop variants pass axe checks in both themes and overflow checks at 320, 390, 600, 900, and 1200 pixels. Native catalog and FAQ controls respond to Enter. The catalog, style guide, and disabled contact page work with JavaScript disabled. Preview contact links stay inside their fictional composition, and the receipt page does not imply an actual submission.
+- Current compressed styles: shared main CSS approximately 5.5 KB; workshop-only CSS approximately 2.0 KB. The workshop stylesheet is not loaded by client pages. Contact remains the only page with executable application JavaScript.
 - Screenshots for the workshop and all four business compositions are saved under `reports/` for visual review.
 
 Evidence files: `reports/factory-browser-checks.json`, `reports/factory-workshop-checks.json`, and the desktop/mobile PNGs. Test results were measured locally; no external form submission was sent.
