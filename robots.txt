@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ryan258.github.io/the-website-factory/sitemap.xml
