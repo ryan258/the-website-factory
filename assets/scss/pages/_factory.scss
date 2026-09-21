@@ -79,5 +79,53 @@
 .preview-bar { border-bottom: 1px solid var(--line); background: var(--mist); padding-block: 14px; font-size: .75rem; }
 .preview-bar .container { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; }
 .preview-bar a { min-height: 32px; display: inline-flex; align-items: center; text-underline-offset: 4px; }
-@media (min-width: 600px) { .fm-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .fm--rows .fm-card { grid-template-columns: .7fr 1fr; } .fm--rows .fm-index { grid-column: 1/-1; } }
-@media (min-width: 900px) { .fm--split .fm-hero-grid { grid-template-columns: 1.1fr 1fr; } .fm--services.fm--cards .fm-grid,.fm--pricing.fm--cards .fm-grid,.fm--areas.fm--cards .fm-grid,.fm--stats .fm-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } .fm--steps .fm-grid { grid-template-columns: repeat(4,minmax(0,1fr)); } .fm-about { grid-template-columns: 1.2fr 1fr; } }
+
+/* Features module */
+.fm-features-split { display: grid; gap: 40px; }
+.fm-features-row { display: grid; gap: 24px; border-top: 1px solid var(--line); padding-top: 32px; align-items: center; }
+.fm-features-panel { background: var(--mist); border: 1px solid var(--line); padding: clamp(24px,4vw,40px); min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+.fm-features-badge { font-size: .75rem; font-weight: 600; color: var(--ink); }
+.fm-features-bar { height: 6px; width: 64px; background: var(--accent); border-radius: 3px; }
+
+/* Logos module */
+.fm-logos-inline { display: flex; flex-wrap: wrap; gap: 20px 40px; align-items: center; padding-block: 24px; border-block: 1px solid var(--line); }
+.fm-logo-badge { display: flex; align-items: baseline; gap: 10px; font-size: .85rem; }
+.fm-logo-badge strong { color: var(--ink); }
+.fm-logo-badge p { color: var(--muted); font-size: .8rem; margin: 0; }
+.fm-logo-mark { color: var(--accent); font-size: .7rem; }
+
+/* Timeline module */
+.fm-timeline-vertical { list-style: none; padding: 0; margin: 0; max-width: 760px; }
+.fm-timeline-step { display: grid; grid-template-columns: 28px 1fr; gap: 24px; }
+.fm-timeline-spine { display: flex; flex-direction: column; align-items: center; }
+.fm-timeline-node { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--paper); box-shadow: 0 0 0 2px var(--line); margin-top: 6px; }
+.fm-timeline-line { flex: 1; width: 2px; background: var(--line); min-height: 48px; }
+.fm-timeline-step:last-child .fm-timeline-line { display: none; }
+.fm-timeline-body { padding-bottom: 40px; }
+.fm-timeline-phase { display: inline-block; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+.fm-timeline-body h3 { margin-bottom: 12px; font-size: 1.25rem; }
+
+/* Bento module */
+.fm-bento { display: grid; gap: 24px; }
+.fm-bento-card { min-width: 0; border: 1px solid var(--line); padding: clamp(24px,3.5vw,36px); background: var(--paper); display: flex; flex-direction: column; justify-content: space-between; }
+.fm-bento-card h3 { margin-bottom: 14px; font-size: 1.3rem; letter-spacing: -.03em; }
+.fm-badge { align-self: flex-start; font-size: .7rem; font-weight: 600; padding: 4px 10px; background: var(--mist); border: 1px solid var(--line); border-radius: 999px; margin-bottom: 20px; color: var(--ink); }
+
+@media (min-width: 600px) {
+  .fm-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .fm--rows .fm-card { grid-template-columns: .7fr 1fr; }
+  .fm--rows .fm-index { grid-column: 1/-1; }
+  .fm-features-row { grid-template-columns: 1.1fr 1fr; }
+  .fm-features-row--alt { direction: rtl; }
+  .fm-features-row--alt > * { direction: ltr; }
+  .fm-bento--mosaic { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .fm-bento--mosaic .fm-bento--large { grid-column: 1/-1; }
+}
+@media (min-width: 900px) {
+  .fm--split .fm-hero-grid { grid-template-columns: 1.1fr 1fr; }
+  .fm--services.fm--cards .fm-grid,.fm--pricing.fm--cards .fm-grid,.fm--areas.fm--cards .fm-grid,.fm--stats .fm-grid,.fm--features.fm--grid .fm-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .fm--steps .fm-grid,.fm--timeline.fm--cards .fm-grid,.fm-timeline-cards.fm-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .fm-about { grid-template-columns: 1.2fr 1fr; }
+  .fm-bento--mosaic { grid-template-columns: 1.3fr 1fr; }
+  .fm-bento--mosaic .fm-bento--wide { grid-column: 1/-1; }
+}

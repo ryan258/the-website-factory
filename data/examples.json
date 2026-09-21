@@ -302,5 +302,119 @@
       }
     ],
     "notice": "An illustrative content transformation, not a measured client result."
+  },
+  "features": {
+    "label": "Capabilities",
+    "title": "Built for clarity, speed, and long-term ownership.",
+    "intro": "Every capability is engineered to serve visitors directly and remain straightforward to maintain.",
+    "items": [
+      {
+        "title": "Lean static delivery",
+        "text": "Pages compile to clean HTML, responsive images, and a compact single stylesheet with zero client-side tracking.",
+        "bullets": [
+          "No database roundtrips",
+          "Self-hosted variable typography",
+          "Sub-100ms server response"
+        ]
+      },
+      {
+        "title": "Accessible by default",
+        "text": "Semantic markup, keyboard navigation, contrast compliance, and screen-reader hierarchy built into every component.",
+        "bullets": [
+          "WCAG 2.2 AA target",
+          "Visible focus rings",
+          "Native disclosure controls"
+        ]
+      },
+      {
+        "title": "Modular subtraction",
+        "text": "Keep only the sections that earn their keep. Unused modules, assets, and routes are pruned at build time.",
+        "bullets": [
+          "Declarative page composition",
+          "Automated image pruning",
+          "Zero dead CSS or JavaScript"
+        ]
+      }
+    ]
+  },
+  "logos": {
+    "label": "Accreditations & press",
+    "title": "Recognized standards and trusted partnerships.",
+    "intro": "Demonstrating how partner marks, association badges, or press mentions integrate seamlessly.",
+    "items": [
+      {
+        "title": "Standard Craft Mark",
+        "text": "Certified sustainable digital practices and verified accessible architecture."
+      },
+      {
+        "title": "Independent Press Review",
+        "text": "Featured in independent regional design publications for editorial restraint."
+      },
+      {
+        "title": "Regional Chamber Partner",
+        "text": "Active trade partner supporting small-business modernization initiatives."
+      },
+      {
+        "title": "Open Standards Guild",
+        "text": "Adherent to web standards without runtime vendor lock-in."
+      }
+    ],
+    "notice": "Sample marks and partner mentions for demonstration. Replace with verified client relationships."
+  },
+  "timeline": {
+    "label": "Engagement milestones",
+    "title": "A dependable path from brief to launch.",
+    "intro": "Know exactly what happens in each phase of work with predictable milestones.",
+    "items": [
+      {
+        "title": "Discovery & Strategy",
+        "text": "Align on business constraints, audience personas, content inventory, and primary conversion targets.",
+        "phase": "Week 1"
+      },
+      {
+        "title": "Wireframing & Copy Pass",
+        "text": "Draft plain-language content and select modular page compositions in the visual workshop.",
+        "phase": "Week 2"
+      },
+      {
+        "title": "Production Build & Asset Optimization",
+        "text": "Compile responsive assets, configure brand tokens, and enforce strict accessibility and performance gates.",
+        "phase": "Week 3"
+      },
+      {
+        "title": "Quality Audit & Client Handover",
+        "text": "Run multi-viewport checks, conduct keyboard navigation audit, and hand over self-contained source files.",
+        "phase": "Week 4"
+      }
+    ]
+  },
+  "bento": {
+    "label": "Showcase at a glance",
+    "title": "Everything you need. Nothing you don’t.",
+    "intro": "A high-density visual cluster grouping performance evidence, core capabilities, and feedback.",
+    "items": [
+      {
+        "title": "Ultra-light transfer",
+        "text": "Core homepage transfers under 100 KB total payload with zero external script dependencies.",
+        "badge": "Performance",
+        "span": "large"
+      },
+      {
+        "title": "Zero maintenance burden",
+        "text": "No vulnerable server plugins, database migrations, or recurring CMS subscription fees.",
+        "badge": "Reliability"
+      },
+      {
+        "title": "Verified accessible",
+        "text": "Every interactive control and color pair is checked across dark and light palettes.",
+        "badge": "Inclusion"
+      },
+      {
+        "title": "Direct client ownership",
+        "text": "You receive full, unencumbered source code in Git with straightforward build helpers.",
+        "badge": "Handover",
+        "span": "wide"
+      }
+    ]
   }
 }

@@ -220,5 +220,58 @@
       "notice"
     ],
     "dependencies": []
+  },
+  "features": {
+    "name": "Features & capabilities",
+    "purpose": "Highlight key capabilities and tangible visitor benefits.",
+    "variants": [
+      "grid",
+      "split"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
+  },
+  "logos": {
+    "name": "Proof & partners",
+    "purpose": "Display partner marks, accreditations, or press mentions.",
+    "variants": [
+      "grid",
+      "inline"
+    ],
+    "required": [
+      "title",
+      "items",
+      "notice"
+    ],
+    "dependencies": []
+  },
+  "timeline": {
+    "name": "Timeline & milestones",
+    "purpose": "Show progressive phases, project milestones, or history.",
+    "variants": [
+      "vertical",
+      "cards"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
+  },
+  "bento": {
+    "name": "Bento highlights",
+    "purpose": "Group proof points, key metrics, and features in a visual cluster.",
+    "variants": [
+      "mosaic",
+      "compact"
+    ],
+    "required": [
+      "title",
+      "items"
+    ],
+    "dependencies": []
   }
 }
