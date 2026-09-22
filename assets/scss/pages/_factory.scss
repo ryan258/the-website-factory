@@ -129,3 +129,15 @@
   .fm-bento--mosaic { grid-template-columns: 1.3fr 1fr; }
   .fm-bento--mosaic .fm-bento--wide { grid-column: 1/-1; }
 }
+
+// Practical visitor information: semantic lists, definitions, and scope groups.
+.fm-practical-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; }
+.fm-practical-groups > div { padding: 1.5rem; border: 1px solid var(--line); }
+.fm-practical-groups ul, .fm-practical-list { padding-left: 1.5rem; }
+.fm-practical-groups li, .fm-practical-list > li { margin-block: 1rem; }
+.fm-practical-list > li { padding: 1rem; border-bottom: 1px solid var(--line); }
+.fm-preparation { list-style-type: square; }
+.fm-practical-definitions > div { display: grid; grid-template-columns: minmax(8rem, 1fr) 2fr; gap: 1rem; padding-block: 1.25rem; border-bottom: 1px solid var(--line); }
+.fm-practical-definitions dt { font-weight: 650; }
+.fm-practical-definitions dd { margin: 0; }
+@media (max-width: 600px) { .fm-practical-columns, .fm-practical-definitions > div { grid-template-columns: 1fr; } }

@@ -8,7 +8,7 @@
 </div>
 <nav aria-label="Footer navigation">{{ partial "nav.html" . }}</nav>
 </div>
-{{ if hugo.Data.factory.workshop }}<a class="workshop-link" href="{{ "site-kit/" | relURL }}">Explore the site kit <span aria-hidden="true">↗</span></a>{{ end }}
+{{ if and hugo.Data.factory.workshop (eq .Section "site-kit") }}<a class="workshop-link" href="{{ "site-kit/" | relURL }}">Internal workshop <span aria-hidden="true">↗</span></a>{{ end }}
 <div class="footer__bottom">
 <span>© {{ now.Year }} {{ hugo.Data.site.wordmark }} {{ hugo.Data.site.notice }}</span>
 <span>{{ hugo.Data.site.address }}</span>

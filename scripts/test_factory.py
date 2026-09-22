@@ -87,7 +87,17 @@ class FactoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='factory-workshop-') as tmp:
             source=Path(tmp)/'source'
             import shutil
-            shutil.copytree(ROOT,source,ignore=shutil.ignore_patterns('public','resources','reports','__pycache__','.tools','node_modules'))
+            shutil.copytree(ROOT,source,ignore=shutil.ignore_patterns('public','public-workshop','resources','reports','__pycache__','.tools','node_modules'))
+            self.command(source)
+            storefront=(source/'public/index.html').read_bytes()
+            configuration=(source/'data/factory.json').read_bytes()
+            self.command(source,'--workshop','--base-url','https://example.invalid/internal/')
+            self.assertTrue((source/'public-workshop/site-kit/index.html').exists())
+            self.assertEqual((source/'public/index.html').read_bytes(),storefront)
+            self.assertEqual((source/'data/factory.json').read_bytes(),configuration)
+            self.assertNotIn('site-kit/',(source/'public-workshop/index.html').read_text())
+            self.command(source,'--workshop','--destination','public',ok=False)
+            path=source/'data/factory.json';config=json.loads(path.read_text());config['workshop']=True;path.write_text(json.dumps(config))
             self.command(source)
             self.assertTrue((source/'public/site-kit/index.html').exists())
             self.assertNotIn('site-kit',(source/'public/sitemap.xml').read_text())

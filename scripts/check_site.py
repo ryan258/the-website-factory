@@ -72,9 +72,11 @@ def check(output, noindex=None):
             if not target.exists():errors.append(f'{label}: missing {ref}')
             elif u.fragment and target in pages and unquote(u.fragment) not in pages[target].ids:errors.append(f'{label}: missing anchor {ref}')
     for directory,extension,budget in [('css','css',20000),('js','js',5000)]:
-        sizes=[len(gzip.compress(p.read_bytes())) for p in (output/directory).glob('*.'+extension)]
-        # Old content hashes may coexist in public; assess each emitted bundle.
-        if any(size>=budget for size in sizes):errors.append(f'{directory}: compressed bundle exceeds {budget} bytes')
+        # The internal editor has a separate budget; public-site bundles retain their limits.
+        for asset in (output/directory).glob('*.'+extension):
+            limit = 9000 if directory == 'js' and asset.name.startswith('workflow.') and (output/'site-kit/index.html').exists() else budget
+            if len(gzip.compress(asset.read_bytes())) >= limit:
+                errors.append(f'{directory}/{asset.name}: compressed bundle exceeds {limit} bytes')
     return errors
 
 def main():

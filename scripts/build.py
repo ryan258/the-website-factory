@@ -71,8 +71,10 @@ def publish_output(source, destination):
     pending.write_text(json.dumps(current, indent=2)+'\n')
     os.replace(pending, manifest)
 
-def content_selection(destination):
+def content_selection(destination, workshop=None):
     config = json.loads((ROOT/'data/factory.json').read_text())
+    if workshop is not None:
+        config['workshop'] = workshop
     profile = json.loads((ROOT/'data/presets'/f"{config['preset']}.json").read_text())
     shutil.copytree(ROOT/'content', destination)
     for path in destination.iterdir():
@@ -82,12 +84,16 @@ def content_selection(destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--destination', default='public')
+    parser.add_argument('--destination', help='Output directory (default: public, or public-workshop with --workshop)')
+    parser.add_argument('--workshop', action='store_true', help='Include the internal catalog in a separate local build')
     parser.add_argument('--base-url')
     parser.add_argument('--serve', action='store_true')
     parser.add_argument('--port', type=int, default=1313)
     args = parser.parse_args()
-    errors = validate(ROOT)
+    args.destination = args.destination or ('public-workshop' if args.workshop else 'public')
+    if args.workshop and (ROOT/args.destination).resolve() == (ROOT/'public').resolve():
+        parser.error('Workshop output must be separate from public; omit --destination or choose another directory.')
+    errors = validate(ROOT, workshop=True if args.workshop else None)
     if errors:
         parser.error("Invalid factory configuration:\n" + "\n".join(errors))
     env = environment()
@@ -112,9 +118,19 @@ def main():
     try:
         with tempfile.TemporaryDirectory(prefix='factory-build-') as temporary:
             temporary = Path(temporary)
-            content_selection(temporary/'content')
+            content_selection(temporary/'content', workshop=True if args.workshop else None)
+            data_args = []
+            if args.workshop:
+                shutil.copytree(ROOT/'data', temporary/'data')
+                config_path = temporary/'data/factory.json'
+                config = json.loads(config_path.read_text())
+                config['workshop'] = True
+                config_path.write_text(json.dumps(config))
+                override = temporary/'workshop.json'
+                override.write_text(json.dumps({'dataDir': str(temporary/'data')}))
+                data_args = ['--config', f'{ROOT / "hugo.toml"},{override}']
             output = temporary/'output'
-            result = subprocess.run(cmd + ['--contentDir',str(temporary/'content'),'--destination',str(output)], cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            result = subprocess.run(cmd + data_args + ['--contentDir',str(temporary/'content'),'--destination',str(output)], cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode or re.search(r'(?m)^WARN\b', result.stdout):
                 print(result.stdout, file=sys.stderr)
                 return result.returncode or 1

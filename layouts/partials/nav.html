@@ -4,4 +4,4 @@
 {{ if index (index hugo.Data.presets hugo.Data.factory.preset).pages $key }}
 <a href="{{ partial "url.html" .url }}"{{ if eq $page.RelPermalink (partial "url.html" .url) }} aria-current="page"{{ end }}>{{ .label }}</a>
 {{ end }}{{ end }}
-{{ if hugo.Data.factory.workshop }}<a href="{{ "site-kit/" | relURL }}"{{ if eq $page.Section "site-kit" }} aria-current="page"{{ end }}>Site kit</a>{{ end }}
+{{ if and hugo.Data.factory.workshop (eq .Section "site-kit") }}<a href="{{ "site-kit/" | relURL }}"{{ if eq $page.Section "site-kit" }} aria-current="page"{{ end }}>Internal workshop</a>{{ end }}

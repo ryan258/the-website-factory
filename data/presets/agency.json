@@ -81,11 +81,6 @@
           "content": "about"
         },
         {
-          "module": "team",
-          "variant": "cards",
-          "content": "team"
-        },
-        {
           "module": "cta",
           "variant": "band",
           "content": "cta"
@@ -168,9 +163,9 @@
   },
   "sections": {
     "hero": {
-      "label": "A digital studio",
+      "label": "Web design for small businesses",
       "title": "Good ideas deserve a better website.",
-      "intro": "Clear words, considered design, and a useful next step. A small-business website with room to grow.",
+      "intro": "Help people understand what you do, find what they need, and take the next step. Thoughtful websites shaped around your business.",
       "action": {
         "label": "Start a conversation",
         "url": "/contact/"
@@ -204,7 +199,7 @@
     "work": {
       "label": "Selected work",
       "title": "Different businesses. Considered solutions.",
-      "intro": "Four fictional projects showing how a shared foundation can take on its own character.",
+      "intro": "Four fictional projects illustrating different business needs and design directions.",
       "items": [
         {
           "title": "Fieldwork",
@@ -238,28 +233,28 @@
       "title": "A little clarity at every step.",
       "items": [
         {
-          "title": "Listen",
-          "text": "Start with your goals, constraints, and the people you want to reach."
+          "title": "Understand",
+          "text": "Discuss your business, your customers, and what the website needs to achieve."
         },
         {
-          "title": "Shape",
-          "text": "Agree on the content, scope, and a direction that feels like you."
+          "title": "Agree",
+          "text": "Set the page plan, content responsibilities, visual direction, and project scope."
         },
         {
-          "title": "Make",
-          "text": "Build the agreed site and review real pages together."
+          "title": "Review",
+          "text": "Review real pages together and refine the content and design around your business."
         },
         {
-          "title": "Refine",
-          "text": "Check the details, make the handover clear, and agree on what comes next."
+          "title": "Handover",
+          "text": "Check the visitor journey, agree launch readiness, and make ownership and future updates clear."
         }
       ]
     },
     "about": {
       "label": "A considered approach",
-      "title": "Small enough to care about the details.",
-      "intro": "Good work starts with understanding what matters to you.",
-      "body": "This example shows how an independent business can explain its approach without a wall of corporate language. Replace it with your own story: why the business exists, who does the work, and what clients can expect.",
+      "title": "A clear plan. A website that fits.",
+      "intro": "Your business goals guide the work from the first conversation to the final review.",
+      "body": "We start with your customers, the information they need, and the action you want them to take. Together we agree the scope and visual direction, review the site as it takes shape, and prepare a clear handover. Every page should earn its place.",
       "aside": "Clear scope. Useful conversations. Thoughtful delivery."
     },
     "team": {
@@ -293,7 +288,7 @@
         },
         {
           "title": "Can the site change later?",
-          "text": "Yes. The modular structure makes it possible to add, remove, or reorder sections as the business develops."
+          "text": "Yes. We can agree on content updates, additional pages, or a wider redesign as your needs change. Ongoing work is scoped separately."
         },
         {
           "title": "Is this a real business?",
