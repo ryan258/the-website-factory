@@ -44,10 +44,15 @@ const base=process.env.PREVIEW_URL||'http://127.0.0.1:14722/';
   for(const slug of ['agency','contractor','consultant','local-service']){
    await page.setViewportSize({width:1440,height:1000});await page.goto(base+'site-kit/'+slug+'/');
    await page.screenshot({path:path.join(out,slug+'-desktop.png'),fullPage:true});
-   await page.getByRole('link',{name:'Start a conversation',exact:false}).first().click();
+   // Hero button labels and targets come from the preset, not from this script.
+   const hero=JSON.parse(fs.readFileSync(path.join(ROOT,'data/presets/'+slug+'.json'),'utf8'));
+   const lead=hero.sections[hero.pages.home.sections[0].content];
+   const hero_buttons=page.locator('.fm--lead');
+   await hero_buttons.getByRole('link',{name:lead.action.label,exact:false}).click();
    if(!page.url().endsWith('#preview-contact'))failures.push(slug+' contact preview');
-   await page.getByRole('link',{name:'Explore our services',exact:false}).click();
-   if(!page.url().includes('/site-kit/'+slug+'/#services-'))failures.push(slug+' services preview');
+   await hero_buttons.getByRole('link',{name:lead.secondary.label,exact:false}).click();
+   const target=lead.secondary.url.replaceAll('/','');
+   if(!page.url().includes('/site-kit/'+slug+'/#'+target+'-'))failures.push(slug+' '+target+' preview');
   }
   const nojs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
   const p=await nojs.newPage();await p.goto(base+'site-kit/catalog/');

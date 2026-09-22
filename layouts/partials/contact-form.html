@@ -25,7 +25,7 @@
 <div>
 <label for="project-type">Project type</label>
 <select id="project-type" name="project-type" required aria-describedby="type-help">
-<option value="">Select a project type</option>{{ range hugo.Data.services }}<option>{{ .title }}</option>{{ end }}<option>Not sure yet</option>
+<option value="">Select a project type</option>{{ range (index hugo.Data.presets hugo.Data.factory.preset).sections.services.items }}<option>{{ .title }}</option>{{ end }}<option>Not sure yet</option>
 </select>
 <small id="type-help">Choose the closest match.</small>
 </div>

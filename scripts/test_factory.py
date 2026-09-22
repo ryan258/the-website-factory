@@ -53,10 +53,13 @@ class FactoryTests(unittest.TestCase):
             self.command(dest)
             path=dest/'data/presets/agency.json';profile=json.loads(path.read_text())
             profile['pages'].pop('pricing')
-            profile['pages']['home']['sections']=[s for s in profile['pages']['home']['sections'] if s['module']!='process']
+            sections=[s for s in profile['pages']['home']['sections'] if s['module']!='process']
+            profile['pages']['home']['sections']=sections
             # Reorder actual sections and give the remaining copy a distinctive test marker.
-            profile['pages']['home']['sections'][1:3]=reversed(profile['pages']['home']['sections'][1:3])
-            profile['sections']['services']['title']='Selected services marker'
+            def position(module): return next(i for i,s in enumerate(sections) if s['module']==module)
+            services,work=position('services'),position('work')
+            sections[services],sections[work]=sections[work],sections[services]
+            profile['sections'][sections[work]['content']]['title']='Selected services marker'
             path.write_text(json.dumps(profile))
             self.command(dest)
             output=dest/'public';home=(output/'index.html').read_text()

@@ -35,13 +35,13 @@
 {{ else }}
 {{ if eq $m "process" }}<ol class="fm-grid fm-list">{{ else if eq $m "timeline" }}<ol class="fm-grid fm-list fm-timeline-cards">{{ else }}<div class="fm-grid">{{ end }}
 {{ range $i, $item := $d.items }}
-{{ if or (eq $m "process") (eq $m "timeline") }}<li class="fm-card">{{ else }}<article class="fm-card">{{ end }}
+{{ if or (eq $m "process") (eq $m "timeline") }}<li class="fm-card">{{ else }}<article class="fm-card{{ with $item.badge }} fm-card--featured{{ end }}">{{ end }}
 {{ if eq $m "work" }}{{ with .image }}{{ $img := resources.Get . }}{{ if not $img }}{{ errorf "Missing module image: %s" . }}{{ else }}{{ $small := $img.Resize "560x webp q80" }}{{ $large := $img.Resize "1120x webp q80" }}<img src="{{ $small.RelPermalink }}" srcset="{{ $small.RelPermalink }} 560w, {{ $large.RelPermalink }} 1120w" sizes="(min-width: 900px) 540px, 100vw" width="{{ $small.Width }}" height="{{ $small.Height }}" alt="{{ $item.title }} — fictional project design" loading="lazy" decoding="async">{{ end }}{{ end }}{{ end }}
 {{ if eq $m "team" }}<div class="fm-avatar" aria-hidden="true">{{ .initials }}</div>{{ end }}
 {{ if in (slice "services" "process" "resources" "features" "timeline") $m }}<span class="fm-index" aria-hidden="true">{{ with .phase }}{{ . }}{{ else }}{{ printf "%02d" (add $i 1) }}{{ end }}</span>{{ end }}
 {{ if eq $m "testimonials" }}<blockquote><p>{{ .text }}</p><footer>{{ .title }}</footer></blockquote>
 {{ else if eq $m "stats" }}<p class="fm-stat">{{ .text }}</p><h3>{{ .title }}</h3>
-{{ else }}<h3>{{ .title }}</h3>{{ with .value }}<p class="fm-value">{{ . }}</p>{{ end }}<p>{{ .text }}</p>{{ with .scope }}<p>{{ . }}</p>{{ end }}{{ with .best }}<p class="caption">For: {{ . }}</p>{{ end }}
+{{ else }}{{ with .badge }}<span class="fm-badge">{{ . }}</span>{{ end }}<h3>{{ .title }}</h3>{{ with .value }}<p class="fm-value">{{ . }}</p>{{ end }}<p>{{ .text }}</p>{{ with .scope }}<p>{{ . }}</p>{{ end }}{{ with .best }}<p class="caption">For: {{ . }}</p>{{ end }}
 {{ with .bullets }}<ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
 {{ with .url }}<a class="text-link" href="{{ if and $.preview (index $.targets .) }}{{ index $.targets . }}{{ else }}{{ partial "url.html" . }}{{ end }}">{{ if eq $m "work" }}View {{ $item.title }}{{ else }}Explore {{ $item.title }}{{ end }} <span aria-hidden="true">↗</span></a>{{ end }}{{ end }}
 {{ if or (eq $m "process") (eq $m "timeline") }}</li>{{ else }}</article>{{ end }}

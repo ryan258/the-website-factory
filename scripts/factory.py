@@ -127,8 +127,7 @@ def apply_preset(destination, slug, name):
         path.parent.mkdir(parents=True,exist_ok=True)
         path.write_text(json.dumps(dict(title=page['title'],description=f"{name}: {page['title'].lower()} and sample information. Content awaits business review."),indent=2)+'\n')
     # Structured contact choices follow the selected business instead of the agency demo.
-    services=profile['sections'].get('services',{}).get('items',[])
-    (root/'data/services.yaml').write_text(json.dumps([dict(title=i['title'],description=i['text']) for i in services],indent=2)+'\n')
+    # Project types come from the preset's services section at render time, so only budgets are written here.
     (root/'data/contact.yaml').write_text(json.dumps(dict(budgets=['To be discussed','I have a scope in mind'],budget_help='No sample budget is a quote.'),indent=2)+'\n')
     site=root/'data/site.yaml';text=site.read_text()
     navigation=[dict(label=p['title'],url='/' if k=='home' else '/'+k+'/') for k,p in profile['pages'].items()]

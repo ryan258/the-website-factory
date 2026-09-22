@@ -20,8 +20,6 @@ navigation:
     url: "/work/"
   - label: "Pricing"
     url: "/pricing/"
-  - label: "About"
-    url: "/about/"
   - label: "Contact"
     url: "/contact/"
 cta:
