@@ -7,9 +7,10 @@ binding = "IMAGES_BUCKET"
 bucket_name = "258webco-images"
 
 # --- Contact form delivery -------------------------------------------------
-# All three blocks below are commented out on purpose. With none of them active,
-# /api/contact returns 503 and the site is a preview that cannot receive mail.
-# docs/cloudflare-setup.md walks through filling them in.
+# /api/contact needs somewhere to put an enquiry (the KV namespace below, or an email
+# binding) AND an explicit ENQUIRY_ENABLED = "true". Missing either, it returns 503 and
+# the site is a preview that cannot receive mail.
+# docs/cloudflare-setup.md walks through filling these in.
 
 # Where enquiries are stored. Create with: npx wrangler kv namespace create ENQUIRY
 [[kv_namespaces]]
@@ -22,7 +23,12 @@ id = "ea6f0db631da4aaeb78c786a4581214c"
 # name = "EMAIL"
 # destination_address = "ryanleejwebdev@gmail.com"
 
-# [vars]
+# Intake is deliberate, not a side effect of the bindings above: /api/contact refuses
+# every submission unless the deployment sets ENQUIRY_ENABLED to "true". A copy of this
+# project starts without it, so an inherited namespace can never receive its enquiries.
+# Confirm this variable is present on the Pages project after deploying.
+[vars]
+ENQUIRY_ENABLED = "true"
 # ENQUIRY_TO = "ryanleejwebdev@gmail.com"
 # ENQUIRY_FROM = "forms@258webco.com"
 

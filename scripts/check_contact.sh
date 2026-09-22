@@ -34,7 +34,7 @@ post() { # post <expected status> <label> <body> [extra curl args...]
   [ "$code" = "$expected" ] || fail "$label: expected $expected, got $code ($(cat "$work/body"))"
 }
 
-serve --kv ENQUIRY
+serve --kv ENQUIRY --binding ENQUIRY_ENABLED=true
 post 200 'valid enquiry'      "$VALID" -H 'Accept: application/json'
 grep -q '"ok":true' "$work/body" || fail 'valid enquiry did not return {"ok":true}'
 post 303 'no-JavaScript post' "$VALID"
@@ -51,4 +51,10 @@ serve # No bindings: the endpoint must refuse rather than silently accept.
 post 503 'unconfigured endpoint' "$VALID" -H 'Accept: application/json'
 stop
 
-echo "Contact endpoint checks passed: accepted, stored, redirected, rejected, and unconfigured paths."
+# A store alone must not open intake: that is what keeps an inherited binding harmless.
+serve --kv ENQUIRY
+post 503 'storage without explicit intake' "$VALID" -H 'Accept: application/json'
+stop
+
+echo "Contact endpoint checks passed: accepted, stored, redirected, rejected, unconfigured, and not-enabled paths."
+echo "Failure paths (storage and notification errors) are covered by scripts/test_contact_endpoint.mjs."

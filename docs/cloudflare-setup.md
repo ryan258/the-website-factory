@@ -120,6 +120,22 @@ binding = "ENQUIRY"
 id = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
 ```
 
+### Turn intake on for this deployment
+
+A namespace is somewhere to put enquiries; it is not permission to accept them. The
+endpoint also requires an explicit variable, so that a copy of this project — which
+starts without it — can never write into the namespace above:
+
+```toml
+[vars]
+ENQUIRY_ENABLED = "true"
+```
+
+That block is already in `wrangler.toml`. After deploying, confirm it arrived: **Workers
+& Pages → your project → Settings → Variables and Secrets** should list
+`ENQUIRY_ENABLED`. If it does not, add it there and redeploy. Without it every
+submission is refused with a 503 and nothing is stored — safe, but silent to you.
+
 If image assets use Cloudflare R2 (`wrangler.toml` declares `IMAGES_BUCKET = "258webco-images"`), create the bucket:
 
 ```sh
