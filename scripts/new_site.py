@@ -102,7 +102,7 @@ form works. Agree who monitors enquiries, and how often, before launch.
 
 
 def create(destination, name, preset="agency"):
-    if preset not in ("agency", "contractor", "consultant", "local-service"):
+    if preset not in ("agency", "contractor", "consultant", "local-service", "258webco"):
         raise ValueError("Unknown business preset.")
     errors = validate(ROOT)
     if errors:
@@ -161,7 +161,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('destination')
     parser.add_argument('--name', required=True)
-    parser.add_argument('--preset', choices=['agency','contractor','consultant','local-service'], default='agency')
+    parser.add_argument('--preset', choices=['agency', 'contractor', 'consultant', 'local-service', '258webco'], default='agency')
     args = parser.parse_args()
     try:
         destination = create(args.destination, args.name, args.preset)

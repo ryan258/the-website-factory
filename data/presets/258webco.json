@@ -1,0 +1,627 @@
+{
+  "name": "258 Web Co.",
+  "label": "Independent Web Development Studio",
+  "tone": "yellow",
+  "description": "High-performance, accessible websites for small businesses. Handcrafted, lightweight, and engineered for speed.",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Fast, accessible websites for small businesses. Live in weeks, not months.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "split",
+          "content": "hero"
+        },
+        {
+          "module": "stats",
+          "variant": "strip",
+          "content": "stats"
+        },
+        {
+          "module": "services",
+          "variant": "cards",
+          "content": "services-preview"
+        },
+        {
+          "module": "work",
+          "variant": "gallery",
+          "content": "work-featured"
+        },
+        {
+          "module": "process",
+          "variant": "steps",
+          "content": "process"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "services": {
+      "title": "Services",
+      "description": "Marketing sites, landing pages, redesigns, speed audits, care plans, and design systems.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-services"
+        },
+        {
+          "module": "services",
+          "variant": "rows",
+          "content": "services"
+        },
+        {
+          "module": "process",
+          "variant": "steps",
+          "content": "process-detail"
+        },
+        {
+          "module": "faq",
+          "variant": "accordion",
+          "content": "faq"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Tell us about your project. We reply in one business day. This demonstration sends nothing.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-contact"
+        },
+        {
+          "module": "contact",
+          "variant": "panel",
+          "content": "contact"
+        }
+      ]
+    },
+    "work": {
+      "title": "Work",
+      "description": "Featured projects and design systems with measured before and after speed scores.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-work"
+        },
+        {
+          "module": "work",
+          "variant": "gallery",
+          "content": "work"
+        },
+        {
+          "module": "before-after",
+          "variant": "panels",
+          "content": "before-after"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "pricing": {
+      "title": "Pricing",
+      "description": "Three clear plans with sample prices. No hidden fees. Real fees require a proposal.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-pricing"
+        },
+        {
+          "module": "pricing",
+          "variant": "cards",
+          "content": "pricing"
+        },
+        {
+          "module": "comparison",
+          "variant": "table",
+          "content": "comparison"
+        },
+        {
+          "module": "faq",
+          "variant": "accordion",
+          "content": "faq-pricing"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "hero": {
+      "label": "Fast websites for small businesses",
+      "title": "Websites built fast. Websites that run fast.",
+      "intro": "We design and build small-business websites in weeks, then prove the speed with the page you are reading.",
+      "action": {
+        "label": "Start a project",
+        "url": "/contact/"
+      },
+      "secondary": {
+        "label": "See our work",
+        "url": "/work/"
+      },
+      "note": "Custom web development \u00b7 Modern engineering",
+      "art": "factory"
+    },
+    "services": {
+      "label": "What we do",
+      "title": "Six ways we can help.",
+      "intro": "Each engagement is scoped in writing before work starts.",
+      "items": [
+        {
+          "title": "Marketing sites",
+          "text": "A clear home for your business. Built to help the right people understand what you do and take the next step.",
+          "bullets": [
+            "Up to five core pages",
+            "Responsive layouts",
+            "Search-ready structure"
+          ]
+        },
+        {
+          "title": "Landing pages",
+          "text": "One page with one clear purpose. Give your next campaign a focused place to turn interest into enquiries.",
+          "bullets": [
+            "Campaign messaging",
+            "Focused contact forms",
+            "Fast mobile experience"
+          ]
+        },
+        {
+          "title": "Website redesign",
+          "text": "Keep what works and fix what gets in the way. We simplify your content and rebuild around the actions your visitors need.",
+          "bullets": [
+            "Content and navigation review",
+            "Custom visual direction",
+            "Redirect planning"
+          ]
+        },
+        {
+          "title": "Speed audits",
+          "text": "Find out what is slowing your site down. Get a practical report with fixes ordered by their likely impact.",
+          "bullets": [
+            "Mobile performance checks",
+            "Asset and script review",
+            "Prioritized recommendations"
+          ]
+        },
+        {
+          "title": "Hosting and care plans",
+          "text": "Keep your site useful after launch. Choose a defined scope for updates, checks, and ongoing maintenance.",
+          "bullets": [
+            "Managed static hosting",
+            "Scheduled health checks",
+            "Agreed update allowance"
+          ]
+        },
+        {
+          "title": "Design systems",
+          "text": "Make the next page easier to build. A small, documented set of reusable components keeps your website consistent.",
+          "bullets": [
+            "Type and color foundations",
+            "Accessible UI components",
+            "Practical usage guidelines"
+          ]
+        }
+      ]
+    },
+    "work": {
+      "label": "Selected work",
+      "title": "Different businesses. Considered solutions.",
+      "intro": "Selected projects illustrating tailored design and high-performance engineering.",
+      "items": [
+        {
+          "title": "Fieldwork",
+          "text": "An approachable home for a neighborhood studio.",
+          "image": "images/fieldwork.png",
+          "url": "/work/fieldwork/"
+        },
+        {
+          "title": "Forma",
+          "text": "A calm, structured portfolio for a design practice.",
+          "image": "images/forma.png",
+          "url": "/work/forma/"
+        },
+        {
+          "title": "Common Ground",
+          "text": "A welcoming digital space for a community business.",
+          "image": "images/common-ground.png",
+          "url": "/work/common-ground/"
+        },
+        {
+          "title": "Northline",
+          "text": "A direct, purposeful site for a growing service business.",
+          "image": "images/northline.png",
+          "url": "/work/northline/"
+        }
+      ],
+      "notice": "Selected case studies and production design systems."
+    },
+    "process": {
+      "label": "How it works",
+      "title": "From first idea to the finish line.",
+      "items": [
+        {
+          "title": "Brief",
+          "text": "Get the right plan on paper."
+        },
+        {
+          "title": "Design",
+          "text": "Make every detail earn its place."
+        },
+        {
+          "title": "Build",
+          "text": "Less weight. More purpose."
+        },
+        {
+          "title": "Launch",
+          "text": "Check it. Ship it. Hand it over."
+        }
+      ]
+    },
+    "team": {
+      "label": "The people",
+      "title": "Know who you\u2019re working with.",
+      "items": [
+        {
+          "title": "Alex Morgan",
+          "text": "Sample profile \u00b7 Strategy and client conversations",
+          "initials": "AM"
+        },
+        {
+          "title": "Sam Rivera",
+          "text": "Sample profile \u00b7 Design and delivery",
+          "initials": "SR"
+        }
+      ],
+      "notice": "Dedicated engineers and designers focused on small business performance."
+    },
+    "faq": {
+      "label": "Before we begin",
+      "title": "Six questions we are asked most.",
+      "items": [
+        {
+          "title": "How long does a website take?",
+          "text": "A focused landing page typically takes two to three weeks. A five-page site is usually three to five weeks after content and scope are agreed. These are sample timelines, not a delivery guarantee."
+        },
+        {
+          "title": "What do you need from us?",
+          "text": "Your goals, existing brand assets, and a first draft of your content. We start with a short brief and identify any gaps before design begins."
+        },
+        {
+          "title": "Can you improve our existing website?",
+          "text": "Yes. We can start with a speed and content review, then recommend a focused update or a rebuild based on what we find."
+        },
+        {
+          "title": "Will we be able to edit the site?",
+          "text": "Content is stored in plain text and structured data files. This sample project has no CMS; an editing workflow would be agreed before a real build."
+        },
+        {
+          "title": "What happens after launch?",
+          "text": "You receive the site source and a handover guide. Hosting, maintenance, and future updates are separately scoped so responsibilities stay clear."
+        },
+        {
+          "title": "Do you guarantee a perfect speed score?",
+          "text": "No. We build against a small performance budget and test the result. The hosting environment, content, and later changes can affect scores."
+        }
+      ]
+    },
+    "pricing": {
+      "label": "Ways to work together",
+      "title": "Three plans. No hidden fees.",
+      "intro": "Transparent investment for small businesses. Final scope and deliverables confirmed in writing.",
+      "items": [
+        {
+          "title": "Starter",
+          "value": "$2,400",
+          "text": "One focused page. A strong first impression. Sample timing: 2\u20133 weeks.",
+          "bullets": [
+            "One landing page",
+            "Mobile design",
+            "Contact form"
+          ]
+        },
+        {
+          "title": "Standard",
+          "value": "$6,800",
+          "badge": "Most popular",
+          "text": "A complete site, built around your business. Sample timing: 3\u20135 weeks.",
+          "bullets": [
+            "Up to five pages",
+            "Custom design",
+            "Speed report"
+          ]
+        },
+        {
+          "title": "Custom",
+          "value": "Quote",
+          "text": "More moving parts. One considered plan. Timing agreed in the proposal.",
+          "bullets": [
+            "Larger websites",
+            "Design systems",
+            "Ongoing care"
+          ]
+        }
+      ],
+      "notice": "Fixed-price scopes and monthly care plans with zero lock-in."
+    },
+    "areas": {
+      "label": "Close to home",
+      "title": "Where the work happens.",
+      "items": [
+        {
+          "title": "Local projects",
+          "text": "Describe the towns or neighborhoods you actually serve."
+        },
+        {
+          "title": "Further afield",
+          "text": "Explain any travel limits and how a visitor can check their location."
+        },
+        {
+          "title": "Remote conversations",
+          "text": "Describe which parts of the process can happen remotely."
+        }
+      ],
+      "notice": "Demonstration coverage. Confirm actual service areas before publication."
+    },
+    "testimonials": {
+      "label": "Client voices",
+      "title": "Make room for real feedback.",
+      "items": [
+        {
+          "title": "Founder, Design Studio",
+          "text": "\u201cWe knew what was happening, what was needed from us, and what came next.\u201d"
+        },
+        {
+          "title": "Managing Director",
+          "text": "\u201cThe finished site finally felt like the business we had built.\u201d"
+        }
+      ],
+      "notice": "Illustrative quotations, not endorsements. Replace with approved, attributable feedback or omit this module."
+    },
+    "stats": {
+      "label": "Proof, not adjectives",
+      "title": "Measured on this page.",
+      "items": [
+        {
+          "title": "Largest Contentful Paint, mobile",
+          "text": "1.5 s"
+        },
+        {
+          "title": "Lighthouse performance, mobile",
+          "text": "100"
+        },
+        {
+          "title": "From agreed brief to launch",
+          "text": "14 days"
+        }
+      ],
+      "notice": "Sample figures. The two speed numbers come from a Lighthouse mobile run of this demonstration build; the timeline is illustrative, not a delivery guarantee."
+    },
+    "cta": {
+      "label": "Your next chapter",
+      "title": "Let\u2019s make something useful.",
+      "intro": "A short conversation is a good place to begin.",
+      "action": {
+        "label": "Talk about your project",
+        "url": "/contact/"
+      }
+    },
+    "contact": {
+      "label": "Start here",
+      "title": "Good projects start with a hello.",
+      "intro": "Tell us what you have in mind, what you need, and any constraints. We reply within one business day. This demonstration does not send messages.",
+      "items": [
+        {
+          "title": "Email",
+          "text": "hello@example.invalid"
+        },
+        {
+          "title": "Office hours",
+          "text": "Monday to Friday, 9 am to 5 pm Central. Sample hours."
+        },
+        {
+          "title": "Based in",
+          "text": "Chicago, IL \u00b7 Remote nationwide"
+        },
+        {
+          "title": "A useful first message",
+          "text": "Your goals, the work you need, and any relevant timing."
+        }
+      ],
+      "notice": "Direct founder communication. Submissions answered within one business day."
+    },
+    "resources": {
+      "label": "Useful starting points",
+      "title": "A little preparation goes a long way.",
+      "items": [
+        {
+          "title": "Before your first conversation",
+          "text": "Gather your goals, priorities, and the questions you need answered.",
+          "url": "/contact/"
+        },
+        {
+          "title": "Find the right scope",
+          "text": "Understand the service options before deciding what you need.",
+          "url": "/services/"
+        }
+      ]
+    },
+    "comparison": {
+      "label": "Choose with confidence",
+      "title": "What each plan includes.",
+      "items": [
+        {
+          "title": "Starter",
+          "text": "One page, adapted foundation.",
+          "scope": "One landing page \u00b7 mobile design \u00b7 contact form \u00b7 basic checks",
+          "best": "A new business with one clear offer"
+        },
+        {
+          "title": "Standard",
+          "text": "Up to five pages, custom design.",
+          "scope": "Up to five pages \u00b7 custom design \u00b7 full speed report",
+          "best": "An established business with services to explain"
+        },
+        {
+          "title": "Custom",
+          "text": "Scoped in the proposal.",
+          "scope": "Larger sites \u00b7 design systems \u00b7 ongoing care as scoped",
+          "best": "A business with more moving parts"
+        }
+      ],
+      "notice": "Illustrative scope comparison. A proposal defines the actual deliverables."
+    },
+    "before-after": {
+      "label": "The difference",
+      "title": "From scattered information to a clear next step.",
+      "items": [
+        {
+          "title": "Before \u00b7 example",
+          "text": "A crowded page, unclear services, and no obvious way to get in touch."
+        },
+        {
+          "title": "After \u00b7 example",
+          "text": "A focused introduction, useful detail, and a contact path where it belongs."
+        }
+      ],
+      "notice": "An illustrative content transformation, not a measured client result."
+    },
+    "intro-services": {
+      "label": "A digital studio",
+      "title": "The right help for what comes next.",
+      "intro": "Marketing sites, landing pages, redesigns, speed audits, care plans, and design systems.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      },
+      "note": "Handcrafted websites \u00b7 Built to perform",
+      "art": "factory"
+    },
+    "intro-contact": {
+      "label": "A digital studio",
+      "title": "Let\u2019s start a conversation.",
+      "intro": "Tell us about your project. We reply in one business day. This demonstration sends nothing.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      },
+      "note": "Direct collaboration \u00b7 Fast turnaround",
+      "art": "factory"
+    },
+    "intro-work": {
+      "label": "A digital studio",
+      "title": "Work with its own character.",
+      "intro": "Selected case studies with verified performance gains and responsive design systems.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      },
+      "note": "Production projects \u00b7 Measured results",
+      "art": "factory"
+    },
+    "intro-pricing": {
+      "label": "A digital studio",
+      "title": "What a website costs here.",
+      "intro": "Three clear plans with sample prices. No hidden fees. Real fees require a proposal.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      },
+      "note": "Clear deliverables \u00b7 Predictable investment",
+      "art": "factory"
+    },
+    "services-preview": {
+      "label": "What we do",
+      "title": "The right help, in the right place.",
+      "intro": "Three of the six ways we work. The Services page covers the rest.",
+      "items": [
+        {
+          "title": "Marketing sites",
+          "text": "A clear home for your business, built so the right people understand what you do."
+        },
+        {
+          "title": "Landing pages",
+          "text": "One page with one purpose, ready for your next campaign."
+        },
+        {
+          "title": "Website redesign",
+          "text": "Keep what works, fix what gets in the way, and rebuild around the next step."
+        }
+      ]
+    },
+    "work-featured": {
+      "label": "Selected work",
+      "title": "Two recent examples.",
+      "intro": "Featured projects showing modern architecture and verified speed scores.",
+      "items": [
+        {
+          "title": "Fieldwork",
+          "text": "An approachable home for a neighborhood studio.",
+          "image": "images/fieldwork.png",
+          "url": "/work/fieldwork/"
+        },
+        {
+          "title": "Forma",
+          "text": "A calm, structured portfolio for a design practice.",
+          "image": "images/forma.png",
+          "url": "/work/forma/"
+        }
+      ],
+      "notice": "Measured performance improvements across live production sites."
+    },
+    "process-detail": {
+      "label": "How it works",
+      "title": "The same four steps, in more detail.",
+      "intro": "Every project runs through the same sequence, whatever its size.",
+      "items": [
+        {
+          "title": "Brief",
+          "text": "We agree on your audience, pages, content, and the one action your website needs to support. You get a written scope before design starts."
+        },
+        {
+          "title": "Design",
+          "text": "We establish the visual direction and review the core page layouts with you before any template is written."
+        },
+        {
+          "title": "Build",
+          "text": "We build reusable components, optimize every asset against a page-weight budget, and check mobile layouts and keyboard access as we go."
+        },
+        {
+          "title": "Launch",
+          "text": "After your approval we verify the forms and the speed scores on the real host, then hand over the source and a short guide."
+        }
+      ]
+    },
+    "faq-pricing": {
+      "label": "Payment and timing",
+      "title": "How the money and the calendar work.",
+      "items": [
+        {
+          "title": "When would payment be due?",
+          "text": "A sample arrangement is 50% to begin and 50% at handover. Any real payment terms would be confirmed in a written proposal."
+        },
+        {
+          "title": "When does the timeline start?",
+          "text": "After scope, content, and the initial payment are agreed. Feedback delays or additional pages can change the schedule."
+        },
+        {
+          "title": "What costs are separate?",
+          "text": "Domain registration, hosting, ongoing care, and new work outside the agreed scope. We would list each separately before you proceed."
+        }
+      ]
+    }
+  }
+}

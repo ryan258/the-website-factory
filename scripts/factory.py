@@ -73,7 +73,7 @@ def validate(root=ROOT, workshop=None):
                 for item in value: links(item)
         links(content)
     for slug, profile in profiles.items():
-        if not re.fullmatch(r'[a-z][a-z0-9-]*',slug): errors.append(f'Invalid preset identifier {slug}')
+        if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', slug): errors.append(f'Invalid preset identifier {slug}')
         if profile.get('tone') not in ('yellow','clay','sage','blue'): errors.append(f'{slug}: unknown tone')
         if not isinstance(profile.get('pages'),dict) or not isinstance(profile.get('sections'),dict):
             errors.append(f'{slug}: pages and sections must be objects'); continue
