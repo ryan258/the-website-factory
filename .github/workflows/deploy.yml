@@ -37,6 +37,14 @@ jobs:
           HUGO_PARAMS_FORMENABLED=true HUGO_PARAMS_NOINDEX=false \
             python3 scripts/build.py --base-url https://258webco.com/
 
+      - name: Verify Generated Site Quality Gates
+        run: |
+          HUGO_PARAMS_NOINDEX=false python3 scripts/check_site.py public
+          python3 scripts/test_factory.py
+          python3 scripts/test_starter.py
+          python3 scripts/test_from_plan.py
+          node scripts/test_contact_endpoint.mjs
+
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
