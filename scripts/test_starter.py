@@ -3,6 +3,7 @@
 import importlib.util
 import html
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -53,6 +54,27 @@ class StarterTests(unittest.TestCase):
             # Mutate an emitted page to prove the checker catches a broken reference.
             page=dest/'public/index.html';page.write_text(home+'<a href="/client/missing/">broken</a>')
             self.assertTrue(any('missing' in error for error in static.check((dest/'public').resolve())))
+    def test_copy_inherits_no_deployment_resources(self):
+        with tempfile.TemporaryDirectory(prefix='starter-isolation-') as tmp:
+            dest=scaffold.create(Path(tmp)/'client','Cedar & Stone','contractor')
+            master=(ROOT/'wrangler.toml').read_text()
+            # Whatever the master is configured with today: ids, buckets, addresses, project name.
+            secrets={m for m in re.findall(r'(?m)^\s*(?:id|bucket_name|name|destination_address|ENQUIRY_TO|ENQUIRY_FROM)\s*=\s*"([^"]+)"',master)}
+            secrets|=set(re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+',master))
+            self.assertTrue(secrets,'the master must actually be configured for this test to mean anything')
+            copied=[p for p in dest.rglob('*') if p.is_file() and p.suffix in ('.toml','.md','.json','.yaml')]
+            for path in copied:
+                text=path.read_text(errors='ignore')
+                for secret in secrets:
+                    if secret in ('public','true'): continue
+                    self.assertNotIn(secret,text,f'{path.relative_to(dest)} carries master value {secret!r}')
+            wrangler=(dest/'wrangler.toml').read_text()
+            self.assertNotIn('\n[[kv_namespaces]]',wrangler)
+            self.assertNotIn('\n[vars]',wrangler)
+            self.assertIn('ENQUIRY_ENABLED',wrangler)  # documented, deliberately not set
+            guide=(dest/'docs/cloudflare-setup.md').read_text()
+            self.assertIn('Cedar & Stone',guide)
+            self.assertNotIn('Email Routing',guide)
     def test_empty_output_fails(self):
         with tempfile.TemporaryDirectory() as tmp:self.assertTrue(static.check(Path(tmp)))
 if __name__=='__main__':unittest.main()

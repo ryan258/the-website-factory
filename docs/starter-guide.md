@@ -6,7 +6,7 @@
 4. Replace the default logo/favicon/touch icon and optional decorative hero artwork when the client has approved assets. Update font licenses if changing the typeface.
 5. Run the pinned build and fast static checks. Run the browser checks after the layout/content pass. The default audit discovers all generated HTML routes; limit checks with CHECK_PATHS/AUDIT_PATHS for a bounded change.
 6. Review copy, phone/tablet layouts, keyboard interactions, 200% text enlargement, and a screen reader. Recheck contrast after palette changes. Record what was actually tested in this instance's acceptance document.
-7. Choose hosting. This version prepares Cloudflare Pages with a same-origin Pages Function for the form; other hosts require implementation. Configure recipient and enable collection only with owner approval. Keep the form disabled on generic static hosts.
+7. Choose hosting. This version prepares Cloudflare Pages with an unconfigured `wrangler.toml` and client-specific setup guide (`docs/cloudflare-setup.md`). Intake requires creating a client-owned KV namespace and setting `ENQUIRY_ENABLED = "true"`. Other hosts require custom backend implementation. Configure recipient and enable collection only with owner approval. Keep the form disabled on generic static hosts.
 8. The owner authorizes Git actions, deployment, indexing, domain changes, and any test messages separately. Verify headers, canonical URLs, HTTPS, compression, live delivery, and mobile performance on the chosen host.
 
 ## Boundaries

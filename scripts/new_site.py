@@ -11,7 +11,95 @@ from factory import apply_preset, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts')
-FILES = ('hugo.toml', 'wrangler.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json')
+FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json')
+
+def project_slug(name):
+    """A Cloudflare-safe project name derived from the client name."""
+    slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')[:54]
+    return slug or 'client-site'
+
+def write_deployment(destination, name):
+    """Write an unconfigured Wrangler file and a client-specific setup guide.
+
+    The master's wrangler.toml names live resources (an R2 bucket, an ENQUIRY KV id) and
+    its setup guide names a live domain and mailbox. Neither is copied: a new instance
+    must create and declare its own, so it can never write into the master's namespace.
+    """
+    master = (ROOT / 'wrangler.toml').read_text()
+    compatibility = re.search(r'(?m)^compatibility_date\s*=\s*"([\d-]+)"', master)
+    if not compatibility:
+        raise ValueError('Master wrangler.toml has no compatibility_date to carry over.')
+    slug = project_slug(name)
+    (destination / 'wrangler.toml').write_text(f"""# Deployment configuration for {name}. Nothing is configured yet, and no resource from
+# the source project is carried over: no bucket, no namespace id, no notification address.
+#
+# /api/contact returns 503 until BOTH of the following are true for this deployment:
+#   1. it declares this client's own ENQUIRY namespace (below), and
+#   2. its environment sets ENQUIRY_ENABLED = "true".
+# Enabling the rendered form in hugo.toml does not open the endpoint on its own.
+# See docs/cloudflare-setup.md.
+
+name = "{slug}"
+pages_build_output_dir = "public"
+compatibility_date = "{compatibility.group(1)}"
+
+# Step 1 — create this client's own store:  npx wrangler kv namespace create ENQUIRY
+# Step 2 — paste its id here and uncomment all three lines.
+# [[kv_namespaces]]
+# binding = "ENQUIRY"
+# id = ""
+
+# Step 3 — open intake for this deployment, once the namespace above is this client's.
+# [vars]
+# ENQUIRY_ENABLED = "true"
+""")
+    (destination / 'docs/cloudflare-setup.md').write_text(f"""# Deploying {name}
+
+This instance has no hosting account, domain, resources, or enquiry destination of its
+own yet. Nothing from the source project applies to it. Work through the steps below
+with the client's own Cloudflare account.
+
+## 1. Build locally
+
+```sh
+python3 scripts/setup.py     # fetches the pinned Dart Sass
+python3 scripts/build.py     # builds public/ and runs the generated-output checks
+```
+
+## 2. Create this client's Pages project
+
+```sh
+npx wrangler pages project create {slug} --production-branch main
+npx wrangler pages deploy public --project-name {slug}
+```
+
+Review the `.pages.dev` preview before any custom domain is attached. Adding a domain is
+the client's decision, not a step this guide assumes.
+
+## 3. Decide whether this site accepts enquiries
+
+The contact form is inert until all three are done, in this order:
+
+1. `npx wrangler kv namespace create ENQUIRY` — a namespace owned by this client.
+2. Put its id in `wrangler.toml` and uncomment the `[[kv_namespaces]]` block.
+3. Uncomment `[vars] ENQUIRY_ENABLED = "true"` there, or set that variable on the Pages
+   project. Without it the endpoint refuses every submission, deliberately.
+
+Then build with the form rendered: `HUGO_PARAMS_FORMENABLED=true python3 scripts/build.py`,
+and confirm receipt end to end (`scripts/check_contact.sh`, or a real submission read back
+with `npx wrangler kv key list --binding ENQUIRY --remote`) before telling the client the
+form works. Agree who monitors enquiries, and how often, before launch.
+
+## 4. Publishing decisions that remain open
+
+- `noindex` stays on and `baseURL` stays at `example.invalid` until the owner decides
+  otherwise (`hugo.toml`).
+- Sample content, prices, claims, and contact details must be replaced with confirmed
+  client facts.
+- Performance and accessibility results from the source project do not transfer. Re-run
+  the checks against this instance.
+""")
+
 
 def create(destination, name, preset="agency"):
     if preset not in ("agency", "contractor", "consultant", "local-service"):
@@ -45,7 +133,7 @@ def create(destination, name, preset="agency"):
         shutil.copy2(ROOT / 'docs/factory-guide.md', destination / 'docs/factory-guide.md')
         shutil.copy2(ROOT / 'docs/agency-workflow.md', destination / 'docs/agency-workflow.md')
         shutil.copy2(ROOT / 'docs/component-library.md', destination / 'docs/component-library.md')
-        shutil.copy2(ROOT / 'docs/cloudflare-setup.md', destination / 'docs/cloudflare-setup.md')
+        write_deployment(destination, name)
         config = destination / 'data/site.yaml'
         text = config.read_text()
         for key, value in [('name', name), ('wordmark', name), ('email', 'hello@example.invalid')]:
@@ -79,7 +167,7 @@ def main():
         destination = create(args.destination, args.name, args.preset)
     except (OSError, ValueError) as error:
         parser.exit(1, f'Not created: {error}\n')
-    print(f'Created {destination}\nEdit data/site.yaml and content/. Read README.md.\nNo Git repository, tool binaries, reports, or generated site was copied. Forms stay disabled; noindex stays on.')
+    print(f'Created {destination}\nEdit data/site.yaml and content/. Read README.md.\nNo Git repository, tool binaries, reports, or generated site was copied. Forms stay disabled; noindex stays on.\nNo hosting resources were copied: wrangler.toml is unconfigured and /api/contact refuses submissions until this client declares its own. See docs/cloudflare-setup.md.')
 
 if __name__ == '__main__':
     main()
