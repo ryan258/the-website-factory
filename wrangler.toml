@@ -8,19 +8,19 @@ compatibility_date = "2026-01-01"
 # docs/cloudflare-setup.md walks through filling them in.
 
 # Where enquiries are stored. Create with: npx wrangler kv namespace create ENQUIRY
-# [[kv_namespaces]]
-# binding = "ENQUIRY"
-# id = "<paste the id wrangler prints>"
+[[kv_namespaces]]
+binding = "ENQUIRY"
+id = "ea6f0db631da4aaeb78c786a4581214c"
 
 # Notification email. The address in ENQUIRY_TO must be a verified destination
 # address on this Cloudflare account; sending to it is free and quota-exempt.
-# [[send_email]]
-# name = "EMAIL"
-# destination_address = "you@example.com"
+[[send_email]]
+name = "EMAIL"
+destination_address = "ryanleejwebdev@gmail.com"
 
-# [vars]
-# ENQUIRY_TO = "you@example.com"
-# ENQUIRY_FROM = "forms@yourdomain.com"
+[vars]
+ENQUIRY_TO = "ryanleejwebdev@gmail.com"
+ENQUIRY_FROM = "forms@258webco.com"
 
 # --- Building --------------------------------------------------------------
 # Preferred: build locally, where the Hugo and Dart Sass pins are verified, then

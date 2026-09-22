@@ -122,40 +122,26 @@ id = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
 
 ---
 
-## Step 5 — Decide how you want to be told about new enquiries
+## Step 5 — Set up mail on the domain
 
-You have two choices. **Read both before doing either.**
+258webco.com's mail currently points at an unused Microsoft 365 mailbox. You are
+replacing it with Cloudflare Email Routing. Do these in order.
 
-### Choice A — Storage only (safe, no risk to your email)
+> **Note on Cloudflare UI layout:** Under the domain sidebar for **258webco.com**, the
+> **Email** menu only lists DMARC and Security. Zone-level Email Routing is configured
+> under **DNS**: go to **DNS** → **Records**, then click the **Email Routing** sub-tab at the top.
 
-Do nothing more. Enquiries are saved in the box you just made, and you read them with:
+1. Account level → **Email** → **Email Routing** → **Destination addresses** → add
+   `ryanleejwebdev@gmail.com`. Open Gmail and click Cloudflare's verification link.
+   Nothing works until you click it.
+2. In the left sidebar under **258webco.com**, click **DNS** → **Records**, then click
+   the **Email Routing** sub-tab at the top.
+3. Enable Email Routing and accept the DNS records it offers. This replaces the old Outlook MX record.
+4. Add a route: `ryan@258webco.com` → your Gmail. Add a **catch-all** → your Gmail too,
+   so nothing else bounces.
+5. Send a message to `ryan@258webco.com` from another account and confirm it arrives.
 
-```sh
-npx wrangler kv key list --binding ENQUIRY --remote
-```
-
-Nothing lands in your inbox. Nothing about your domain's email changes.
-
-### Choice B — Storage plus a notification email
-
-Cloudflare can email you when an enquiry arrives, free, as long as the address it
-sends to is one you have verified on your account.
-
-**⚠️ Read this before you turn it on.** Setting up Email Routing on 258webco.com
-changes that domain's MX records, which is the setting that decides where mail for
-`@258webco.com` is delivered. **If you currently receive mail at any `@258webco.com`
-address — Google Workspace, Fastmail, anything — this will break it.** If you are not
-completely certain that domain has no mail on it, choose A for now. You can add email
-later without redoing anything else.
-
-If the domain has no mail on it:
-
-1. In the Cloudflare dashboard, open **258webco.com** → **Email** → **Email Routing**,
-   and enable it. Accept the DNS records it offers to add.
-2. Go to **Destination addresses** and add `ryanleejwebdev@gmail.com`.
-3. Open your Gmail. Cloudflare has sent a verification email. Click the link in it.
-   **Nothing will work until you click that link.**
-4. Back in `wrangler.toml`, uncomment the last two blocks and fill them in:
+`wrangler.toml` is already filled in for this:
 
 ```toml
 [[send_email]]
@@ -167,8 +153,9 @@ ENQUIRY_TO = "ryanleejwebdev@gmail.com"
 ENQUIRY_FROM = "forms@258webco.com"
 ```
 
-`ENQUIRY_FROM` does not need to be a real mailbox. It is just the name on the envelope,
-and it has to be on a domain in your account.
+`ENQUIRY_TO` is the Gmail address, not `ryan@258webco.com` — Cloudflare delivers to
+verified destination addresses, and `ryan@` is one it forwards *from*. `ENQUIRY_FROM`
+needs no mailbox behind it; the catch-all covers any replies.
 
 ---
 
