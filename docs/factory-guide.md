@@ -1,6 +1,8 @@
 # Sculpt a client website
 
-The master includes four fictional business compositions, a visual catalog at `/site-kit/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are review surfaces, not additional client pages.
+Follow [the agency delivery cycle](agency-workflow.md) in the master: agree the brief and scope before selecting components. The agency storefront is the default build. Run `python3 scripts/build.py --workshop --serve --port 1314` for internal planning at `http://127.0.0.1:1314/site-kit/`; workshop output goes to `public-workshop`.
+
+The master includes four fictional business compositions, a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
 
 ## Start a separate copy
 
@@ -36,7 +38,7 @@ The helper validates configuration before building and renders into an isolated 
 
 The workshop deliberately demonstrates testimonial, statistic, and pricing layouts with conspicuous sample notices. The default compositions omit testimonial endorsements. Replace or omit sample people, claims, service areas, and offers before using a site as a real business website. A new name does not approve the other text.
 
-Client contact pages retain the existing accessible form. Its service choices come from `data/services.yaml`, and budget choices from `data/contact.yaml`. Keep those in sync with offered services. A preview never sends a message. A Cloudflare Pages Function (`functions/api/contact.js`) is the only implemented delivery provider, documented in `docs/cloudflare-setup.md`, and actual receipt remains an external acceptance step.
+Client contact pages retain the existing accessible form. Its service choices come from `data/services.yaml`, and budget choices from `data/contact.yaml`. Keep those in sync with offered services. A preview never sends a message. A Cloudflare Pages Function (`functions/api/contact.js`) provides durable enquiry storage in KV, documented in `docs/cloudflare-setup.md`, and actual receipt remains an external acceptance step.
 
 ## Review and verify
 
@@ -46,6 +48,8 @@ python3 scripts/build.py
 python3 scripts/check_site.py
 python3 scripts/test_factory.py
 sh scripts/check_contact.sh
+node scripts/check_components.cjs
+node scripts/check_workflow.cjs
 ```
 
 Use the targeted browser checks documented in the README for changed routes. Check narrow screens, keyboard use, both color modes, and a no-JavaScript visit. Performance reports and automated accessibility results apply only to the measured output, never every future composition.

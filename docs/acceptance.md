@@ -25,4 +25,4 @@ Lighthouse scores from the original five-page demo are historical and are not cu
 
 All showcased businesses, names, testimonials, and offers are fictional examples. Real identity, copy, imagery rights, service coverage, and any claims require client review. Hosting, domain configuration, indexing, live form receipt, and publication remain owner-controlled and have not been performed.
 
-The prior demo and starter acceptance records are preserved in [reference-demo-acceptance.md](reference-demo-acceptance.md) and [starter-acceptance.md](starter-acceptance.md). Strategic direction, milestone status, and planned evolution are tracked in [roadmap.md](../roadmap.md).
+The prior demo and starter acceptance records are preserved in [reference-demo-acceptance.md](reference-demo-acceptance.md) and [starter-acceptance.md](starter-acceptance.md). Practical component expansion and low-fidelity planning workspace acceptance are documented in [component-library.md](component-library.md) and [workflow-acceptance.md](workflow-acceptance.md). Strategic direction, milestone status, and planned evolution are tracked in [roadmap.md](../roadmap.md).

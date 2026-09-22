@@ -1,18 +1,18 @@
 # The Website Factory
 
-A kitchen-sink Hugo website master: build a broad collection of reusable sections, layouts, and business presets, then sculpt each client site into a focused, coherent website.
-
-The master keeps the full collection. Each client gets a separate copy with its own branding, content, page composition, and selected capabilities. TheWebsiteFactory, a fictional agency, is the reference design and one example composition.
+A web agency storefront backed by an internal website production system. Clients buy a website shaped around their business; reusable components, presets, and checks help us deliver it consistently.
 
 ## Direction and current state
 
-The guiding principle is **broad capability, intentional defaults, easy subtraction**. The full collection belongs in the master and its visual workshop. A finished client site includes the sections that serve its visitors and that the business can supply and maintain.
+The public site explains services, examples, scope, and the client journey. The internal factory keeps the broad section library and workshop. Each client gets a separate copy with its own branding, content, page composition, and selected capabilities.
+
+The operating cycle is **brief → scope → assemble → client review → verify and hand over → improve the master**. Read [the agency workflow](docs/agency-workflow.md) for responsibilities and the two preview commands. The agency remains a fictional demonstration until real business details and launch readiness are established.
 
 This adopts the master-and-sculpt approach used in the sibling `jones-construction` project. Shared patterns can inform this implementation; contractor-specific content, business claims, approvals, and integrations must remain specific to their client.
 
-**Available now:** 20 module families with 41 variants, a visual workshop at `/site-kit/`, an interactive Living Style Guide at `/site-kit/style-guide/`, four business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has six main pages, four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
+**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, four business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has six main pages, four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
 
-**Client review:** open `/site-kit/` to compare the agency, contractor, consultant, and local-service compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
+**Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/` to create or resume a client project. Work through its brief, page plan, wireframe copy, review, and design handoff. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, consultant, and local-service compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
 See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical client plays, vertical presets, and monetization ideas. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
 
@@ -34,14 +34,20 @@ The library includes these section families:
 | Timeline and milestones | Connected vertical milestone spines and phase cards |
 | Bento showcase | Asymmetric mosaic clusters and compact proof cards |
 | Offers and contact | Pricing or scope guidance, calls to action, contact details, and inquiry forms |
+| Decision support | Service fit and alternatives; included versus separately agreed scope |
+| Preparation and arrival | Preparation checklists, opening hours, directions, and access information |
+| Menus and sessions | Readable item lists, price or scope tables, event agendas, and session cards |
+| Practical help | Business-approved policies, definitions, and support routes |
+
+All 30 families are selectable in the low-fidelity planner. New practical components include copy and accessibility guidance, plus blank planning sections; reference examples never become approved client copy automatically. See [the component expansion guide](docs/component-library.md).
 
 Every module has a stable identifier, a clear purpose, documented content inputs, supported variants, dependencies, and an example. Required content is validated before a build; optional copy is omitted when absent. Sample testimonials, credentials, prices, coverage, and results remain clearly fictional until replaced with supported business facts.
 
 ### Visual workshop and Living Style Guide
 
-The `/site-kit/` catalog shows the available modules and their variants with realistic example content. The living style guide at `/site-kit/style-guide/` documents design tokens (colors, fluid typography specimens, 8-step spacing scale) and atomic UI primitives (buttons, badges, marks, cards, forms, tables, and native disclosures). Native disclosure controls work with a keyboard and without JavaScript.
+The `/site-kit/catalog/` catalog shows the available modules and their variants with realistic example content. The living style guide at `/site-kit/style-guide/` documents design tokens (colors, fluid typography specimens, 8-step spacing scale) and atomic UI primitives (buttons, badges, marks, cards, forms, tables, and native disclosures). Native disclosure controls work with a keyboard and without JavaScript.
 
-The workshop is a development and review surface. Client copies exclude it from emitted pages, navigation, search, and sitemaps. Keep the reference homepage a deliberate composition that demonstrates the design.
+The workshop is an internal development surface, omitted from the default agency build. Client review focuses on the selected client site. Client copies exclude it from emitted pages, navigation, search, and sitemaps. Keep the reference homepage a deliberate composition that demonstrates the design.
 
 ### Page composition and business presets
 
@@ -85,6 +91,11 @@ Client copies must start without inherited approvals, historical performance gua
 | Cloudflare setup and deployment runbook | `docs/cloudflare-setup.md` |
 | Contact form Pages Function endpoint | `functions/api/contact.js` |
 | Expanded workshop, keyboard, and no-JavaScript checks | `scripts/check_workshop.cjs` |
+| Practical component contract checks | `scripts/check_components.cjs` |
+| Planning workspace behavior and persistence checks | `scripts/check_workflow.cjs` |
+| Agency delivery workflow guide | `docs/agency-workflow.md` |
+| Practical component library guide | `docs/component-library.md` |
+| Planning workspace acceptance evidence | `docs/workflow-acceptance.md` |
 | Strategic direction, milestone status, and planned evolution | `roadmap.md` |
 
 ## Build and preview
@@ -100,7 +111,8 @@ python3 scripts/setup.py       # Only if .tools/dart-sass is not already present
 python3 scripts/build.py       # Validates, builds, and checks isolated output before replacing generated files
 python3 scripts/check_site.py  # Fast generated-output checks
 python3 scripts/build.py --serve --port 1313
-# Open http://127.0.0.1:1313/site-kit/ for the client workshop.
+# Open http://127.0.0.1:1313/ for the agency site.
+# Internal workshop: python3 scripts/build.py --workshop --serve --port 1314
 ```
 
 The helper scripts also work when called by absolute path from another directory. They find the project relative to their own location. The build helper uses a private Dart Sass installation if present and a writable temporary Hugo cache. It does not download tools or install anything implicitly.
@@ -174,7 +186,9 @@ In another terminal, run the broader checks when ready:
 ```sh
 PREVIEW_URL=http://127.0.0.1:14722/ npm run check:browser
 npm run audit -- http://127.0.0.1:14722/
-PREVIEW_URL=http://127.0.0.1:14722/ node scripts/check_workshop.cjs
+PREVIEW_URL=http://127.0.0.1:1314/ node scripts/check_workshop.cjs
+node scripts/check_components.cjs
+node scripts/check_workflow.cjs
 ```
 
 The standard browser and Lighthouse commands discover every generated `index.html`, including renamed/new case studies and the contact receipt page, and return nonzero on failure. Browser checks cover axe WCAG A/AA, one H1, `noindex`, light/dark modes, and widths 320/600/900/1200. Lighthouse checks Performance >=95, Accessibility 100, LCP <1.5 s, CLS <0.05, and Home <150 KB / <=10 requests. `CHECK_PATHS` or `AUDIT_PATHS` can limit a run, e.g. `CHECK_PATHS='["/","/pricing/"]'`. Use `SITE_OUTPUT` for an alternate build directory and `CHROME_PATH` for an existing Chrome binary. Reports are written under this project's ignored `reports/` directory, independent of the caller's working directory.
@@ -183,9 +197,9 @@ Automated checks do not establish manual keyboard, screen-reader, field INP, liv
 
 ## Hosting and forms
 
-The generated site can be served by any static host. `wrangler.toml` is an optional, pinned Cloudflare Pages recipe; the deployment URL sets canonical URLs. It neither deploys nor connects an account. `_headers` is a Cloudflare/Netlify-style header file; other hosts need equivalent settings. Compression, HTTPS, cache headers, and CSP must be verified at the actual host.
+The generated site can be served by any static host. `wrangler.toml` is an optional, pinned Cloudflare Pages recipe; the deployment URL sets canonical URLs. It neither deploys nor connects an account. `_headers` is a Cloudflare/Netlify-style header file enforcing strict security defaults including CSP, clickjacking prevention, and `Strict-Transport-Security: max-age=31536000; includeSubDomains`. `wrangler.toml` declares the `ENQUIRY` KV namespace and optional `IMAGES_BUCKET` R2 binding. Compression, HTTPS, cache headers, and CSP must be verified at the actual host.
 
-The current **form backend is a Cloudflare Pages Function** (`functions/api/contact.js`), not a generic multi-provider adapter. On hosts without Pages Functions keep delivery disabled until a real integration is implemented. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment, binds `ENQUIRY` (KV) and/or `EMAIL` (send_email), and chooses the recipient. With neither binding present the endpoint returns 503 and accepts nothing. Step-by-step account setup, including the domain, the enquiry store, and notification email, is in [docs/cloudflare-setup.md](docs/cloudflare-setup.md). Verify the endpoint before enabling it with `sh scripts/check_contact.sh`, which builds a form-enabled site, serves it with `wrangler pages dev` against a local KV binding, and exercises the accepted, stored, redirected, rejected, and unconfigured paths. It deploys nothing and needs no Cloudflare account. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
+The current **form backend is a Cloudflare Pages Function** (`functions/api/contact.js`), not a generic multi-provider adapter. On hosts without Pages Functions keep delivery disabled until a real integration is implemented. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment and binds `ENQUIRY` (KV). With no binding present the endpoint returns 503 and accepts nothing. The public contact form notice is scoped to storage-only until live email receipt is confirmed. Step-by-step account setup, including the domain, the enquiry store, and notification email, is in [docs/cloudflare-setup.md](docs/cloudflare-setup.md). Verify the endpoint before enabling it with `sh scripts/check_contact.sh`, which builds a form-enabled site, serves it with `wrangler pages dev` against a local KV binding, and exercises the accepted, stored, redirected, rejected, and unconfigured paths. It deploys nothing and needs no Cloudflare account. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
 
 No inbox or account is configured. No form test is sent by the local checks. Test both submission paths with synthetic data only after explicit authorization, and verify actual receipt rather than trusting the success page. Do not enable indexing, use the fictional domain, or replace sample claims with unsupported claims.
 

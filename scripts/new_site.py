@@ -43,6 +43,8 @@ def create(destination, name, preset="agency"):
         (destination / 'docs').mkdir()
         shutil.copy2(ROOT / 'docs/starter-guide.md', destination / 'docs/starter-guide.md')
         shutil.copy2(ROOT / 'docs/factory-guide.md', destination / 'docs/factory-guide.md')
+        shutil.copy2(ROOT / 'docs/agency-workflow.md', destination / 'docs/agency-workflow.md')
+        shutil.copy2(ROOT / 'docs/component-library.md', destination / 'docs/component-library.md')
         shutil.copy2(ROOT / 'docs/cloudflare-setup.md', destination / 'docs/cloudflare-setup.md')
         config = destination / 'data/site.yaml'
         text = config.read_text()
