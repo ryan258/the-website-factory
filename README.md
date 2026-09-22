@@ -10,9 +10,9 @@ The operating cycle is **brief → scope → assemble → client review → veri
 
 This adopts the master-and-sculpt approach used in the sibling `jones-construction` project. Shared patterns can inform this implementation; contractor-specific content, business claims, approvals, and integrations must remain specific to their client.
 
-**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, four business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
+**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, five business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
 
-**Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/` to create or resume a client project. Work through its brief, page plan, wireframe copy, review, and design handoff. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, consultant, and local-service compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
+**Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/` to create or resume a client project. Work through its brief, page plan, wireframe copy, review, and design handoff. Exported project plans can be compiled directly into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, consultant, local-service, and 258webco compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
 See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical client plays, vertical presets, and monetization ideas. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
 
@@ -53,7 +53,7 @@ The workshop is an internal development surface, omitted from the default agency
 
 Each page declares its ordered section selection and variants through validated JSON configuration. Business identity, editorial content, visual theme, and page composition have separate configuration surfaces.
 
-Choose from agency, contractor, consultant, and local-service presets. Presets select an initial composition; they do not establish which services a business offers or supply approved copy. Typography, imagery, colors, tone, and layout remain editable.
+Choose from agency, contractor, consultant, local-service, and 258webco presets. Presets select an initial composition; they do not establish which services a business offers or supply approved copy. Typography, imagery, colors, tone, and layout remain editable.
 
 ### Complete selection and removal
 
@@ -87,10 +87,13 @@ Client copies must start without inherited approvals, historical performance gua
 | Composition and component rendering | `layouts/partials/factory/` |
 | Configuration validation and preset selection | `scripts/factory.py` |
 | Focused copy, omission, and failure-path checks | `scripts/test_factory.py` |
+| Planner-to-preset compilation engine | `scripts/from_plan.py` |
+| Planner compilation regression tests | `scripts/test_from_plan.py` |
 | Cloudflare contact endpoint test harness | `scripts/check_contact.sh` |
 | Contact endpoint failure paths (no account needed) | `scripts/test_contact_endpoint.mjs` |
 | Cloudflare setup and deployment runbook | `docs/cloudflare-setup.md` |
 | Contact form Pages Function endpoint | `functions/api/contact.js` |
+| Internal inventory and dotfile protection middleware | `functions/_middleware.js` |
 | Expanded workshop, keyboard, and no-JavaScript checks | `scripts/check_workshop.cjs` |
 | Practical component contract checks | `scripts/check_components.cjs` |
 | Planning workspace behavior and persistence checks | `scripts/check_workflow.cjs` |
@@ -162,9 +165,13 @@ The Python checks require no package installation. They fail with a nonzero exit
 ```sh
 python3 scripts/build.py
 python3 scripts/check_site.py
-python3 scripts/test_starter.py
 python3 scripts/test_factory.py
+python3 scripts/test_starter.py
+python3 scripts/test_from_plan.py
+node scripts/test_contact_endpoint.mjs
 sh scripts/check_contact.sh
+# Or run all unit/contract tests at once:
+npm test
 ```
 
 The focused starter test creates an isolated temporary client copy, changes branding and metrics, builds it under a subpath, checks its output, and deliberately introduces a broken link to prove the checker fails. It also verifies refusal to overwrite an existing destination. Temporary output is removed after the test.
@@ -198,9 +205,9 @@ Automated checks do not establish manual keyboard, screen-reader, field INP, liv
 
 ## Hosting and forms
 
-The generated site can be served by any static host. `wrangler.toml` is an optional, pinned Cloudflare Pages recipe; the deployment URL sets canonical URLs. It neither deploys nor connects an account. `_headers` is a Cloudflare/Netlify-style header file enforcing strict security defaults including CSP, clickjacking prevention, and `Strict-Transport-Security: max-age=31536000; includeSubDomains`. `wrangler.toml` declares the `ENQUIRY` KV namespace and optional `IMAGES_BUCKET` R2 binding. Compression, HTTPS, cache headers, and CSP must be verified at the actual host.
+The generated site can be served by any static host. `wrangler.toml` is an optional, pinned Cloudflare Pages recipe; the deployment URL sets canonical URLs. It neither deploys nor connects an account. `_headers` is a Cloudflare/Netlify-style header file enforcing strict security defaults including CSP, clickjacking prevention, `Strict-Transport-Security: max-age=31536000; includeSubDomains`, and `no-store`/`noindex` rules for internal build inventories. Cloudflare Pages middleware (`functions/_middleware.js`) returns 404 for `/.factory-build.json` and hidden dotfiles. `wrangler.toml` declares the `ENQUIRY` KV namespace and optional `IMAGES_BUCKET` R2 binding. Compression, HTTPS, cache headers, and CSP must be verified at the actual host.
 
-The current **form backend is a Cloudflare Pages Function** (`functions/api/contact.js`), not a generic multi-provider adapter. On hosts without Pages Functions keep delivery disabled until a real integration is implemented. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment and binds `ENQUIRY` (KV). Rendering the form does not open the endpoint: it accepts a submission only when the deployment both binds a destination and sets `ENQUIRY_ENABLED = "true"`, and it acknowledges receipt only after the durable write succeeds — a failed write is a 502 for both the JavaScript and no-JavaScript paths, never a receipt page. With no binding or no explicit intake the endpoint returns 503 and accepts nothing. A scaffolded client copy inherits neither: its `wrangler.toml` is generated unconfigured, with no namespace id, bucket, or notification address from this project. The public contact form notice is scoped to storage-only until live email receipt is confirmed. Step-by-step account setup, including the domain, the enquiry store, and notification email, is in [docs/cloudflare-setup.md](docs/cloudflare-setup.md). Verify the endpoint before enabling it with `sh scripts/check_contact.sh`, which builds a form-enabled site, serves it with `wrangler pages dev` against a local KV binding, and exercises the accepted, stored, redirected, rejected, unconfigured, and bindings-without-intake paths. It deploys nothing and needs no Cloudflare account. `node scripts/test_contact_endpoint.mjs` covers the failure paths that need no runtime at all: storage errors, notification errors, and unopened intake. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
+The current **form backend is a Cloudflare Pages Function** (`functions/api/contact.js`), not a generic multi-provider adapter. On hosts without Pages Functions keep delivery disabled until a real integration is implemented. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment and binds `ENQUIRY` (KV). Rendering the form does not open the endpoint: it accepts a submission only when the deployment both binds a destination and sets `ENQUIRY_ENABLED = "true"`, and it acknowledges receipt only after the durable write succeeds — a failed write is a 502 for both the JavaScript and no-JavaScript paths, never a receipt page. Stored submissions set a 90-day retention TTL (`expirationTtl`), client IPs are rate-limited to 5 submissions per 10 minutes via KV, and real-time webhook alerts can be dispatched via `NOTIFICATION_WEBHOOK`. With no binding or no explicit intake the endpoint returns 503 and accepts nothing. A scaffolded client copy inherits neither: its `wrangler.toml` is generated unconfigured, with no namespace id, bucket, or notification address from this project. The public contact form notice is scoped to storage-only until live email receipt is confirmed. Step-by-step account setup, including the domain, the enquiry store, and notification email, is in [docs/cloudflare-setup.md](docs/cloudflare-setup.md). Verify the endpoint before enabling it with `sh scripts/check_contact.sh`, which builds a form-enabled site, serves it with `wrangler pages dev` against a local KV binding, and exercises the accepted, stored, redirected, rejected, unconfigured, and bindings-without-intake paths. It deploys nothing and needs no Cloudflare account. `node scripts/test_contact_endpoint.mjs` covers offline verification: storage errors, notification errors, unopened intake, retention TTL, and IP rate limiting. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
 
 No inbox or account is configured. No form test is sent by the local checks. Test both submission paths with synthetic data only after explicit authorization, and verify actual receipt rather than trusting the success page. Do not enable indexing, use the fictional domain, or replace sample claims with unsupported claims.
 

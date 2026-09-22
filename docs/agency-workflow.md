@@ -47,7 +47,7 @@ Projects are saved in browser local storage on the current origin (including the
 
 The AI copy control prepares a prompt from the brief and selected section. No model or external service is connected. Paste a proposed response, review it, and apply it as draft; proposals are saved separately until applied. Business facts and approval remain under operator control.
 
-The component catalog moved to `/site-kit/catalog/`; the style guide and preset references remain available from it. Visual design, automated site generation from the project, direct AI integration, shared storage, and launch workflows are subsequent work.
+The component catalog moved to `/site-kit/catalog/`; the style guide and preset references remain available from it. Exported JSON project plans can now be compiled directly into validated factory presets using `scripts/from_plan.py` (`python3 scripts/from_plan.py export.json --name client-preset --write`). Direct AI integration, shared remote storage, and full automated launch workflows remain subsequent work.
 
 ### Focused verification
 

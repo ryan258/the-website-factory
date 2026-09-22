@@ -2,7 +2,7 @@
 
 Follow [the agency delivery cycle](agency-workflow.md) in the master: agree the brief and scope before selecting components. The agency storefront is the default build. Run `python3 scripts/build.py --workshop --serve --port 1314` for internal planning at `http://127.0.0.1:1314/site-kit/`; workshop output goes to `public-workshop`.
 
-The master includes four fictional business compositions, a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
+The master includes five business compositions (`agency`, `contractor`, `consultant`, `local-service`, `258webco`), a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
 
 ## Start a separate copy
 
@@ -10,7 +10,17 @@ The master includes four fictional business compositions, a project workspace at
 python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor
 ```
 
-Choose `agency`, `contractor`, `consultant`, or `local-service`. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated agency project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
+Choose `agency`, `contractor`, `consultant`, `local-service`, or `258webco`. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated agency project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
+
+## Compiling presets from the planning workshop
+
+Exported project plans from `/site-kit/` can be converted directly into validated factory presets:
+
+```sh
+python3 scripts/from_plan.py path/to/plan.json --name "my-preset" --write
+```
+
+This compiles the planner JSON into `data/presets/<name>.json`, normalizes the page hierarchy (ensuring `home` first and `contact` last), injects mandatory hero headers and services, maps sections to schema contracts in `data/modules.json`, and validates the output against `scripts/factory.py`.
 
 ## Edit the composition
 
@@ -32,13 +42,13 @@ Page front matter controls browser metadata. Composition content controls the vi
 
 `data/modules.json` documents each module's variants, required fields, and page dependencies. The work module requires the work page. Image references must resolve to local assets. Module links currently support local page paths only; external links and arbitrary fragments are intentionally rejected until they have a defined validation contract.
 
-The helper validates configuration before building and renders into an isolated temporary destination. Successful builds reconcile only files recorded in the previous build manifest. Existing untracked HTML that would otherwise remain as a stale page blocks the build; choose an empty output directory rather than deleting unknown files. Never use a source directory as the output destination.
+The helper validates configuration before building and renders into an isolated temporary destination. Successful builds reconcile only files recorded in the previous build manifest. Existing untracked assets (`.html`, `.js`, `.css`, `.map`) that would otherwise remain in the destination block the build; choose an empty output directory rather than leaving unknown assets in place. Never use a source directory as the output destination.
 
 ## Content and delivery review
 
 The workshop deliberately demonstrates testimonial, statistic, and pricing layouts with conspicuous sample notices. The default compositions omit testimonial endorsements. Replace or omit sample people, claims, service areas, and offers before using a site as a real business website. A new name does not approve the other text.
 
-Client contact pages retain the existing accessible form. Its service choices come from the selected preset's `services` section, so the form and the Services page can never disagree; budget choices come from `data/contact.yaml`. Keep budgets in step with any prices you publish. A preview never sends a message. The endpoint accepts a submission only when the deployment declares its own storage and sets `ENQUIRY_ENABLED = "true"`, and it acknowledges receipt only after the durable write succeeds; a client copy is scaffolded with neither, so it cannot write into another site's enquiry store. A Cloudflare Pages Function (`functions/api/contact.js`) provides durable enquiry storage in KV, documented in `docs/cloudflare-setup.md`, and actual receipt remains an external acceptance step.
+Client contact pages retain the existing accessible form. Its service choices come from the selected preset's `services` section, so the form and the Services page can never disagree; budget choices come from `data/contact.yaml`. Keep budgets in step with any prices you publish. A preview never sends a message. The endpoint accepts a submission only when the deployment declares its own storage and sets `ENQUIRY_ENABLED = "true"`, and it acknowledges receipt only after the durable write succeeds; a client copy is scaffolded with neither, so it cannot write into another site's enquiry store. A Cloudflare Pages Function (`functions/api/contact.js`) provides durable enquiry storage in KV with 90-day retention and IP rate limiting, documented in `docs/cloudflare-setup.md`, and actual receipt remains an external acceptance step.
 
 ## Review and verify
 
@@ -47,6 +57,8 @@ python3 scripts/factory.py
 python3 scripts/build.py
 python3 scripts/check_site.py
 python3 scripts/test_factory.py
+python3 scripts/test_from_plan.py
+node scripts/test_contact_endpoint.mjs
 sh scripts/check_contact.sh
 node scripts/check_components.cjs
 node scripts/check_workflow.cjs

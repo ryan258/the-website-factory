@@ -165,7 +165,14 @@ replacing it with Cloudflare Email Routing. Do these in order.
 
 Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the catch-all) directly to your Gmail.
 
-*(Note: Cloudflare Pages configuration files reject `[[send_email]]` bindings, which are supported only in Workers. Enquiries submitted through the contact form are durably stored in the `ENQUIRY` KV namespace, where they can be queried or processed without loss. The public contact notice reflects this as storage-only until an external worker/service test confirms live email receipt).*
+*(Note: Cloudflare Pages configuration files reject `[[send_email]]` bindings, which are supported only in Workers. Enquiries submitted through the contact form are durably stored in the `ENQUIRY` KV namespace with automatic 90-day retention TTL (`expirationTtl: 7776000`), where they can be queried or processed without loss. Client submissions are rate-limited to 5 per 10 minutes per IP via KV. Optional real-time alerts can be dispatched via `NOTIFICATION_WEBHOOK` in `[vars]`. The public contact notice reflects this as storage-only until an external worker/service test confirms live email receipt).*
+
+### Security & Privacy Protections
+
+- **Rate Limiting:** `functions/api/contact.js` tracks IP submission frequency in KV (`ratelimit:<ip>`), returning HTTP 429 if more than 5 enquiries arrive within a 10-minute window.
+- **Data Retention TTL:** Enquiries are stored with a 90-day expiration TTL in KV to avoid hoarding personal information indefinitely.
+- **Webhook Delivery:** Setting `NOTIFICATION_WEBHOOK = "https://..."` enables immediate POST notification forwarding for new submissions.
+- **Internal Artifact & Dotfile Protection:** `functions/_middleware.js` intercepts and returns HTTP 404 for `/.factory-build.json` and hidden dotfiles, backed by `static/_headers` with `X-Robots-Tag: noindex, nofollow, noarchive` and `Cache-Control: no-store`.
 
 ---
 
@@ -279,7 +286,7 @@ adding a domain or changing how you get notified.
 ## What this setup does not do
 
 - It does not make backups of your enquiries anywhere except Cloudflare KV.
-- It does not stop spam beyond a simple hidden-field trap. If spam arrives, that is
+- It does not stop distributed spam beyond a simple hidden-field honeypot trap and IP rate limiting (5 requests per 10 minutes). If large-scale spam arrives, that is
   the point to add Turnstile — and doing so needs the security headers in
   `static/_headers` loosened, so it is a deliberate change, not a switch.
 - It does not send a confirmation email to the person who filled in the form.

@@ -1,6 +1,6 @@
 # Client starter handover
 
-1. Create a fresh copy with `scripts/new_site.py --preset agency|contractor|consultant|local-service` (choose one preset value). It refuses existing paths and keeps delivery disabled and `noindex` on.
+1. Create a fresh copy with `scripts/new_site.py --preset agency|contractor|consultant|local-service|258webco` (choose one preset value). It refuses existing paths and keeps delivery disabled and `noindex` on.
 2. Edit `data/site.yaml`: name/wordmark, email, address, hours, location, navigation, shared CTA, font, colors, social-card text. These are design inputs, not verified business facts.
 3. Edit ordered sections and visible copy in `data/presets/<preset>.json`. Replace page metadata and Markdown, contact service choices, and selected case studies. See `docs/factory-guide.md` for module contracts and removal behavior. All six case metrics live in each case's front matter. Remove unused case files and replace original artwork deliberately.
 4. Replace the default logo/favicon/touch icon and optional decorative hero artwork when the client has approved assets. Update font licenses if changing the typeface.
