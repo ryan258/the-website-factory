@@ -27,6 +27,36 @@ const KEY='website-factory-projects-v1';
  const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Export backup',exact:true}).click();const download=await downloadPromise;const backup=fs.readFileSync(await download.path());assert.equal(JSON.parse(backup).projects.length,1);
  await page.getByRole('button',{name:'All projects',exact:true}).click();await page.locator('#import-project').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:backup});assert.equal(await page.getByLabel('Project name',{exact:true}).inputValue(),'Regression fixture (imported)');
  await page.getByRole('button',{name:'All projects',exact:true}).click();const before=await page.evaluate(key=>localStorage.getItem(key),KEY);await page.locator('#import-project').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{"version":1,"projects":[{}]}')});await page.waitForFunction(()=>document.querySelector('#wf-status').textContent.includes('Import failed'));assert.match(await page.locator('#wf-status').innerText(),/Import failed/);assert.equal(await page.evaluate(key=>localStorage.getItem(key),KEY),before);results.push('Downloaded backup imports as a separate project; malformed imports leave saved data unchanged.');
+ // A backup the app writes must import, and work must stop before it cannot.
+ await page.getByLabel('New project name',{exact:true}).fill('Capacity fixture');await page.getByRole('button',{name:'Start project',exact:true}).click();
+ const filled=await page.evaluate(async()=>{
+  const sleep=()=>new Promise(r=>setTimeout(r,0));
+  const refusal=()=>{const text=document.querySelector('#wf-status').textContent;return text.includes('undone')?text:'';};
+  const click=async selector=>{const el=document.querySelector(selector);if(el){el.click();await sleep();}return !!el;};
+  const stage=n=>click(`[data-action="step"][data-step="${n}"]`);
+  const paragraph='R\u00e9\u00e9valuation des priorit\u00e9s \u2014 '.repeat(500).slice(0,11990); // multibyte, at the field limit
+  let refused='';
+  for(let p=0;p<5&&!refused;p++){
+   if(p){await stage(1);await click('[data-action="add-page"]');}
+   await stage(2);
+   for(let i=0;i<29&&!refused;i++){await click('[data-action="add-section"]');refused=refusal();}
+   for(const field of document.querySelectorAll('[data-copy="body"]')){
+    if(field.value)continue;
+    field.value=paragraph;field.dispatchEvent(new Event('input',{bubbles:true}));await sleep();
+    refused=refusal();if(refused)break;
+   }
+  }
+  return refused;
+ });
+ assert.match(filled,/backup limit/,'editing past the backup limit must be refused and undone');
+ const near=page.waitForEvent('download');await page.getByRole('button',{name:'Export backup',exact:true}).click();const large=fs.readFileSync(await (await near).path());
+ assert.ok(large.length>500000,`capacity fixture should be a large backup, got ${large.length} bytes`);
+ assert.ok(large.length<=2000000,`the app must not write a backup it refuses to read: ${large.length} bytes`);
+ await page.getByRole('button',{name:'All projects',exact:true}).click();await page.locator('#import-project').setInputFiles({name:'large.json',mimeType:'application/json',buffer:large});
+ await page.waitForFunction(()=>!document.querySelector('#wf-status').textContent.includes('Import failed'));
+ assert.match(await page.getByLabel('Project name',{exact:true}).inputValue(),/\(imported\)$/);
+ results.push(`A ${large.length}-byte backup with multibyte copy round-trips; oversized edits are refused (status: ${filled.slice(0,40)}).`);
+ await page.getByRole('button',{name:'All projects',exact:true}).click();
  await page.getByRole('button',{name:'Open project',exact:true}).first().click();await page.getByRole('button',{name:'5. Design handoff',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Mark plan ready for design',exact:true}).isEnabled(),false);
  for(const name of ['1. Brief','2. Page plan','3. Shape pages','4. Review','5. Design handoff']){await page.getByRole('button',{name,exact:true}).click();const axe=await new AxeBuilder({page}).include('#workflow').withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();assert.deepEqual(axe.violations.map(x=>({id:x.id,nodes:x.nodes.map(n=>n.target)})),[],name);for(const width of [320,900,1440]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${name} overflow at ${width}`);}}
  await page.emulateMedia({colorScheme:'dark'});await page.getByRole('button',{name:'3. Shape pages',exact:true}).click();const darkAxe=await new AxeBuilder({page}).include('#workflow').withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();assert.deepEqual(darkAxe.violations.map(x=>({id:x.id,nodes:x.nodes.map(n=>n.target)})),[],'Dark mode editor');await page.emulateMedia({colorScheme:'light'});
