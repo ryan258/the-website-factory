@@ -1,0 +1,35 @@
+name = "website-factory"
+pages_build_output_dir = "public"
+compatibility_date = "2026-01-01"
+
+# --- Contact form delivery -------------------------------------------------
+# All three blocks below are commented out on purpose. With none of them active,
+# /api/contact returns 503 and the site is a preview that cannot receive mail.
+# docs/cloudflare-setup.md walks through filling them in.
+
+# Where enquiries are stored. Create with: npx wrangler kv namespace create ENQUIRY
+# [[kv_namespaces]]
+# binding = "ENQUIRY"
+# id = "<paste the id wrangler prints>"
+
+# Notification email. The address in ENQUIRY_TO must be a verified destination
+# address on this Cloudflare account; sending to it is free and quota-exempt.
+# [[send_email]]
+# name = "EMAIL"
+# destination_address = "you@example.com"
+
+# [vars]
+# ENQUIRY_TO = "you@example.com"
+# ENQUIRY_FROM = "forms@yourdomain.com"
+
+# --- Building --------------------------------------------------------------
+# Preferred: build locally, where the Hugo and Dart Sass pins are verified, then
+# upload the checked output with `npx wrangler pages deploy`.
+#
+# If you connect a Git repository and let Cloudflare build instead:
+#   Build command:    python3 scripts/setup.py && python3 scripts/build.py --base-url "$CF_PAGES_URL/"
+#   Output directory: public
+#   HUGO_VERSION=0.166.0  DART_SASS_VERSION=1.104.1  HUGO_ENVIRONMENT=production
+# Python and pip are preinstalled on the Pages build image, and setup.py fetches
+# Dart Sass for linux-x64. build.py fails loudly if that image's Hugo is not the
+# Extended build, so a bad image is a failed deploy rather than broken styling.

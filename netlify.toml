@@ -1,9 +1,0 @@
-[build]
-  command = 'hugo --minify --gc --baseURL "$DEPLOY_PRIME_URL/"'
-  publish = 'public'
-[build.environment]
-  HUGO_VERSION = '0.166.0'
-  DART_SASS_VERSION = '1.104.1'
-  HUGO_ENVIRONMENT = 'production'
-# Form delivery remains disabled until the owner chooses a destination and
-# enables Netlify form detection. Then set HUGO_PARAMS_FORMENABLED=true.

@@ -10,8 +10,8 @@ import sys
 from factory import apply_preset, validate
 
 ROOT = Path(__file__).resolve().parents[1]
-FOLDERS = ('assets', 'content', 'data', 'layouts', 'static', 'scripts')
-FILES = ('hugo.toml', 'netlify.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json')
+FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts')
+FILES = ('hugo.toml', 'wrangler.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json')
 
 def create(destination, name, preset="agency"):
     if preset not in ("agency", "contractor", "consultant", "local-service"):
@@ -43,6 +43,7 @@ def create(destination, name, preset="agency"):
         (destination / 'docs').mkdir()
         shutil.copy2(ROOT / 'docs/starter-guide.md', destination / 'docs/starter-guide.md')
         shutil.copy2(ROOT / 'docs/factory-guide.md', destination / 'docs/factory-guide.md')
+        shutil.copy2(ROOT / 'docs/cloudflare-setup.md', destination / 'docs/cloudflare-setup.md')
         config = destination / 'data/site.yaml'
         text = config.read_text()
         for key, value in [('name', name), ('wordmark', name), ('email', 'hello@example.invalid')]:
@@ -58,6 +59,7 @@ def create(destination, name, preset="agency"):
         text = conf.read_text()
         text = re.sub(r'^baseURL\s*=.*$', "baseURL = 'https://example.invalid/'", text, flags=re.M)
         text = re.sub(r'^\s*formEnabled\s*=.*$', '  formEnabled = false', text, flags=re.M)
+        text = re.sub(r'^\s*noindex\s*=.*$', '  noindex = true', text, flags=re.M)
         conf.write_text(text)
         (destination / 'docs/acceptance.md').write_text('# New instance: not yet verified\n\nNo source-project performance or accessibility results apply to this instance. Run the local checks and review all sample content before publication. No deployment or form delivery has been performed.\n')
     except Exception:
