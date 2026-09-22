@@ -42,8 +42,14 @@ def publish_output(source, destination):
         if Path(name).is_absolute() or '..' in parts:
             raise ValueError(f'Invalid output manifest path: {name}')
         path = destination / name
+        parent_conflict = next((i for i in range(len(parts) - 1)
+                                if (a := destination.joinpath(*parts[:i+1])).exists() and not a.is_dir()), None)
         if any(destination.joinpath(*parts[:i+1]).is_symlink() for i in range(len(parts))):
             conflicts.append(f'{name}: symlink in generated output')
+        elif parent_conflict is not None:
+            # A file sitting where a generated directory must go: caught here, because
+            # mkdir would otherwise fail mid-copy with part of the build already written.
+            conflicts.append(f'{name}: {"/".join(parts[:parent_conflict+1])} exists as a file, not a directory')
         elif path.is_dir():
             conflicts.append(f'{name}: destination is a directory, not a file')
         elif path.exists() and name not in previous:
@@ -58,18 +64,29 @@ def publish_output(source, destination):
     if conflicts:
         raise ValueError('Refusing to write generated output; nothing was changed:\n  ' + '\n  '.join(conflicts)
                          + '\nChoose an empty destination or restore these files.')
-    # ponytail: preflight only, no rollback journal. A copy failing mid-loop still leaves a mixed tree;
-    # add staged directory swap if that ever bites. Same for concurrent builds — no destination lock.
+    # ponytail: preflight only, no staged directory swap, and no destination lock for
+    # concurrent builds. A copy that fails mid-loop leaves a mixed tree, but the manifest
+    # below is written to match what actually landed, so the next build owns that output
+    # and replaces it instead of refusing it as untracked.
+    recorded = dict(previous)
+    def store():
+        pending = manifest.with_suffix('.json.tmp')
+        pending.write_text(json.dumps(recorded, indent=2)+'\n')
+        os.replace(pending, manifest)
     destination.mkdir(parents=True, exist_ok=True)
-    for name in current:
-        path = destination / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source / name, path)
-    for name in stale:
-        (destination / name).unlink(missing_ok=True)
-    pending = manifest.with_suffix('.json.tmp')
-    pending.write_text(json.dumps(current, indent=2)+'\n')
-    os.replace(pending, manifest)
+    try:
+        for name in current:
+            path = destination / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source / name, path)
+            recorded[name] = current[name]
+        for name in stale:
+            (destination / name).unlink(missing_ok=True)
+            recorded.pop(name, None)
+    except Exception:
+        store()
+        raise
+    store()
 
 def content_selection(destination, workshop=None):
     config = json.loads((ROOT/'data/factory.json').read_text())

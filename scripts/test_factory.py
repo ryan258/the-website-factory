@@ -122,6 +122,40 @@ class FactoryTests(unittest.TestCase):
             self.assertEqual((dest/'old.html').read_text(),'unknown page')
             self.assertEqual((dest/'notes.txt').read_text(),'owner notes')
             self.assertFalse((dest/'index.html').exists())
+    def test_parent_file_conflict_leaves_destination_unchanged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp=Path(tmp);source=tmp/'source';(source/'z-assets').mkdir(parents=True)
+            (source/'index.html').write_text('new');(source/'z-assets/main.css').write_text('body{}')
+            dest=tmp/'output';dest.mkdir();(dest/'z-assets').write_text('owner file')
+            before={p:p.read_bytes() for p in dest.rglob('*') if p.is_file()}
+            with self.assertRaises(ValueError) as caught:build.publish_output(source,dest)
+            self.assertIn('exists as a file, not a directory',str(caught.exception))
+            self.assertEqual({p:p.read_bytes() for p in dest.rglob('*') if p.is_file()},before)
+            self.assertFalse((dest/'index.html').exists())
+            self.assertFalse((dest/'.factory-build.json').exists())
+    def test_interrupted_publication_leaves_an_owned_recoverable_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp=Path(tmp);source=tmp/'source';source.mkdir()
+            for name in ('a.html','b.html','c.html'):(source/name).write_text(name)
+            dest=tmp/'output'
+            import shutil as shutil_module
+            original=shutil_module.copy2;copied=[]
+            def fail_after_one(src,target,*args,**kwargs):
+                if len(copied)>=1:raise OSError('device full')
+                copied.append(target);return original(src,target,*args,**kwargs)
+            build.shutil.copy2=fail_after_one
+            try:
+                with self.assertRaises(OSError):build.publish_output(source,dest)
+            finally:
+                build.shutil.copy2=original
+            manifest=json.loads((dest/'.factory-build.json').read_text())
+            landed={p.name for p in dest.glob('*.html')}
+            self.assertEqual(set(manifest),landed,'the manifest must describe exactly what landed')
+            for name,digest in manifest.items():
+                self.assertEqual(build.digest(dest/name),digest)
+            # A rerun now owns the partial output and completes it instead of refusing it.
+            build.publish_output(source,dest)
+            self.assertEqual({p.name for p in dest.glob('*.html')},{'a.html','b.html','c.html'})
     def test_output_reconciliation_refuses_unowned_targets(self):
         with tempfile.TemporaryDirectory() as tmp:
             source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')
