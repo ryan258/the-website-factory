@@ -78,6 +78,12 @@ def validate(root=ROOT, workshop=None):
         if not isinstance(profile.get('pages'),dict) or not isinstance(profile.get('sections'),dict):
             errors.append(f'{slug}: pages and sections must be objects'); continue
         if not all(k in profile['pages'] for k in ('home','contact')): errors.append(f'{slug}: home and contact are required')
+        # The contact form offers the services module's own items as project types, whatever
+        # content key it references. Without one there is nothing to offer, so fail here.
+        if 'contact' in profile['pages'] and not any(s.get('module')=='services'
+                for page in profile['pages'].values() if isinstance(page,dict)
+                for s in (page.get('sections') or []) if isinstance(s,dict)):
+            errors.append(f'{slug}: a services module is required somewhere; the contact form offers its items as project types')
         for key,page in profile['pages'].items():
             if not re.fullmatch(r'[a-z][a-z0-9-]*',key): errors.append(f'{slug}: invalid page key {key}')
             sections=page.get('sections')

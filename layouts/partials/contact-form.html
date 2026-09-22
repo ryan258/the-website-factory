@@ -1,3 +1,12 @@
+{{ $profile := index hugo.Data.presets hugo.Data.factory.preset }}
+{{ $key := "" }}
+{{/* Go templates range maps in sorted key order, so this choice is deterministic. */}}
+{{ range $page, $definition := $profile.pages }}{{ range $definition.sections }}
+{{ if and (eq .module "services") (or (not $key) (eq $page "services")) }}{{ $key = .content }}{{ end }}
+{{ end }}{{ end }}
+{{ $types := slice }}
+{{ with $key }}{{ range (index $profile.sections .).items }}{{ $types = $types | append .title }}{{ end }}{{ end }}
+{{ if not $types }}{{ errorf "contact form: no services module content to offer as project types" }}{{ end }}
 <div>
 <div class="notice">{{ if site.Params.formEnabled }}Demo form: submissions are recorded by this site on Cloudflare. Do not include sensitive information.{{ else }}Local preview: message delivery is not enabled. You can explore the form; nothing will be sent.{{ end }}</div>
 <form class="contact-form" name="project-enquiry"{{ if site.Params.formEnabled }} method="POST" action="{{ "api/contact" | relURL }}"{{ end }} data-enabled="{{ site.Params.formEnabled }}">
@@ -25,7 +34,7 @@
 <div>
 <label for="project-type">Project type</label>
 <select id="project-type" name="project-type" required aria-describedby="type-help">
-<option value="">Select a project type</option>{{ range (index hugo.Data.presets hugo.Data.factory.preset).sections.services.items }}<option>{{ .title }}</option>{{ end }}<option>Not sure yet</option>
+<option value="">Select a project type</option>{{ range $types }}<option>{{ . }}</option>{{ end }}<option>Not sure yet</option>
 </select>
 <small id="type-help">Choose the closest match.</small>
 </div>
