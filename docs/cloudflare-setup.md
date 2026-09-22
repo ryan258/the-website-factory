@@ -141,21 +141,9 @@ replacing it with Cloudflare Email Routing. Do these in order.
    so nothing else bounces.
 5. Send a message to `ryan@258webco.com` from another account and confirm it arrives.
 
-`wrangler.toml` is already filled in for this:
+Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the catch-all) directly to your Gmail.
 
-```toml
-[[send_email]]
-name = "EMAIL"
-destination_address = "ryanleejwebdev@gmail.com"
-
-[vars]
-ENQUIRY_TO = "ryanleejwebdev@gmail.com"
-ENQUIRY_FROM = "forms@258webco.com"
-```
-
-`ENQUIRY_TO` is the Gmail address, not `ryan@258webco.com` — Cloudflare delivers to
-verified destination addresses, and `ryan@` is one it forwards *from*. `ENQUIRY_FROM`
-needs no mailbox behind it; the catch-all covers any replies.
+*(Note: Cloudflare Pages configuration files reject `[[send_email]]` bindings, which are supported only in Workers. Enquiries submitted through the contact form are durably stored in the `ENQUIRY` KV namespace, where they can be queried or processed without loss).*
 
 ---
 
@@ -198,11 +186,11 @@ For a private preview, leave both settings off and just run `python3 scripts/bui
 ## Step 8 — Send it to Cloudflare
 
 ```sh
-npx wrangler pages deploy
+npx wrangler pages deploy public --project-name 258webco
 ```
 
 **You should see:** an upload progress list, then `Deployment complete!` and a
-`.pages.dev` address.
+`.pages.dev` address (e.g. `https://258webco.pages.dev`).
 
 Open that address in a browser. The site should be there. Go to the contact page and
 send yourself a real test enquiry. Then check it arrived:
@@ -211,8 +199,12 @@ send yourself a real test enquiry. Then check it arrived:
 npx wrangler kv key list --binding ENQUIRY --remote
 ```
 
-**You should see:** one entry, starting with `enquiry:` and today's date. If you chose
-option B in step 5, you should also have an email.
+**You should see:** one entry, starting with `enquiry:` and today's date. To view the
+submitted message content:
+
+```sh
+npx wrangler kv key get --binding ENQUIRY --remote "<paste-key-name>"
+```
 
 **Do not skip this test.** It is the only proof that a real customer's message reaches
 you. A form that looks fine and quietly drops enquiries is worse than no form.
@@ -221,8 +213,12 @@ you. A form that looks fine and quietly drops enquiries is worse than no form.
 
 ## Step 9 — Put your real domain on it
 
-In the Cloudflare dashboard: **Workers & Pages** → **258webco** → **Custom domains** →
-**Set up a custom domain** → type `258webco.com` → confirm.
+In the Cloudflare dashboard:
+1. Go to **Workers & Pages** → click **258webco**.
+2. Along the top tabs, click **Custom domains**.
+3. Click the blue **Set up a custom domain** button.
+4. Type `258webco.com` and click **Continue** → **Activate domain**.
+5. *(Optional)* Click **Set up a custom domain** again and add `www.258webco.com`.
 
 Because the domain is already in this same Cloudflare account, the DNS record is added
 for you and the certificate is issued automatically. It usually takes a minute or two.
@@ -251,6 +247,7 @@ adding a domain or changing how you get notified.
 |---|---|---|
 | `Refusing to write generated output` | The `public/` folder contains files the build does not own | `rm -rf public` and build again |
 | `hugo: expected 0.166.0` | Wrong Hugo version installed | See README.md for the pinned install |
+| `Configuration file for Pages projects does not support "send_email"` | Pages configuration does not support `send_email` in `wrangler.toml` (Workers-only) | Keep `[[send_email]]` commented out in `wrangler.toml`; enquiries are stored in KV |
 | Form says "could not confirm delivery" | The endpoint refused the message | Run `sh scripts/check_contact.sh` to find out which check failed |
 | Form works but no email | The destination address was never verified | Re-check step 5, choice B, point 3 |
 | `Authentication error` from wrangler | Login expired | `npx wrangler login` again |

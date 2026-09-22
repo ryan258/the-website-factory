@@ -38,29 +38,20 @@ Run these commands from your local project terminal (`~/Projects/the-website-fac
    npx wrangler pages project create 258webco --production-branch main
    ```
 
-3. **Verify KV Namespace & Config**:
-   The KV namespace is already created and referenced in [wrangler.toml](wrangler.toml):
+3. **Verify KV Namespace in `wrangler.toml`**:
+   The KV namespace is configured in [wrangler.toml](wrangler.toml):
    ```toml
    [[kv_namespaces]]
    binding = "ENQUIRY"
    id = "ea6f0db631da4aaeb78c786a4581214c"
-
-   [[send_email]]
-   name = "EMAIL"
-   destination_address = "ryanleejwebdev@gmail.com"
-
-   [vars]
-   ENQUIRY_TO = "ryanleejwebdev@gmail.com"
-   ENQUIRY_FROM = "forms@258webco.com"
    ```
+   *(Note: Cloudflare Pages configuration files reject `send_email` bindings — only Workers support that block in config files. The Pages Function at `functions/api/contact.js` automatically uses `ENQUIRY` KV for durable zero-loss enquiry storage).*
 
-4. **Attach Bindings in the Dashboard**:
-   Go to Cloudflare Dashboard → **Workers & Pages** → **258webco** → **Settings** → **Functions**:
-   - **KV namespace bindings**: Click *Add binding* → Variable name: `ENQUIRY`, KV namespace: `ENQUIRY` (`ea6f0db631da4aaeb78c786a4581214c`).
-   - **Send Email bindings**: Click *Add binding* → Variable name: `EMAIL`, Destination address: `ryanleejwebdev@gmail.com`.
-   - **Environment variables**: Under **Variables and Secrets**, add:
-     - `ENQUIRY_TO` = `ryanleejwebdev@gmail.com`
-     - `ENQUIRY_FROM` = `forms@258webco.com`
+4. **Attach KV Binding in Cloudflare Pages Dashboard**:
+   Go to Cloudflare Dashboard → **Workers & Pages** → **258webco** → **Settings** → **Bindings**:
+   - Under **KV namespace bindings**, verify or add:
+     - Variable name: `ENQUIRY`
+     - KV namespace: `ENQUIRY` (`ea6f0db631da4aaeb78c786a4581214c`)
 
 ---
 
@@ -111,21 +102,26 @@ npx wrangler pages deploy public --project-name 258webco
 
 ## 5. Attach Custom Domain (258webco.com)
 
-1. In the Cloudflare dashboard, go to **Workers & Pages** → **258webco** → **Custom domains**.
-2. Click **Set up a custom domain**.
-3. Type `258webco.com` and click **Continue**.
-4. Confirm DNS record activation. Cloudflare automatically issues an SSL/TLS certificate (usually takes 1–2 minutes).
+1. In the Cloudflare dashboard, go to **Workers & Pages** → **258webco**.
+2. Click the **Custom domains** tab along the top.
+3. Click **Set up a custom domain**.
+4. Type `258webco.com` and click **Continue** → **Activate domain**.
+5. *(Optional)* Click **Set up a custom domain** again to add `www.258webco.com`.
+6. Confirm DNS record activation. Cloudflare automatically handles the DNS routing and issues SSL/TLS certificates (typically active in 1–2 minutes).
 
 ---
 
 ## 6. Live Verification (Smoke Test)
 
-1. Open `https://258webco.com/contact/` in your browser.
+1. Open `https://258webco.com/contact/` in your browser (or your preview at `https://258webco.pages.dev/contact/`).
 2. Fill out and submit the form with a test message.
 3. Confirm:
    - Success state appears on the page ("Thank you. Your enquiry has been received.").
-   - Notification email arrives in `ryanleejwebdev@gmail.com`.
    - Backup enquiry is recorded in Cloudflare KV:
      ```sh
      npx wrangler kv key list --binding ENQUIRY --remote
+     ```
+   - Inspect the stored message payload:
+     ```sh
+     npx wrangler kv key get --binding ENQUIRY --remote "<key-from-list-above>"
      ```
