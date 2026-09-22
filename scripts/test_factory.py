@@ -109,4 +109,28 @@ class FactoryTests(unittest.TestCase):
             self.assertEqual((dest/'old.html').read_text(),'unknown page')
             self.assertEqual((dest/'notes.txt').read_text(),'owner notes')
             self.assertFalse((dest/'index.html').exists())
+    def test_output_reconciliation_refuses_unowned_targets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')
+            def fresh(setup):
+                dest=Path(tempfile.mkdtemp(dir=tmp));setup(dest);return dest
+            # An owner edit to a previously generated file that this build emits again.
+            def edited(dest):
+                (dest/'index.html').write_text('owner edit')
+                (dest/'.factory-build.json').write_text(json.dumps({'index.html':hashlib.sha256(b'old').hexdigest()}))
+            # A file never tracked by the factory sitting where generated output would land.
+            untracked=lambda dest:(dest/'index.html').write_text('owner page')
+            # A directory occupying a generated file path.
+            collision=lambda dest:(dest/'index.html').mkdir()
+            symlinked=lambda dest:(dest/'.factory-build.json').symlink_to(Path(tmp)/'sibling.json')
+            (Path(tmp)/'sibling.json').write_text('owner data')
+            for setup in (edited,untracked,collision,symlinked):
+                with self.subTest(setup=setup):
+                    dest=fresh(setup);before={p:p.read_bytes() for p in dest.rglob('*') if p.is_file()}
+                    with self.assertRaises(ValueError):build.publish_output(source,dest)
+                    self.assertEqual({p:p.read_bytes() for p in dest.rglob('*') if p.is_file()},before)
+                    self.assertEqual((Path(tmp)/'sibling.json').read_text(),'owner data')
+            # A clean destination still publishes, and an unchanged rebuild is accepted.
+            dest=Path(tmp)/'clean';build.publish_output(source,dest);build.publish_output(source,dest)
+            self.assertEqual((dest/'index.html').read_text(),'new')
 if __name__=='__main__': unittest.main()

@@ -2,12 +2,19 @@
 """Check generated HTML, metadata, local references, and compressed asset budgets."""
 import argparse
 import gzip
+import os
+import re
 from html.parser import HTMLParser
 from pathlib import Path
 import sys
 from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
+
+def noindex_expected():
+    """Search-engine visibility is a deliberate release setting, not a template edit."""
+    found = re.search(r'(?m)^\s*noindex\s*=\s*(\w+)', (ROOT/'hugo.toml').read_text())
+    return os.environ.get('HUGO_PARAMS_NOINDEX', found.group(1) if found else 'true').lower() not in ('false', '0', 'no')
 class Page(HTMLParser):
     def __init__(self):
         super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]
@@ -26,7 +33,8 @@ class Page(HTMLParser):
     def handle_data(self, value):
         if self.in_title:self.title+=value
 
-def check(output):
+def check(output, noindex=None):
+    noindex = noindex_expected() if noindex is None else noindex
     errors=[]; pages={}
     for file in output.rglob('*.html'):
         p=Page();p.feed(file.read_text());pages[file.resolve()]=p
@@ -41,7 +49,8 @@ def check(output):
         if p.h1!=1:errors.append(f'{label}: expected one H1')
         if len(p.title)>=60:errors.append(f'{label}: title must be under 60 characters')
         if len(p.meta.get('description',''))>=155:errors.append(f'{label}: description must be under 155 characters')
-        if p.meta.get('robots')!='noindex':errors.append(f'{label}: noindex missing')
+        if noindex and p.meta.get('robots')!='noindex':errors.append(f'{label}: noindex missing')
+        if not noindex and p.meta.get('robots')=='noindex':errors.append(f'{label}: noindex present in an indexable build')
         if len(set(p.ids))!=len(p.ids):errors.append(f'{label}: duplicate IDs')
         base=urlparse(p.canonical)
         rel=file.relative_to(output).as_posix()
@@ -72,5 +81,5 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('output',nargs='?',default=str(ROOT/'public'));args=parser.parse_args()
     errors=check(Path(args.output).resolve())
     if errors:print('\n'.join(errors),file=sys.stderr);return 1
-    print('Static checks passed: unique metadata, H1, noindex, references, anchors, and compressed CSS/JS budgets.');return 0
+    print(f'Static checks passed: unique metadata, H1, robots ({"noindex" if noindex_expected() else "indexable"}), references, anchors, and compressed CSS/JS budgets.');return 0
 if __name__=='__main__':sys.exit(main())

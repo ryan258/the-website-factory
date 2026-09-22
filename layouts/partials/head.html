@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{ $title }}</title>
 <meta name="description" content="{{ .Description | default hugo.Data.site.description }}">
-<meta name="robots" content="noindex">
+{{ if site.Params.noindex }}<meta name="robots" content="noindex">{{ end }}
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="{{ .Permalink }}">
 <meta property="og:title" content="{{ $title }}">

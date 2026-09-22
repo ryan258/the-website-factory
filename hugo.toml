@@ -4,6 +4,8 @@ enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term', 'RSS']
 [params]
   formEnabled = false
+  # Set false only for a real public domain: it lets search engines index the site.
+  noindex = true
 [security.exec]
   osEnv = ['(?i)^(PATH|PATHEXT|APPDATA|TMP|TEMP|TERM|GO\w+|HOME|USERPROFILE|SYSTEMROOT|LOCALAPPDATA)$']
 
