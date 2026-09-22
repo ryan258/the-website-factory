@@ -14,10 +14,26 @@ export async function onRequestPost({request, env}) {
   // Intake is an explicit per-deployment decision. Inherited bindings alone never open
   // this endpoint: ENQUIRY_ENABLED must be set to "true" for the deployment that owns them.
   const open = String(env.ENQUIRY_ENABLED || '').trim().toLowerCase() === 'true';
-  if (!open || (!env.ENQUIRY && !env.EMAIL)) return reply(503, {error: 'This site is not configured to accept enquiries.'});
+  if (!open || (!env.ENQUIRY && !env.EMAIL && !env.NOTIFICATION_WEBHOOK)) return reply(503, {error: 'This site is not configured to accept enquiries.'});
   let form;
   try { form = await request.formData(); } catch { return reply(400, {error: 'Submission could not be read.'}); }
   if (String(form.get('website') || '').trim()) return done(200, {ok: true}); // Honeypot: accept, discard.
+
+  // Rate limiting by client IP via KV (max 5 requests per 10 minutes)
+  const ip = request.headers.get('cf-connecting-ip') || '';
+  if (ip && env.ENQUIRY && typeof env.ENQUIRY.get === 'function') {
+    const rlKey = `ratelimit:${ip}`;
+    try {
+      const current = parseInt(await env.ENQUIRY.get(rlKey) || '0', 10);
+      if (current >= 5) {
+        return reply(429, {error: 'Too many enquiries submitted. Please wait before trying again.'});
+      }
+      await env.ENQUIRY.put(rlKey, String(current + 1), {expirationTtl: 600});
+    } catch {
+      // Best-effort rate limiting; do not block users if KV get fails
+    }
+  }
+
   const enquiry = {};
   for (const [field, limit] of Object.entries(LIMITS)) {
     const value = String(form.get(field) || '').trim();
@@ -28,13 +44,30 @@ export async function onRequestPost({request, env}) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(enquiry.email)) return reply(400, {error: 'Enter a valid email address.'});
   enquiry.received = new Date().toISOString();
   // The durable copy is the receipt: nothing is acknowledged until the write succeeds.
+  // 90-day retention prevents indefinitely hoarding personal data in KV.
   let stored = false;
   if (env.ENQUIRY) {
     try {
-      await env.ENQUIRY.put(`enquiry:${enquiry.received}:${crypto.randomUUID()}`, JSON.stringify(enquiry));
+      const TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days
+      await env.ENQUIRY.put(`enquiry:${enquiry.received}:${crypto.randomUUID()}`, JSON.stringify(enquiry), {expirationTtl: TTL_SECONDS});
       stored = true;
     } catch {
       return reply(502, {error: 'Your enquiry could not be stored, so it has not been received. Please try again.'});
+    }
+  }
+  // Webhook notification (Pages-compatible delivery path)
+  if (env.NOTIFICATION_WEBHOOK) {
+    try {
+      await fetch(env.NOTIFICATION_WEBHOOK, {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({
+          text: `New website enquiry from ${enquiry.name} (${enquiry.email}):\n${enquiry.message}`,
+          enquiry,
+        }),
+      });
+    } catch {
+      if (!stored && !env.EMAIL) return reply(502, {error: 'Delivery could not be confirmed.'});
     }
   }
   // Notification is best effort once a copy is stored, and the only path when none is.

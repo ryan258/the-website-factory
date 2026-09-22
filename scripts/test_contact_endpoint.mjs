@@ -4,10 +4,10 @@ import assert from 'node:assert/strict';
 import {onRequestPost} from '../functions/api/contact.js';
 
 const VALID = 'name=Test+Person&email=test%40example.com&project-type=Not+sure+yet&budget=Under+10k&message=Hello';
-const post = (env, {json = true, body = VALID} = {}) => onRequestPost({
+const post = (env, {json = true, body = VALID, headers = {}} = {}) => onRequestPost({
   request: new Request('https://example.invalid/api/contact', {
     method: 'POST',
-    headers: {'content-type': 'application/x-www-form-urlencoded', ...(json ? {accept: 'application/json'} : {})},
+    headers: {'content-type': 'application/x-www-form-urlencoded', ...(json ? {accept: 'application/json'} : {}), ...headers},
     body,
   }),
   env,
@@ -15,7 +15,13 @@ const post = (env, {json = true, body = VALID} = {}) => onRequestPost({
 
 const store = () => {
   const written = [];
-  return {written, put: async (key, value) => { written.push([key, value]); }};
+  const kv = new Map();
+  return {
+    written,
+    kv,
+    get: async key => kv.get(key) || null,
+    put: async (key, value, opts) => { written.push([key, value, opts]); kv.set(key, value); }
+  };
 };
 const failing = message => ({put: async () => { throw new Error(message); }});
 const mailer = () => {
@@ -99,6 +105,27 @@ check('invalid submissions are rejected before storage', async () => {
     assert.equal((await post({...ENABLED, ENQUIRY}, {body})).status, 400, body.slice(0, 40));
   }
   assert.equal(ENQUIRY.written.length, 0);
+});
+
+check('stored enquiry sets 90-day expiration TTL', async () => {
+  const ENQUIRY = store();
+  const response = await post({...ENABLED, ENQUIRY});
+  assert.equal(response.status, 200);
+  assert.equal(ENQUIRY.written.length, 1);
+  const [, , opts] = ENQUIRY.written[0];
+  assert.equal(opts?.expirationTtl, 90 * 24 * 60 * 60);
+});
+
+check('rate limiting restricts submissions from same IP to 5 per window', async () => {
+  const ENQUIRY = store();
+  const headers = {'cf-connecting-ip': '203.0.113.42'};
+  for (let i = 0; i < 5; i++) {
+    const res = await post({...ENABLED, ENQUIRY}, {headers});
+    assert.equal(res.status, 200, `request ${i+1} should succeed`);
+  }
+  const rateLimitedRes = await post({...ENABLED, ENQUIRY}, {headers});
+  assert.equal(rateLimitedRes.status, 429);
+  assert.match((await rateLimitedRes.json()).error, /Too many enquiries/);
 });
 
 let failures = 0;
