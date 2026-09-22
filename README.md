@@ -10,7 +10,7 @@ The operating cycle is **brief → scope → assemble → client review → veri
 
 This adopts the master-and-sculpt approach used in the sibling `jones-construction` project. Shared patterns can inform this implementation; contractor-specific content, business claims, approvals, and integrations must remain specific to their client.
 
-**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, four business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has six main pages, four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
+**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, four business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
 
 **Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/` to create or resume a client project. Work through its brief, page plan, wireframe copy, review, and design handoff. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, consultant, and local-service compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
@@ -141,7 +141,7 @@ The new name appears in the header, footer, page titles, structured data, and ge
 | Visible headings, introductions, section content and order | `data/presets/<preset>.json` |
 | Browser titles and meta descriptions | Each section's `content/*/_index.md` |
 | Contact budget choices and currency hint | `data/contact.yaml` |
-| Contact form service choices | `data/services.yaml` |
+| Contact form service choices | the preset's `services` section (shared with the Services page) |
 | Pricing and comparison sections | Selected preset JSON |
 | FAQ sections | Selected preset JSON |
 | Workshop examples of every module | `data/examples.json` (master only) |

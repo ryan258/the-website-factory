@@ -38,7 +38,7 @@ The helper validates configuration before building and renders into an isolated 
 
 The workshop deliberately demonstrates testimonial, statistic, and pricing layouts with conspicuous sample notices. The default compositions omit testimonial endorsements. Replace or omit sample people, claims, service areas, and offers before using a site as a real business website. A new name does not approve the other text.
 
-Client contact pages retain the existing accessible form. Its service choices come from `data/services.yaml`, and budget choices from `data/contact.yaml`. Keep those in sync with offered services. A preview never sends a message. A Cloudflare Pages Function (`functions/api/contact.js`) provides durable enquiry storage in KV, documented in `docs/cloudflare-setup.md`, and actual receipt remains an external acceptance step.
+Client contact pages retain the existing accessible form. Its service choices come from the selected preset's `services` section, so the form and the Services page can never disagree; budget choices come from `data/contact.yaml`. Keep budgets in step with any prices you publish. A preview never sends a message. A Cloudflare Pages Function (`functions/api/contact.js`) provides durable enquiry storage in KV, documented in `docs/cloudflare-setup.md`, and actual receipt remains an external acceptance step.
 
 ## Review and verify
 

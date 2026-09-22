@@ -187,7 +187,7 @@ npm run audit -- http://127.0.0.1:14722/                           # Lighthouse 
 
 **6. Quarterly content-refresh retainers.**
 - Everything a retainer touches is text in one file: `sections` in the preset JSON (headings, cards, FAQs, pricing bullets) plus `content/work/*.md` for case studies.
-- Keep `data/services.yaml` (contact-form service choices) and `data/contact.yaml` (budget choices) in sync whenever services change.
+- The contact form's service choices are the preset's `services` items, so they follow the Services page automatically. Keep `data/contact.yaml` (budget choices) in step with any published prices.
 - Bill the gate run, not the edit: `factory.py` → `build.py` → `check_site.py` catches a broken link or a 60-character title before the client sees it.
 
 **7. Teaser → full site, phased.**
@@ -270,7 +270,7 @@ Each recipe below gives a **start**, a **home stack**, and the **edits**. Readin
 **22. Artisan coffee roaster & tasting room**
 - Start `--preset contractor` (clay reads as earthy).
 - Home: `hero/split` → `timeline/vertical` (origin/harvest/roast, `phase` per item) → `pricing/cards` (subscription tiers, `value` + `bullets[]`, `notice` required) → `contact/panel`.
-- Wholesale enquiries: add the option to `data/services.yaml` so it appears in the form.
+- Wholesale enquiries: add the option to the preset's `services` items so it appears in the form.
 
 **23. Craft brewery & taproom**
 - Start `--preset local-service`.
@@ -295,7 +295,7 @@ Each recipe below gives a **start**, a **home stack**, and the **edits**. Readin
 **27. High-end wedding / event venue**
 - Start `--preset agency`.
 - Home: `hero/split` (full-bleed image via a `work` item or hero art) → `bento/mosaic` (spaces) → `pricing/cards` (packages) → `faq/accordion` (availability) → `contact/panel`.
-- Tour booking is a contact path, not a calendar. Add "Book a tour" to `data/services.yaml` and keep expectations in `contact.items`.
+- Tour booking is a contact path, not a calendar. Add "Book a tour" to the preset's `services` items and keep expectations in `contact.items`.
 
 **28. Specialty accounting & tax practice**
 - Start `--preset consultant`.
@@ -335,7 +335,7 @@ Each recipe below gives a **start**, a **home stack**, and the **edits**. Readin
 **35. Boutique catering & private chef**
 - Start `--preset contractor`.
 - Home: `hero/split` → `comparison/table` (sample menus: `scope` = courses, `best` = occasion) → `pricing/cards` (per-head tiers) → `faq/accordion` (dietary) → `contact/panel`.
-- Dietary requirements belong in the form's free-text field; keep the structured choices in `data/services.yaml` short.
+- Dietary requirements belong in the form's free-text field; keep the preset's `services` titles short.
 
 ---
 
