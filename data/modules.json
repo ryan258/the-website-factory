@@ -273,5 +273,214 @@
       "items"
     ],
     "dependencies": []
+  },
+  "fit": {
+    "name": "Is this right for you?",
+    "category": "Decision support",
+    "purpose": "Help visitors recognize whether the service matches their needs.",
+    "variants": [
+      "split",
+      "stacked"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Describe who benefits and when a different service is a better choice. Use respectful, concrete criteria.",
+    "a11y_guidance": "Name each group in text; never rely on ticks, crosses, or color alone.",
+    "item_required": [
+      "group"
+    ],
+    "item_choices": {
+      "group": [
+        "fit",
+        "alternative"
+      ]
+    }
+  },
+  "inclusions": {
+    "name": "Included and outside scope",
+    "category": "Decision support",
+    "purpose": "Prevent surprises by separating included work from separately agreed work.",
+    "variants": [
+      "columns",
+      "stacked"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "List actual deliverables and exclusions. State where the agreed proposal takes precedence.",
+    "a11y_guidance": "Give included and excluded groups explicit headings.",
+    "item_required": [
+      "group"
+    ],
+    "item_choices": {
+      "group": [
+        "included",
+        "excluded"
+      ]
+    }
+  },
+  "preparation": {
+    "name": "Preparation checklist",
+    "category": "Taking action",
+    "purpose": "Help a visitor arrive prepared for a conversation or appointment.",
+    "variants": [
+      "checklist",
+      "ordered"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "List the material needed, why it helps, and alternatives if it is unavailable.",
+    "a11y_guidance": "Use a real list and plain instructions; do not make preparation depend on downloading a file."
+  },
+  "hours": {
+    "name": "Opening hours",
+    "category": "Visiting and availability",
+    "purpose": "Show the regular schedule and explain exceptions.",
+    "variants": [
+      "table",
+      "list"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Confirm timezone, regular hours, holiday exceptions, and whether visits need an appointment.",
+    "a11y_guidance": "Use day labels and readable time ranges. Explain closed days in words."
+  },
+  "visit": {
+    "name": "Plan your visit",
+    "category": "Visiting and availability",
+    "purpose": "Answer practical arrival and access questions before someone travels.",
+    "variants": [
+      "details",
+      "cards"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Confirm the address, entrance, transport, parking, and access arrangements. Include a contact route for questions.",
+    "a11y_guidance": "Give written directions and specific access information; a map alone is insufficient."
+  },
+  "menu": {
+    "name": "Menu or service list",
+    "category": "Offers and schedules",
+    "purpose": "Let visitors compare specific items and clearly stated prices or scope.",
+    "variants": [
+      "table",
+      "cards"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Use approved item names, descriptions, units, and prices. Identify dietary or eligibility questions that need confirmation.",
+    "a11y_guidance": "Keep the menu as readable text. Define symbols and do not hide key information in an image.",
+    "item_required": [
+      "value"
+    ]
+  },
+  "events": {
+    "name": "Events and sessions",
+    "category": "Offers and schedules",
+    "purpose": "Explain what is happening, when, where, and how to participate.",
+    "variants": [
+      "agenda",
+      "cards"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Confirm date, timezone, location, access arrangements, and registration status. Remove or update expired sessions.",
+    "a11y_guidance": "State dates and locations in text; explain online or in-person access.",
+    "item_required": [
+      "when",
+      "place"
+    ]
+  },
+  "policies": {
+    "name": "Practical policies",
+    "category": "Trust and support",
+    "purpose": "Make important service conditions easy to find before a commitment.",
+    "variants": [
+      "accordion",
+      "open"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Use the business-approved wording for booking, changes, cancellation, and other conditions. Record who maintains it.",
+    "a11y_guidance": "Use descriptive disclosure labels; keep essential terms visible near the relevant action."
+  },
+  "glossary": {
+    "name": "Terms explained",
+    "category": "Trust and support",
+    "purpose": "Explain unfamiliar words where visitors need them.",
+    "variants": [
+      "definitions",
+      "disclosures"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Define only the terms the audience is likely to encounter. Prefer examples and everyday language.",
+    "a11y_guidance": "Pair each term with its definition using semantic definitions or labelled disclosures."
+  },
+  "support": {
+    "name": "Help and support routes",
+    "category": "Trust and support",
+    "purpose": "Route existing customers to the right help without forcing one contact method.",
+    "variants": [
+      "routes",
+      "steps"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Explain each route, what information helps, and confirmed response expectations. Do not imply live support or guaranteed timing.",
+    "a11y_guidance": "Use meaningful link labels and offer a non-phone route when available.",
+    "item_required": [
+      "url",
+      "link_label"
+    ]
   }
 }

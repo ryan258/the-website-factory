@@ -16,7 +16,9 @@
 <div class="fm-cta"><div><p class="eyebrow">{{ $d.label }}</p><h2>{{ $d.title }}</h2><p>{{ $d.intro }}</p></div>{{ partial "factory/action.html" (dict "action" $d.action "preview" .preview "targets" .targets) }}</div>
 {{ else }}
 <div class="fm-heading"><p class="eyebrow">{{ $d.label }}</p><h2>{{ $d.title }}</h2>{{ with $d.intro }}<p>{{ . }}</p>{{ end }}</div>
-{{ if eq $m "about" }}
+{{ if in (slice "fit" "inclusions" "preparation" "hours" "visit" "menu" "events" "policies" "glossary" "support") $m }}
+{{ partial "factory/practical.html" . }}
+{{ else if eq $m "about" }}
 <div class="fm-about"><p class="fm-body">{{ $d.body }}</p><aside><span aria-hidden="true">↗</span><p>{{ $d.aside }}</p></aside></div>
 {{ else if eq $m "faq" }}
 <div class="fm-faq">{{ range $d.items }}{{ if eq $v "accordion" }}<details><summary>{{ .title }}</summary><p>{{ .text }}</p></details>{{ else }}<article><h3>{{ .title }}</h3><p>{{ .text }}</p></article>{{ end }}{{ end }}</div>

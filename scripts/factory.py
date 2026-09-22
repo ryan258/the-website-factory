@@ -10,10 +10,12 @@ ROOT = Path(__file__).resolve().parents[1]
 def read(path):
     return json.loads(path.read_text())
 
-def validate(root=ROOT):
+def validate(root=ROOT, workshop=None):
     errors = []
     try:
         config = read(root / 'data/factory.json')
+        if workshop is not None:
+            config['workshop'] = workshop
         registry = read(root / 'data/modules.json')
         profiles = {p.stem: read(p) for p in (root / 'data/presets').glob('*.json')}
         examples = read(root / 'data/examples.json') if config.get('workshop') else {}
@@ -36,6 +38,12 @@ def validate(root=ROOT):
             for i, item in enumerate(content['items']):
                 if not isinstance(item, dict) or not all(isinstance(item.get(k),str) and item[k].strip() for k in ('title','text')):
                     errors.append(f'{label}: item {i+1} needs title and text'); continue
+                for field in registry[module].get('item_required', []):
+                    if not isinstance(item.get(field), str) or not item[field].strip():
+                        errors.append(f'{label}: item {i+1} needs {field}')
+                for field, choices in registry[module].get('item_choices', {}).items():
+                    if item.get(field) not in choices:
+                        errors.append(f'{label}: item {i+1} has unsupported {field}')
                 if module == 'comparison' and not all(item.get(k) for k in ('scope','best')):
                     errors.append(f'{label}: comparison needs scope and best')
                 if item.get('image'):

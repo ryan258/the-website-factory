@@ -416,5 +416,195 @@
         "span": "wide"
       }
     ]
+  },
+  "fit": {
+    "label": "Decision support",
+    "title": "Is this right for you?",
+    "intro": "Help visitors recognize whether the service matches their needs.",
+    "items": [
+      {
+        "title": "A focused first website",
+        "text": "For an example business that needs clear service information and one contact path.",
+        "group": "fit"
+      },
+      {
+        "title": "A complex booking platform",
+        "text": "Discuss specialist requirements before assuming a simple website will cover them.",
+        "group": "alternative"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "inclusions": {
+    "label": "Decision support",
+    "title": "Included and outside scope",
+    "intro": "Prevent surprises by separating included work from separately agreed work.",
+    "items": [
+      {
+        "title": "Core page content",
+        "text": "Example scope includes an agreed set of pages and a content review.",
+        "group": "included"
+      },
+      {
+        "title": "Ongoing campaigns",
+        "text": "Advertising and recurring marketing work would need a separate agreement.",
+        "group": "excluded"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "preparation": {
+    "label": "Taking action",
+    "title": "Preparation checklist",
+    "intro": "Help a visitor arrive prepared for a conversation or appointment.",
+    "items": [
+      {
+        "title": "Bring your main question",
+        "text": "Describe the decision you want the first conversation to help with."
+      },
+      {
+        "title": "Gather existing material",
+        "text": "Have your current website or notes available. Missing material can be discussed."
+      },
+      {
+        "title": "Identify open decisions",
+        "text": "Note who needs to review the work and any timing constraints."
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "hours": {
+    "label": "Visiting and availability",
+    "title": "Opening hours",
+    "intro": "Show the regular schedule and explain exceptions.",
+    "items": [
+      {
+        "title": "Monday–Thursday",
+        "text": "Example only: 9 am–5 pm Central"
+      },
+      {
+        "title": "Friday",
+        "text": "Example only: by appointment"
+      },
+      {
+        "title": "Weekend",
+        "text": "Example only: closed"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "visit": {
+    "label": "Visiting and availability",
+    "title": "Plan your visit",
+    "intro": "Answer practical arrival and access questions before someone travels.",
+    "items": [
+      {
+        "title": "Find the entrance",
+        "text": "Replace this example with the verified street address and entrance description."
+      },
+      {
+        "title": "Getting here",
+        "text": "Describe confirmed transit stops or parking arrangements; include any limitations."
+      },
+      {
+        "title": "Access questions",
+        "text": "State verified step-free access and available facilities, with a way to ask for help."
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "menu": {
+    "label": "Offers and schedules",
+    "title": "Menu or service list",
+    "intro": "Let visitors compare specific items and clearly stated prices or scope.",
+    "items": [
+      {
+        "title": "Initial consultation",
+        "text": "Illustrative service item; agree the purpose and duration before booking.",
+        "value": "Price to be confirmed"
+      },
+      {
+        "title": "Focused review",
+        "text": "Illustrative service item; the written scope defines the deliverable.",
+        "value": "Quoted by scope"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "events": {
+    "label": "Offers and schedules",
+    "title": "Events and sessions",
+    "intro": "Explain what is happening, when, where, and how to participate.",
+    "items": [
+      {
+        "title": "Project introduction session",
+        "text": "Fictional session explaining how a website brief is prepared.",
+        "when": "Example date — not scheduled",
+        "place": "Example online session"
+      },
+      {
+        "title": "Content preparation session",
+        "text": "Fictional session for organizing useful business information.",
+        "when": "Example date — not scheduled",
+        "place": "Venue not confirmed"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "policies": {
+    "label": "Trust and support",
+    "title": "Practical policies",
+    "intro": "Make important service conditions easy to find before a commitment.",
+    "items": [
+      {
+        "title": "Changing an appointment",
+        "text": "Insert the approved contact method and notice period. This example creates no booking policy."
+      },
+      {
+        "title": "What an agreement covers",
+        "text": "Explain where the visitor can review the actual scope and conditions before agreeing."
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "glossary": {
+    "label": "Trust and support",
+    "title": "Terms explained",
+    "intro": "Explain unfamiliar words where visitors need them.",
+    "items": [
+      {
+        "title": "Domain name",
+        "text": "The address people type to find a website, such as an approved business domain."
+      },
+      {
+        "title": "Hosting",
+        "text": "The service that makes a website available online."
+      },
+      {
+        "title": "Content",
+        "text": "The words, images, and other information shown on a website."
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "support": {
+    "label": "Trust and support",
+    "title": "Help and support routes",
+    "intro": "Route existing customers to the right help without forcing one contact method.",
+    "items": [
+      {
+        "title": "A question about services",
+        "text": "Review the service description before preparing your question.",
+        "url": "/services/",
+        "link_label": "Read the service information"
+      },
+      {
+        "title": "Discuss a project",
+        "text": "The example contact page explains the intended inquiry route. Delivery is disabled.",
+        "url": "/contact/",
+        "link_label": "View contact options"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
   }
 }

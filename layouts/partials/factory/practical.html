@@ -1,0 +1,26 @@
+{{ $m := .module }}{{ $v := .variant }}{{ $d := .data }}
+{{ if in (slice "fit" "inclusions") $m }}
+<div class="fm-practical-groups {{ if in (slice "split" "columns") $v }}fm-practical-columns{{ end }}">
+{{ $groups := slice "fit" "alternative" }}{{ $labels := slice "A good fit" "Discuss another approach" }}
+{{ if eq $m "inclusions" }}{{ $groups = slice "included" "excluded" }}{{ $labels = slice "Included in scope" "Separately agreed" }}{{ end }}
+{{ range $i, $group := $groups }}<div><h3>{{ index $labels $i }}</h3><ul>{{ range where $d.items "group" $group }}<li><strong>{{ .title }}</strong><p>{{ .text }}</p></li>{{ end }}</ul></div>{{ end }}
+</div>
+{{ else if eq $m "preparation" }}
+{{ if eq $v "ordered" }}<ol class="fm-practical-list">{{ else }}<ul class="fm-practical-list fm-preparation">{{ end }}
+{{ range $d.items }}<li><h3>{{ .title }}</h3><p>{{ .text }}</p></li>{{ end }}
+{{ if eq $v "ordered" }}</ol>{{ else }}</ul>{{ end }}
+{{ else if and (in (slice "hours" "menu") $m) (eq $v "table") }}
+<div class="table-scroll" tabindex="0" role="region" aria-label="{{ $d.title }}"><table><caption>{{ $d.title }}</caption><thead><tr><th scope="col">{{ if eq $m "hours" }}Day{{ else }}Item{{ end }}</th><th scope="col">{{ if eq $m "hours" }}Hours and exceptions{{ else }}Description{{ end }}</th>{{ if eq $m "menu" }}<th scope="col">Price or scope</th>{{ end }}</tr></thead><tbody>{{ range $d.items }}<tr><th scope="row">{{ .title }}</th><td>{{ .text }}</td>{{ if eq $m "menu" }}<td>{{ .value }}</td>{{ end }}</tr>{{ end }}</tbody></table></div>
+{{ else if or (and (eq $m "hours") (eq $v "list")) (and (eq $m "visit") (eq $v "details")) (and (eq $m "glossary") (eq $v "definitions")) }}
+<dl class="fm-practical-definitions">{{ range $d.items }}<div><dt>{{ .title }}</dt><dd>{{ .text }}</dd></div>{{ end }}</dl>
+{{ else if or (eq $m "policies") (eq $m "glossary") }}
+<div class="fm-faq">{{ range $d.items }}{{ if in (slice "accordion" "disclosures") $v }}<details><summary>{{ .title }}</summary><p>{{ .text }}</p></details>{{ else }}<article><h3>{{ .title }}</h3><p>{{ .text }}</p></article>{{ end }}{{ end }}</div>
+{{ else }}
+{{ $ordered := or (eq $v "agenda") (eq $v "steps") }}
+{{ if $ordered }}<ol class="fm-practical-list">{{ else }}<div class="fm-grid">{{ end }}
+{{ range $item := $d.items }}{{ if $ordered }}<li class="fm-card">{{ else }}<article class="fm-card">{{ end }}
+<h3>{{ .title }}</h3>{{ with .when }}<p><strong>When:</strong> {{ . }}</p>{{ end }}{{ with .place }}<p><strong>Where:</strong> {{ . }}</p>{{ end }}<p>{{ .text }}</p>{{ with .value }}<p><strong>{{ . }}</strong></p>{{ end }}
+{{ with .url }}<a class="text-link" href="{{ if and $.preview (index $.targets .) }}{{ index $.targets . }}{{ else }}{{ partial "url.html" . }}{{ end }}">{{ $item.link_label }}</a>{{ end }}
+{{ if $ordered }}</li>{{ else }}</article>{{ end }}{{ end }}
+{{ if $ordered }}</ol>{{ else }}</div>{{ end }}
+{{ end }}
