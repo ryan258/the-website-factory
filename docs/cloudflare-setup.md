@@ -120,6 +120,12 @@ binding = "ENQUIRY"
 id = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
 ```
 
+If image assets use Cloudflare R2 (`wrangler.toml` declares `IMAGES_BUCKET = "258webco-images"`), create the bucket:
+
+```sh
+npx wrangler r2 bucket create 258webco-images
+```
+
 ---
 
 ## Step 5 — Set up mail on the domain
@@ -143,7 +149,7 @@ replacing it with Cloudflare Email Routing. Do these in order.
 
 Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the catch-all) directly to your Gmail.
 
-*(Note: Cloudflare Pages configuration files reject `[[send_email]]` bindings, which are supported only in Workers. Enquiries submitted through the contact form are durably stored in the `ENQUIRY` KV namespace, where they can be queried or processed without loss).*
+*(Note: Cloudflare Pages configuration files reject `[[send_email]]` bindings, which are supported only in Workers. Enquiries submitted through the contact form are durably stored in the `ENQUIRY` KV namespace, where they can be queried or processed without loss. The public contact notice reflects this as storage-only until an external worker/service test confirms live email receipt).*
 
 ---
 
@@ -249,7 +255,7 @@ adding a domain or changing how you get notified.
 | `hugo: expected 0.166.0` | Wrong Hugo version installed | See README.md for the pinned install |
 | `Configuration file for Pages projects does not support "send_email"` | Pages configuration does not support `send_email` in `wrangler.toml` (Workers-only) | Keep `[[send_email]]` commented out in `wrangler.toml`; enquiries are stored in KV |
 | Form says "could not confirm delivery" | The endpoint refused the message | Run `sh scripts/check_contact.sh` to find out which check failed |
-| Form works but no email | The destination address was never verified | Re-check step 5, choice B, point 3 |
+| Form works but no email received | Submissions are stored directly in KV; Pages Functions do not dispatch emails without an external worker binding | Query KV keys directly using step 8 |
 | `Authentication error` from wrangler | Login expired | `npx wrangler login` again |
 
 ---

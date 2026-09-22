@@ -2,6 +2,10 @@ name = "website-factory"
 pages_build_output_dir = "public"
 compatibility_date = "2026-01-01"
 
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "258webco-images"
+
 # --- Contact form delivery -------------------------------------------------
 # All three blocks below are commented out on purpose. With none of them active,
 # /api/contact returns 503 and the site is a preview that cannot receive mail.

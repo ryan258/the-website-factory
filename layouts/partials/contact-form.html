@@ -1,5 +1,5 @@
 <div>
-<div class="notice">{{ if site.Params.formEnabled }}Demo form: submissions are handled by this site on Cloudflare and emailed to the owner. Do not include sensitive information.{{ else }}Local preview: message delivery is not enabled. You can explore the form; nothing will be sent.{{ end }}</div>
+<div class="notice">{{ if site.Params.formEnabled }}Demo form: submissions are recorded by this site on Cloudflare. Do not include sensitive information.{{ else }}Local preview: message delivery is not enabled. You can explore the form; nothing will be sent.{{ end }}</div>
 <form class="contact-form" name="project-enquiry"{{ if site.Params.formEnabled }} method="POST" action="{{ "api/contact" | relURL }}"{{ end }} data-enabled="{{ site.Params.formEnabled }}">
 <p hidden>
 <label>Leave this field empty <input name="website" tabindex="-1" autocomplete="off">
