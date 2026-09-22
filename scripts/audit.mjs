@@ -6,7 +6,11 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {ROOT, paths}=require('./qa-paths.cjs');
 const routes=paths('AUDIT_PATHS');
-const base=process.argv[2] || 'http://127.0.0.1:1313/';
+let base = process.argv[2] || 'http://127.0.0.1:1313/';
+if (base === '/') base = 'http://127.0.0.1:1313/';
+if (!/^https?:\/\//i.test(base)) {
+  base = `http://${base.replace(/^\/+/, '')}`;
+}
 const chrome=await chromeLauncher.launch({chromeFlags:['--headless'],chromePath:process.env.CHROME_PATH});
 const output=path.join(ROOT,'reports/lighthouse');
 await fs.mkdir(output,{recursive:true});

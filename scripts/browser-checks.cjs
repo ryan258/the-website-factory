@@ -3,8 +3,16 @@ const {AxeBuilder} = require('@axe-core/playwright');
 const fs = require('node:fs');
 const path = require('node:path');
 const {ROOT, paths} = require('./qa-paths.cjs');
+function noindexExpected() {
+  const hugoToml = fs.readFileSync(path.join(ROOT, 'hugo.toml'), 'utf8');
+  const match = hugoToml.match(/^\s*noindex\s*=\s*(\w+)/m);
+  const setting = process.env.HUGO_PARAMS_NOINDEX || (match ? match[1] : 'true');
+  return !['false', '0', 'no'].includes(setting.trim().toLowerCase());
+}
+
 (async () => {
   const routes = paths('CHECK_PATHS');
+  const expectedNoindex = noindexExpected();
   const base = process.env.PREVIEW_URL || 'http://127.0.0.1:1313/';
   const browser = await chromium.launch({headless:true, ...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {})});
   const results = [];
@@ -26,6 +34,7 @@ const {ROOT, paths} = require('./qa-paths.cjs');
         const axe = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
         const h1 = await page.locator('h1').count();
         const noindex = await page.locator('meta[name="robots"]').evaluateAll(nodes => nodes[0]?.getAttribute('content') ?? null);
+        const noindexOK = expectedNoindex ? (noindex === 'noindex') : (noindex !== 'noindex');
         const widths = [];
         for (const width of [320,600,900,1200]) {
           await page.setViewportSize({width,height:900});
@@ -33,7 +42,7 @@ const {ROOT, paths} = require('./qa-paths.cjs');
         }
         const result = {route,mode,h1,noindex,violations:axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})),widths};
         results.push(result);
-        if (h1 !== 1 || noindex !== 'noindex' || axe.violations.length || widths.some(w=>w.overflow)) failures.push(`${route} (${mode})`);
+        if (h1 !== 1 || !noindexOK || axe.violations.length || widths.some(w=>w.overflow)) failures.push(`${route} (${mode})`);
       }
     }
     fs.writeFileSync(path.join(reportDir,'browser-checks.json'),JSON.stringify(results,null,2));

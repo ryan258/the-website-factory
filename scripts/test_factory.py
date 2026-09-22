@@ -122,6 +122,12 @@ class FactoryTests(unittest.TestCase):
             self.assertEqual((dest/'old.html').read_text(),'unknown page')
             self.assertEqual((dest/'notes.txt').read_text(),'owner notes')
             self.assertFalse((dest/'index.html').exists())
+    def test_output_reconciliation_refuses_untracked_assets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')
+            dest=Path(tmp)/'output';dest.mkdir();(dest/'old.js').write_text('console.log(1)')
+            with self.assertRaises(ValueError) as caught:build.publish_output(source,dest)
+            self.assertIn('old.js: untracked JS would remain',str(caught.exception))
     def test_parent_file_conflict_leaves_destination_unchanged(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp=Path(tmp);source=tmp/'source';(source/'z-assets').mkdir(parents=True)

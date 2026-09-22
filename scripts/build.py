@@ -57,10 +57,12 @@ def publish_output(source, destination):
         elif path.exists() and digest(path) != previous[name]:
             conflicts.append(f'{name}: edited since the last build')
     if destination.is_dir():
-        for path in destination.rglob('*.html'):
-            name = path.relative_to(destination).as_posix()
-            if name not in current and name not in previous:
-                conflicts.append(f'{name}: untracked HTML would remain')
+        for path in destination.rglob('*'):
+            if path.is_file() and path.name != '.factory-build.json':
+                name = path.relative_to(destination).as_posix()
+                if name not in current and name not in previous:
+                    if path.suffix in ('.html', '.js', '.css', '.map'):
+                        conflicts.append(f'{name}: untracked {path.suffix.lstrip(".").upper()} would remain')
     if conflicts:
         raise ValueError('Refusing to write generated output; nothing was changed:\n  ' + '\n  '.join(conflicts)
                          + '\nChoose an empty destination or restore these files.')
