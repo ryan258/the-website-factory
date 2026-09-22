@@ -6,7 +6,11 @@
   "scripts": {
     "check:browser": "node scripts/browser-checks.cjs",
     "audit": "node scripts/audit.mjs",
-    "test:starter": "python3 scripts/test_starter.py"
+    "test:contact": "node scripts/test_contact_endpoint.mjs",
+    "test:plan": "python3 scripts/test_from_plan.py",
+    "test:starter": "python3 scripts/test_starter.py",
+    "from-plan": "python3 scripts/from_plan.py",
+    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_starter.py"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
