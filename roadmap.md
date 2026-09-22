@@ -2,13 +2,14 @@
 
 **Strategic Direction:** Maintain `the-website-factory` as a high-performance, kitchen-sink Hugo master with broad capability, intentional defaults, and easy subtraction. The repository houses a comprehensive library of modular sections, an interactive visual workshop at `/site-kit/`, pre-configured business presets, and an automated client scaffolding command that selects required features and prunes unneeded assets.
 
-**Current Baseline (2026-09-21):**
-- **Architecture & Build:** Pinned Hugo Extended 0.166.0 + Dart Sass 1.104.1 via Hugo Pipes (`@use`, css.Sass, `hugo:vars`). System-independent Python build helper (`scripts/build.py`) with manifest-based output reconciliation and unselected page pruning.
+**Current Baseline (2026-09-22):**
+- **Architecture & Build:** Pinned Hugo Extended 0.166.0 + Dart Sass 1.104.1 via Hugo Pipes (`@use`, css.Sass, `hugo:vars`). System-independent Python build helper (`scripts/build.py`) with preflight output reconciliation protecting untracked, colliding, or edited files via atomic manifest writes. Configurable search-engine visibility (`hugo.toml` `params.noindex`, `HUGO_PARAMS_NOINDEX` env var).
+- **Hosting & Forms:** Cloudflare Pages default (`wrangler.toml`) with same-origin Pages Function (`functions/api/contact.js`) for enquiry delivery into Cloudflare KV (`ENQUIRY`) and optional notification email (`EMAIL`) via Cloudflare Email Routing.
 - **Component & Module Library:** 20 module families spanning 41 variants across heroes, services, features, case studies, logos/partners, team/business credentials, process steps, timeline/milestones, bento clusters, FAQs, pricing, comparison, and contact modules. Contracts enforced via `data/modules.json`.
 - **Visual Workshop & Living Style Guide:** Live interactive workshop at `/site-kit/` showcasing all 41 variants with native disclosure controls, plus an interactive Living Style Guide at `/site-kit/style-guide/` detailing design tokens, typography specimens, spacing scales, and atomic UI primitives.
 - **Business Presets:** 4 foundational business archetypes (`agency`, `contractor`, `consultant`, `local-service`) defined in `data/presets/*.json`.
-- **Scaffolding Engine (`scripts/new_site.py`):** Deterministic creation of independent client copies, stripping the workshop, unused presets, unselected page trees, and unreferenced project images while enforcing disabled delivery and `noindex`.
-- **Verification Harness:** Deterministic test suites (`scripts/test_factory.py`, `scripts/test_starter.py`, `scripts/check_site.py`) validating JSON schema, asset integrity, link resolution, subpath deployments, and negative edge cases. Playwright/axe browser audit scripts (`scripts/check_workshop.cjs`, `scripts/browser-checks.cjs`) verifying 41 variants, style guide accessibility, and zero overflow.
+- **Scaffolding Engine (`scripts/new_site.py`):** Deterministic creation of independent client copies, stripping the workshop, unused presets, unselected page trees, and unreferenced project images while scaffolding `functions/`, `wrangler.toml`, `docs/cloudflare-setup.md`, and enforcing disabled delivery and `noindex`.
+- **Verification Harness:** Deterministic test suites (`scripts/test_factory.py`, `scripts/test_starter.py`, `scripts/check_site.py`, `scripts/check_contact.sh`) validating JSON schema, asset integrity, link resolution, output reconciliation, subpath deployments, robots visibility, and end-to-end local contact function endpoints. Playwright/axe browser audit scripts (`scripts/check_workshop.cjs`, `scripts/browser-checks.cjs`) verifying 41 variants, style guide accessibility, and zero overflow.
 
 ---
 
@@ -39,6 +40,14 @@
 - Dedicated interactive Living Style Guide at `/site-kit/style-guide/` covering color swatches (light/dark semantics and archetype tone accents), fluid typography specimens, 8-step spacing visualizer, buttons, badges, card primitives, form controls, tables, and native disclosures.
 - Automated Playwright/axe WCAG A/AA validation covering all 41 variants and the style guide page across 320px–1200px viewports with zero horizontal overflow.
 
+### Milestone 5: Cloudflare Pages Deployment & Contact Function Integration
+- Migrated default hosting & form delivery from Netlify Forms to Cloudflare Pages Functions (`functions/api/contact.js`).
+- Implemented dual delivery path: durable KV storage (`ENQUIRY`) and optional notification email (`EMAIL`) via Cloudflare Email Routing, with honeypot spam protection, length checks, and progressive-enhancement no-JS HTML redirect (`303 See Other`).
+- Built local test harness (`scripts/check_contact.sh`) running `wrangler pages dev` with simulated KV bindings, validating accepted, stored, redirected, rejected, and unconfigured paths without deploying.
+- Hardened output reconciliation in `scripts/build.py` to preflight and refuse unowned targets, non-empty collisions, symlinks, and edited files before writing anything, using atomic manifest writes.
+- Made `noindex` a configurable release parameter in `hugo.toml` and `scripts/check_site.py` (`HUGO_PARAMS_NOINDEX`).
+- Created step-by-step account onboarding and deployment runbook in `docs/cloudflare-setup.md`.
+
 ---
 
 ## Active & Planned Priorities
@@ -48,7 +57,7 @@
 - Support deep in-page anchor verification across dynamically composed multi-section layouts.
 
 ### Phase 5: Multi-Provider Form Integration Surface
-- Abstract the form partial to support alternative static form providers (e.g., Cloudflare Pages Forms, static webhook endpoints, Formspree) alongside the current Netlify Forms default.
+- Abstract the form partial to support alternative static form providers (e.g., static webhook endpoints, Formspree) alongside the current Cloudflare Pages Function default.
 - Retain honest disabled-by-default behavior until host-specific form delivery is explicitly configured.
 
 ### Phase 6: Expanded Archetypes & Design Presets

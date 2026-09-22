@@ -127,9 +127,9 @@ One more that bites on a real client site: the `work` module generates its own `
 
 A fresh copy is built to be un-publishable by accident. To ship a real site you change all of these on purpose:
 
-1. **`noindex`** is hardcoded at `layouts/partials/head.html:8`, and `scripts/check_site.py:44` *requires* it. Publishing means editing both.
+1. **`noindex`** defaults to true in `hugo.toml` (`params.noindex = true`) and is conditionally rendered in `layouts/partials/head.html`. `scripts/check_site.py` validates the expected robots tag. Build with `HUGO_PARAMS_NOINDEX=false` (or set `noindex = false` in `hugo.toml`) for a live, indexable release.
 2. **`baseURL`** in `hugo.toml` is `https://example.invalid/`. Set the real domain.
-3. **Form delivery** is off (`params.formEnabled = false`). The only implemented backend is **Netlify Forms**: set `HUGO_PARAMS_FORMENABLED=true` after enabling form detection in a real account. On any other host, keep it off until you implement a backend.
+3. **Form delivery** is off (`params.formEnabled = false`). The only implemented backend is a **Cloudflare Pages Function** (`functions/api/contact.js`): set `HUGO_PARAMS_FORMENABLED=true` after binding `ENQUIRY` (KV) and/or `EMAIL` (send_email) in a real account. On a host without Pages Functions, keep it off until you implement a backend.
 4. **Sample copy** — every name, testimonial, statistic, price, and service area ships fictional and labelled. A new business name does not approve the rest of the text.
 5. **Contact details** in `data/site.yaml` default to `hello@example.invalid`.
 
@@ -315,7 +315,7 @@ Each recipe below gives a **start**, a **home stack**, and the **edits**. Readin
 **31. Executive search / headhunting firm**
 - Start `--preset consultant`.
 - Home: `hero/centered` → `features/split` (two audiences: candidates, employers) → `timeline/vertical` (retained search stages) → `faq/accordion` → `contact/compact`.
-- Confidentiality: keep the form disabled and publish a direct address, or wire Netlify Forms to a named recipient before enabling it.
+- Confidentiality: keep the form disabled and publish a direct address, or bind the Pages Function to a named recipient before enabling it.
 
 **32. Independent software consultant / fractional CTO**
 - Start `--preset consultant`.
@@ -378,8 +378,8 @@ Every play here sells a number. Generate the number on the finished client build
 - With forms enabled, submission is a same-origin HTML POST with a honeypot; the optional script only adds status messages and input retention. No-JS error rendering depends on the host.
 
 **44. Sub-second TTFB static hosting**
-- Any static host serves the output. `netlify.toml` is a pinned build recipe (Hugo 0.166.0, Dart Sass 1.104.1) and nothing more — it does not deploy or connect an account.
-- `static/_headers` is Netlify/Cloudflare-style. On other hosts you must re-create cache, compression, HTTPS, and CSP settings, then verify them at the host.
+- Any static host serves the output. `wrangler.toml` is a pinned Cloudflare Pages recipe (Hugo 0.166.0, Dart Sass 1.104.1) and nothing more — it does not deploy or connect an account. The form endpoint needs Pages Functions; static-only hosts serve the pages but not `/api/contact`.
+- `static/_headers` is Cloudflare/Netlify-style. On other hosts you must re-create cache, compression, HTTPS, and CSP settings, then verify them at the host.
 
 **45. Font-privacy / GDPR compliance**
 - The font is local: `static/fonts/inter-latin-variable.woff2`, preloaded, referenced by `font.file` in `data/site.yaml`. No third-party font request exists to block.
@@ -442,7 +442,7 @@ Before selling anything derived from this tree: **there is no `LICENSE` file in 
 - Mirror tokens from `data/site.yaml` `theme` and the style guide at `/site-kit/style-guide/`. Spacing and breakpoints stay developer-owned Sass tokens — mark them non-negotiable in the kit.
 
 **58. Lead-magnet bundles**
-- Gate a zip of one preset + theme behind an email form. Your own site's form is Netlify-only, so the capture path is whichever provider you already use.
+- Gate a zip of one preset + theme behind an email form. Your own site's form posts to its own Pages Function, so extend that endpoint rather than adding a provider.
 - Keep the giveaway a preset, not the engine, if you plan to sell the engine later.
 
 **59. Notion-to-factory workflow toolkit**
@@ -570,7 +570,7 @@ Every play here runs on the master copy with `"workshop": true` in `data/factory
 
 **85. The "no hidden costs" hosting comparison**
 - Concrete list: static hosting, a domain, and optional form handling. No CMS license, no plugin subscriptions, no PHP host.
-- Be exact about what is not implemented: form delivery is Netlify Forms only. On another host, budget for a backend.
+- Be exact about what is not implemented: form delivery is a Cloudflare Pages Function only. On another host, budget for a backend.
 
 **86. Stakeholder alignment workshops**
 - Project `/site-kit/` and make each department argue for a specific module on a specific page. The output is an ordered array, which is harder to fudge than a wishlist.
@@ -628,7 +628,7 @@ These are the fastest way to learn the system; nobody is waiting on them. All of
 
 **98. Wedding / anniversary portal**
 - `--preset contractor` for the warm clay accent. Home: `hero/split` → `timeline/vertical` (the story) → `faq/accordion` (dress code, travel) → `contact/panel` (RSVP instructions).
-- RSVP by form requires Netlify Forms and a real recipient. Until then, publish an address and keep `formEnabled = false`.
+- RSVP by form requires the Pages Function bindings and a real recipient. Until then, publish an address and keep `formEnabled = false`.
 
 **99. Open-source project showcase**
 - `hero/centered` → `features/grid` → `comparison/table` (feature matrix) → `faq/accordion` → `cta/quiet`.

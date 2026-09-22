@@ -81,6 +81,9 @@ Client copies must start without inherited approvals, historical performance gua
 | Composition and component rendering | `layouts/partials/factory/` |
 | Configuration validation and preset selection | `scripts/factory.py` |
 | Focused copy, omission, and failure-path checks | `scripts/test_factory.py` |
+| Cloudflare contact endpoint test harness | `scripts/check_contact.sh` |
+| Cloudflare setup and deployment runbook | `docs/cloudflare-setup.md` |
+| Contact form Pages Function endpoint | `functions/api/contact.js` |
 | Expanded workshop, keyboard, and no-JavaScript checks | `scripts/check_workshop.cjs` |
 | Strategic direction, milestone status, and planned evolution | `roadmap.md` |
 
@@ -141,13 +144,14 @@ Add a case study by copying an existing `content/work/*.md` file and updating it
 
 ## Local quality checks
 
-The Python checks require no package installation. They fail with a nonzero exit code for build warnings, missing links/assets, duplicate metadata, missing `noindex`, incorrect H1 counts, or oversized compressed CSS/JS bundles.
+The Python checks require no package installation. They fail with a nonzero exit code for build warnings, missing links/assets, duplicate metadata, unexpected robots/noindex state, incorrect H1 counts, or oversized compressed CSS/JS bundles.
 
 ```sh
 python3 scripts/build.py
 python3 scripts/check_site.py
 python3 scripts/test_starter.py
 python3 scripts/test_factory.py
+sh scripts/check_contact.sh
 ```
 
 The focused starter test creates an isolated temporary client copy, changes branding and metrics, builds it under a subpath, checks its output, and deliberately introduces a broken link to prove the checker fails. It also verifies refusal to overwrite an existing destination. Temporary output is removed after the test.
@@ -179,9 +183,9 @@ Automated checks do not establish manual keyboard, screen-reader, field INP, liv
 
 ## Hosting and forms
 
-The generated site can be served by any static host. `netlify.toml` is an optional, pinned Netlify build recipe; its preview URL sets canonical URLs. It neither deploys nor connects an account. `_headers` is a Netlify/Cloudflare-style header file; other hosts need equivalent settings. Compression, HTTPS, cache headers, and CSP must be verified at the actual host.
+The generated site can be served by any static host. `wrangler.toml` is an optional, pinned Cloudflare Pages recipe; the deployment URL sets canonical URLs. It neither deploys nor connects an account. `_headers` is a Cloudflare/Netlify-style header file; other hosts need equivalent settings. Compression, HTTPS, cache headers, and CSP must be verified at the actual host.
 
-The current **form backend is Netlify Forms only**, not a generic multi-provider adapter. On other hosts keep delivery disabled until a real integration is implemented. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment, enables Netlify form detection, and chooses the account/recipient. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
+The current **form backend is a Cloudflare Pages Function** (`functions/api/contact.js`), not a generic multi-provider adapter. On hosts without Pages Functions keep delivery disabled until a real integration is implemented. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment, binds `ENQUIRY` (KV) and/or `EMAIL` (send_email), and chooses the recipient. With neither binding present the endpoint returns 503 and accepts nothing. Step-by-step account setup, including the domain, the enquiry store, and notification email, is in [docs/cloudflare-setup.md](docs/cloudflare-setup.md). Verify the endpoint before enabling it with `sh scripts/check_contact.sh`, which builds a form-enabled site, serves it with `wrangler pages dev` against a local KV binding, and exercises the accepted, stored, redirected, rejected, and unconfigured paths. It deploys nothing and needs no Cloudflare account. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
 
 No inbox or account is configured. No form test is sent by the local checks. Test both submission paths with synthetic data only after explicit authorization, and verify actual receipt rather than trusting the success page. Do not enable indexing, use the fictional domain, or replace sample claims with unsupported claims.
 
