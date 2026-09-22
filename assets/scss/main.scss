@@ -1,3 +1,4 @@
+// Import order matters: tokens, then base, layout, components, pages.
 @use 'base/root';
 @use 'base/reset';
 @use 'base/typography';
@@ -9,5 +10,4 @@
 @use 'components/form';
 @use 'components/pricing-table';
 @use 'pages/home';
-
 @use 'pages/factory';

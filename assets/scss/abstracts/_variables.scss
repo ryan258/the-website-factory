@@ -1,6 +1,35 @@
+@use 'sass:color';
 @use 'hugo:vars' as brand;
-$ink: brand.$ink; $paper: brand.$paper; $mist: brand.$mist; $line: brand.$line; $accent: brand.$accent; $link: brand.$link;
+
+// Brand values arrive from data/site.yaml through Hugo's Sass vars. Nothing below
+// hard-codes a color: everything else in this project derives from these.
+$ink: brand.$ink;
+$paper: brand.$paper;
+$mist: brand.$mist;
+$line: brand.$line;
+$accent: brand.$accent;
+$link: brand.$link;
+
+// Tints for the hero illustration, which stays light in both color schemes.
+// ponytail: mixed from $ink and $line, so a theme change carries through the art.
+// Percentages were chosen by eye; adjust them, not the literals.
+$art-soft: color.mix($ink, $line, 8%);
+$art-medium: color.mix($ink, $line, 12%);
+$art-strong: color.mix($ink, $line, 18%);
+
+
+// Faint ink grid lines over the accent art.
+$ink-grid: color.change($ink, $alpha: .09);
+
+// Muted text on an ink background (the closing call to action).
+$muted-on-ink: color.mix($ink, $line, 14%);
+
+// Accent per preset tone. Mirrored by the tone map in scripts/factory.py, which
+// writes the selected accent into data/site.yaml when a client copy is scaffolded.
+$tones: ("yellow": #ffc400, "clay": #edb08e, "sage": #b9d7bb, "blue": #a6cef7);
+
 $font: brand.$font_family, Arial, sans-serif;
 $spaces: (1: 4px, 2: 8px, 3: 16px, 4: 24px, 5: 32px, 6: 48px, 7: 64px, 8: 96px);
 $breakpoints: (small: 600px, medium: 900px, large: 1200px);
-$width: 1120px; $reading: 65ch;
+$width: 1120px;
+$reading: 65ch;

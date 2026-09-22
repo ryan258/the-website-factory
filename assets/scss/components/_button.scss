@@ -1,1 +1,43 @@
-.button { display: inline-flex; justify-content: center; align-items: center; gap: var(--s4); min-height: 48px; padding: var(--s3) var(--s4); background: var(--accent); color: var(--accent-text); border: 1px solid var(--accent); text-decoration: none; font-size: .8rem; font-weight: 650; line-height: 1.4; } .button:hover { box-shadow: 4px 4px 0 var(--ink); } .button--outline { background: transparent; border-color: var(--line); color: var(--ink); } .button--small { padding: var(--s2) var(--s3); } .button-group { display: flex; flex-wrap: wrap; gap: var(--s3); } .button:disabled { cursor: not-allowed; background: var(--mist); border-color: var(--line); color: var(--muted); box-shadow: none; }
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s4);
+  min-height: 48px;
+  padding: var(--s3) var(--s4);
+  background: var(--accent);
+  color: var(--accent-text);
+  border: 1px solid var(--accent);
+  text-decoration: none;
+  font-size: .8rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.button:hover {
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.button--outline {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.button--small {
+  padding: var(--s2) var(--s3);
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  background: var(--mist);
+  border-color: var(--line);
+  color: var(--muted);
+  box-shadow: none;
+}

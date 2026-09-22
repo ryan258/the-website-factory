@@ -1,3 +1,30 @@
-.plan { position: relative; border: 1px solid var(--line); padding: var(--s5); display: flex; flex-direction: column; align-items: start; } .plan--featured { border: 2px solid var(--accent); } .plan__badge { background: var(--accent); color: var(--accent-text); padding: var(--s2) var(--s3); font-size: .65rem; font-weight: 650; margin: calc(-1 * var(--s5)) calc(-1 * var(--s5)) var(--s5); align-self: stretch; text-align: center; } .plan__price { margin-block: var(--s4); font-size: 2.4rem; } .plan > p:not(.eyebrow):not(.plan__badge) { font-size: .8rem; } .plan ul { padding-left: var(--s4); font-size: .85rem; margin-block: var(--s5); } .plan li { margin-block: var(--s2); } .plan .button { margin-top: auto; width: 100%; } .plan__note { margin-top: var(--s3); } .table-scroll { overflow-x: auto; margin-block: var(--s5); } table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: .85rem; text-align: left; } caption { text-align: left; font-size: .75rem; padding-bottom: var(--s3); color: var(--muted); } th, td { padding: var(--s3); border-bottom: 1px solid var(--line); } thead { background: var(--mist); }
+// The comparison table. Scrolls sideways on small screens without stretching the page.
+.table-scroll {
+  overflow-x: auto;
+  margin-block: var(--s5);
+}
 
-.plan + .caption + .section__heading, .grid + .caption + .section__heading { margin-top: var(--s7); }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-size: .85rem;
+  text-align: left;
+}
+
+caption {
+  text-align: left;
+  font-size: .75rem;
+  padding-bottom: var(--s3);
+  color: var(--muted);
+}
+
+th,
+td {
+  padding: var(--s3);
+  border-bottom: 1px solid var(--line);
+}
+
+thead {
+  background: var(--mist);
+}

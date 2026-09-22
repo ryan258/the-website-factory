@@ -1,2 +1,44 @@
-@use '../abstracts/mixins' as m;
-.footer { padding-block: var(--s6) var(--s4); } .footer__top { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--s5); padding-bottom: var(--s6); } .footer__top p { font-size: .8rem; margin-top: var(--s3); } .footer nav { display: flex; flex-wrap: wrap; gap: var(--s4); } .footer nav a, .footer__bottom a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; font-size: .75rem; } .footer__bottom { border-top: 1px solid var(--line); padding-top: var(--s4); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3); color: var(--muted); font-size: .65rem; }
+.footer {
+  padding-block: var(--s6) var(--s4);
+}
+
+.footer__top {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s5);
+  padding-bottom: var(--s6);
+}
+
+.footer__top p {
+  font-size: .8rem;
+  margin-top: var(--s3);
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+}
+
+// Every footer link keeps a 44px tap target, including the bottom row.
+.footer nav a,
+.footer__bottom a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+  font-size: .75rem;
+}
+
+.footer__bottom {
+  border-top: 1px solid var(--line);
+  padding-top: var(--s4);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s3);
+  color: var(--muted);
+  font-size: .65rem;
+}

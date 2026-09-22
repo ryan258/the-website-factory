@@ -1,5 +1,100 @@
+@use 'sass:color';
 @use '../abstracts/mixins' as m;
-.header { border-bottom: 1px solid var(--line); position: relative; z-index: 10; background: var(--paper); } .header__inner { min-height: 96px; display: flex; align-items: center; justify-content: space-between; gap: var(--s3); } .brand { display: inline-flex; align-items: center; gap: var(--s2); text-decoration: none; font-size: .9rem; font-weight: 750; letter-spacing: -.045em; min-height: 44px; } .brand svg { flex-shrink: 0; } .brand__dot { color: var(--ink); } .header__nav, .header__cta { display: none !important; } .header__nav { align-items: center; gap: var(--s4); } .header__nav a, .mobile-menu a { text-decoration: none; font-size: .75rem; min-height: 44px; display: flex; align-items: center; } a[aria-current='page'] { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 8px; } .mobile-menu summary { min-height: 44px; display: flex; align-items: center; gap: var(--s2); font-size: .8rem; } .mobile-menu nav { position: absolute; top: 100%; left: 0; right: 0; padding: var(--s4); background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 16px 32px #0001; } .mobile-menu a { font-size: 1rem; padding-block: var(--s2); }
-@include m.breakpoint(medium) { .mobile-menu { display: none; } .header__nav, .header__cta { display: flex !important; } }
+@use '../abstracts/variables' as v;
 
-.brand { min-width: 0; } .brand > span { overflow-wrap: anywhere; }
+.header {
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 10;
+  background: var(--paper);
+}
+
+.header__inner {
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  text-decoration: none;
+  font-size: .9rem;
+  font-weight: 750;
+  letter-spacing: -.045em;
+  min-height: 44px;
+  min-width: 0;
+}
+
+.brand svg {
+  flex-shrink: 0;
+}
+
+.brand > span {
+  overflow-wrap: anywhere;
+}
+
+// Shown from the medium breakpoint up; the details menu covers smaller screens.
+.header__nav,
+.header__cta {
+  display: none !important;
+}
+
+.header__nav {
+  align-items: center;
+  gap: var(--s4);
+}
+
+.header__nav a,
+.mobile-menu a {
+  text-decoration: none;
+  font-size: .75rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+a[aria-current='page'] {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+}
+
+.mobile-menu summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: .8rem;
+}
+
+.mobile-menu nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: var(--s4);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 16px 32px #{color.change(v.$ink, $alpha: .07)};
+}
+
+.mobile-menu a {
+  font-size: 1rem;
+  padding-block: var(--s2);
+}
+
+@include m.breakpoint(medium) {
+  .mobile-menu {
+    display: none;
+  }
+
+  .header__nav,
+  .header__cta {
+    display: flex !important;
+  }
+}

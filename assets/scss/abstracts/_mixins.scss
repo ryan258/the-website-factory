@@ -1,3 +1,13 @@
-@use 'sass:map'; @use 'variables' as v;
-@mixin breakpoint($name) { @media (min-width: map.get(v.$breakpoints, $name)) { @content; } }
-@mixin focus { outline: 3px solid var(--link); outline-offset: 4px; }
+@use 'sass:map';
+@use 'variables' as v;
+
+@mixin breakpoint($name) {
+  @media (min-width: map.get(v.$breakpoints, $name)) {
+    @content;
+  }
+}
+
+@mixin focus {
+  outline: 3px solid var(--link);
+  outline-offset: 4px;
+}

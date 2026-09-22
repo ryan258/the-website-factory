@@ -1,6 +1,58 @@
 @use '../abstracts/mixins' as m;
-.container { width: min(calc(100% - 2 * var(--s4)), var(--width)); margin-inline: auto; }
-.section { padding-block: var(--s7); } .section--mist { background: var(--mist); } .section--topless { padding-top: 0; } .section__heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s4); margin-bottom: var(--s6); } .section__heading h2 { max-width: 24ch; margin-top: var(--s3); } .section__heading p:not(.eyebrow) { max-width: var(--reading); margin-top: var(--s3); }
-.grid { display: grid; gap: var(--s4); } .grid > * { min-width: 0; } .page-intro { padding-block: var(--s7); } .page-intro h1 { white-space: pre-line; margin-block: var(--s4); max-width: 20ch; } .page-intro > p:not(.eyebrow) { max-width: var(--reading); } .page-intro .button { margin-top: var(--s5); }
-@include m.breakpoint(small) { .grid--two, .grid--three { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@include m.breakpoint(medium) { .grid--three { grid-template-columns: repeat(3,minmax(0,1fr)); } .section, .page-intro { padding-block: var(--s8); } .section--topless { padding-top: 0; } }
+
+.container {
+  width: min(calc(100% - 2 * var(--s4)), var(--width));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--s7);
+}
+
+.section--mist {
+  background: var(--mist);
+}
+
+.section__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--s4);
+  margin-bottom: var(--s6);
+}
+
+.section__heading h2 {
+  max-width: 24ch;
+  margin-top: var(--s3);
+}
+
+.section__heading p:not(.eyebrow) {
+  max-width: var(--reading);
+  margin-top: var(--s3);
+}
+
+.page-intro {
+  padding-block: var(--s7);
+}
+
+.page-intro h1 {
+  white-space: pre-line;
+  margin-block: var(--s4);
+  max-width: 20ch;
+}
+
+.page-intro > p:not(.eyebrow) {
+  max-width: var(--reading);
+}
+
+.page-intro .button {
+  margin-top: var(--s5);
+}
+
+@include m.breakpoint(medium) {
+  .section,
+  .page-intro {
+    padding-block: var(--s8);
+  }
+}

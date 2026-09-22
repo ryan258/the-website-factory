@@ -1,4 +1,65 @@
 @use '../abstracts/mixins' as m;
-.contact-grid { display: grid; gap: var(--s6); } .contact-grid > * { min-width: 0; } .contact-form label { display: block; font-size: .8rem; font-weight: 600; margin: var(--s4) 0 var(--s2); } .contact-form label span { color: var(--muted); font-weight: 400; } input, select, textarea { display: block; width: 100%; max-width: 100%; min-height: 48px; border: 1px solid var(--muted); border-radius: 0; background: var(--paper); color: var(--ink); padding: var(--s2) var(--s3); font-size: .9rem; } textarea { resize: vertical; } .contact-form small { display: block; font-size: .65rem; color: var(--muted); margin-top: var(--s2); } .form-grid { display: grid; gap: var(--s3); } .form-grid > * { min-width: 0; } .contact-form button { margin-top: var(--s4); } .contact-form [role='alert'] { border-left: 4px solid var(--ink); padding: var(--s3); margin-top: var(--s4); color: var(--ink); } .contact-panel { background: var(--mist); padding: var(--s5); align-self: start; } .contact-panel h2 { font-size: 1.8rem; margin-block: var(--s4); } .contact-panel p { font-size: .85rem; } .contact-panel .caption { font-size: .7rem; margin-top: var(--s2); } .contact-panel dt { font-size: .7rem; font-weight: 600; margin-top: var(--s5); } .contact-panel dd { margin: var(--s2) 0 0; font-size: .8rem; overflow-wrap: anywhere; } .contact-panel__note { margin-top: var(--s5); border-top: 1px solid var(--line); padding-top: var(--s4); } .faq { max-width: 800px; } .faq h2 { margin-bottom: var(--s5); } .faq details { border-bottom: 1px solid var(--line); } .faq summary { padding-block: var(--s4); font-size: .95rem; font-weight: 600; min-height: 48px; } .faq details p { font-size: .9rem; padding-bottom: var(--s4); }
-@include m.breakpoint(small) { .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@include m.breakpoint(medium) { .contact-grid { grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); } }
+
+.contact-form label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 600;
+  margin: var(--s4) 0 var(--s2);
+}
+
+.contact-form label span {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--muted);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  padding: var(--s2) var(--s3);
+  font-size: .9rem;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.contact-form small {
+  display: block;
+  font-size: .65rem;
+  color: var(--muted);
+  margin-top: var(--s2);
+}
+
+.form-grid {
+  display: grid;
+  gap: var(--s3);
+}
+
+.form-grid > * {
+  min-width: 0;
+}
+
+.contact-form button {
+  margin-top: var(--s4);
+}
+
+.contact-form [role='alert'] {
+  border-left: 4px solid var(--ink);
+  padding: var(--s3);
+  margin-top: var(--s4);
+  color: var(--ink);
+}
+
+@include m.breakpoint(small) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

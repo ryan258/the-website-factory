@@ -1,6 +1,100 @@
 @use 'hugo:vars' as brand;
 @use '../abstracts/functions' as f;
-@font-face { font-family: brand.$font_family; font-style: normal; font-weight: 100 900; font-display: swap; src: url("#{brand.$font_url}") format('woff2'); }
-body { font-family: var(--font); font-size: f.rem(18); line-height: 1.6; color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; } h1, h2, h3 { line-height: 1.15; font-weight: 650; letter-spacing: -.045em; text-wrap: balance; } h1 { font-size: clamp(2.75rem, 5.2vw, 4.35rem); } h2 { font-size: clamp(1.8rem, 3.2vw, 2.65rem); } h3 { font-size: 1.4rem; } p { color: var(--muted); } .eyebrow { font-size: .68rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); } .caption { font-size: .75rem; margin-top: var(--s4); } .prose { max-width: var(--reading); } .prose h2 { margin: var(--s6) 0 var(--s4); } .prose p { margin-bottom: var(--s4); } .prose a { color: var(--link); } .text-link { display: inline-flex; align-items: center; gap: var(--s3); min-height: 44px; font-size: .8rem; font-weight: 600; text-underline-offset: 5px; text-decoration-thickness: 1px; } .text-link:hover { color: var(--link); } .notice { border-left: 4px solid var(--accent); padding: var(--s3) var(--s4); background: var(--mist); margin-bottom: var(--s5); font-size: .85rem; }
 
-.multiline { white-space: pre-line; }
+@font-face {
+  font-family: brand.$font_family;
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("#{brand.$font_url}") format('woff2');
+}
+
+body {
+  font-family: var(--font);
+  font-size: f.rem(18);
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2.75rem, 5.2vw, 4.35rem);
+}
+
+h2 {
+  font-size: clamp(1.8rem, 3.2vw, 2.65rem);
+}
+
+h3 {
+  font-size: 1.4rem;
+}
+
+p {
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-size: .68rem;
+  font-weight: 650;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.caption {
+  font-size: .75rem;
+  margin-top: var(--s4);
+}
+
+.prose {
+  max-width: var(--reading);
+}
+
+.prose h2 {
+  margin: var(--s6) 0 var(--s4);
+}
+
+.prose p {
+  margin-bottom: var(--s4);
+}
+
+.prose a {
+  color: var(--link);
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 44px;
+  font-size: .8rem;
+  font-weight: 600;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}
+
+.text-link:hover {
+  color: var(--link);
+}
+
+.notice {
+  border-left: 4px solid var(--accent);
+  padding: var(--s3) var(--s4);
+  background: var(--mist);
+  margin-bottom: var(--s5);
+  font-size: .85rem;
+}
+
+.multiline {
+  white-space: pre-line;
+}

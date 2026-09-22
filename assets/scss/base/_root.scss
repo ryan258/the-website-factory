@@ -1,4 +1,33 @@
 @use 'hugo:vars' as brand;
 @use '../abstracts/variables' as v;
-:root { --ink: #{v.$ink}; --paper: #{v.$paper}; --mist: #{v.$mist}; --line: #{v.$line}; --accent: #{v.$accent}; --accent-text: #{brand.$accent_text}; --link: #{v.$link}; --muted: #{brand.$muted}; --font: #{v.$font}; --width: #{v.$width}; --reading: #{v.$reading}; @each $key, $value in v.$spaces { --s#{$key}: #{$value}; } color-scheme: light dark; }
-@media (prefers-color-scheme: dark) { :root { --ink: #{brand.$dark_ink}; --paper: #{brand.$dark_paper}; --mist: #{brand.$dark_mist}; --line: #{brand.$dark_line}; --muted: #{brand.$dark_muted}; --link: #{brand.$dark_link}; } }
+
+:root {
+  --ink: #{v.$ink};
+  --paper: #{v.$paper};
+  --mist: #{v.$mist};
+  --line: #{v.$line};
+  --accent: #{v.$accent};
+  --accent-text: #{brand.$accent_text};
+  --link: #{v.$link};
+  --muted: #{brand.$muted};
+  --font: #{v.$font};
+  --width: #{v.$width};
+  --reading: #{v.$reading};
+
+  @each $key, $value in v.$spaces {
+    --s#{$key}: #{$value};
+  }
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #{brand.$dark_ink};
+    --paper: #{brand.$dark_paper};
+    --mist: #{brand.$dark_mist};
+    --line: #{brand.$dark_line};
+    --muted: #{brand.$dark_muted};
+    --link: #{brand.$dark_link};
+  }
+}
