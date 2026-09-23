@@ -2,11 +2,9 @@
 """Create a source-only client starter without overwriting an existing path."""
 import argparse
 import json
-import os
 from pathlib import Path
 import re
 import shutil
-import sys
 from factory import apply_preset, validate
 
 ROOT = Path(__file__).resolve().parents[1]

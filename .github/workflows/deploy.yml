@@ -71,7 +71,13 @@ jobs:
           python3 scripts/test_factory.py
           python3 scripts/test_starter.py
           python3 scripts/test_from_plan.py
+          python3 scripts/test_enquiries.py
           node scripts/test_contact_endpoint.mjs
+
+      - name: Lint Python and JavaScript
+        run: |
+          pip install --quiet ruff==0.15.8
+          npm run -s lint
 
       - name: Verify Enabled Form & Pages Local KV Integration Gate
         run: sh scripts/check_contact.sh

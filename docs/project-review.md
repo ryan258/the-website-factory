@@ -3,7 +3,7 @@
 **Review date:** 2026-09-23
 **Reviewed commit:** `1459cf5` (branch `claude/jolly-planck-xmitzy`, same as `main`)
 
-> **Status update (2026-09-23):** Items **C1–C3** and **H1–H6** in Part 4 are now fixed on `main`. See Milestone 7 in `roadmap.md`. Medium items **M1–M6** and **M13** are also fixed. M7–M12, the Low items, and Part 5 are still open.
+> **Status update (2026-09-23):** Items **C1–C3** and **H1–H6** in Part 4 are now fixed on `main`. See Milestone 7 in `roadmap.md`. All Medium items (**M1–M13**) and the Low items are also fixed, except the code reformat (see Low: a linter was added instead). Part 5 proposals are still open.
 
 ## TL;DR
 

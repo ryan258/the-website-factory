@@ -10,6 +10,15 @@ ROOT = Path(__file__).resolve().parents[1]
 def read(path):
     return json.loads(path.read_text())
 
+def yaml_scalar(raw):
+    """One-line YAML scalar: "double" (JSON escapes), 'single' ('' is a quote), or plain with an optional # comment."""
+    raw = raw.strip()
+    if raw.startswith('"'):
+        return json.loads(raw[:raw.rindex('"')+1])
+    if raw.startswith("'"):
+        return raw[1:raw.rindex("'")].replace("''", "'")
+    return re.sub(r'\s+#.*$', '', raw)
+
 def validate(root=ROOT, workshop=None, extra_presets=None):
     errors = []
     try:
@@ -21,6 +30,7 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         if extra_presets:
             profiles.update(extra_presets)
         examples = read(root / 'data/examples.json') if config.get('workshop') else {}
+        tones = read(root / 'data/tones.json')
     except (OSError, ValueError) as error:
         return [str(error)]
     if config.get('preset') not in profiles:
@@ -30,7 +40,7 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
     # The header, footer, titles, and structured data read data/site.yaml, while the pages read
     # the preset. A mismatch published one business's pages under another's name, so it fails.
     named=re.search(r'(?m)^name:\s*(.+?)\s*$', (root/'data/site.yaml').read_text()) if (root/'data/site.yaml').is_file() else None
-    site_name=json.loads(named.group(1)) if named and named.group(1).startswith('"') else (named.group(1) if named else None)
+    site_name=yaml_scalar(named.group(1)) if named else None
     if config.get('preset') in profiles and site_name!=profiles[config['preset']].get('name'):
         errors.append(f"data/site.yaml: name {site_name!r} must match the selected preset's name {profiles[config['preset']].get('name')!r}")
     def check_content(module, content, label, profile=None):
@@ -82,7 +92,7 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         links(content)
     for slug, profile in profiles.items():
         if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', slug): errors.append(f'Invalid preset identifier {slug}')
-        if profile.get('tone') not in ('yellow','clay','sage','blue'): errors.append(f'{slug}: unknown tone')
+        if profile.get('tone') not in tones: errors.append(f"{slug}: unknown tone; choose one of {', '.join(tones)}")
         if not isinstance(profile.get('pages'),dict) or not isinstance(profile.get('sections'),dict):
             errors.append(f'{slug}: pages and sections must be objects'); continue
         if not all(k in profile['pages'] for k in ('home','contact')): errors.append(f'{slug}: home and contact are required')
@@ -155,7 +165,7 @@ def apply_preset(destination, slug, name):
     # The master's search-engine business details (type, city) belong to the master's business.
     text=re.sub(r'^organization:\n(?:[ \t].*\n)*',lambda _: 'organization: '+json.dumps(dict(type='Organization'))+'\n',text,flags=re.M)
     text=re.sub(r'^social:\n(?:[ \t].*\n)*',lambda _: 'social: '+json.dumps(dict(heading=name,caption='Fictional preview · Content awaiting review'))+'\n',text,flags=re.M)
-    accent = {'yellow':'#ffc400','clay':'#edb08e','sage':'#b9d7bb','blue':'#a6cef7'}[profile['tone']]
+    accent = read(root/'data/tones.json')[profile['tone']]
     text=re.sub(r'^  accent:.*$', '  accent: '+json.dumps(accent),text,flags=re.M)
     site.write_text(text)
     if 'work' not in profile['pages']:

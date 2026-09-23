@@ -1,8 +1,8 @@
 {
-  "name": "website-client-starter",
+  "name": "the-website-factory",
   "private": true,
   "version": "1.0.0",
-  "description": "Optional local website quality tools; not required for Hugo builds",
+  "description": "Optional quality tools for The Website Factory; not required for Hugo builds",
   "type": "module",
   "scripts": {
     "check:browser": "node scripts/browser-checks.cjs",
@@ -13,7 +13,9 @@
     "test:factory": "python3 scripts/test_factory.py",
     "test:integration": "sh scripts/check_contact.sh",
     "from-plan": "python3 scripts/from_plan.py",
-    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py"
+    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py && python3 scripts/test_enquiries.py",
+    "test:enquiries": "python3 scripts/test_enquiries.py",
+    "lint": "ruff check scripts && for f in assets/js/*.js functions/*.js functions/api/*.js scripts/*.cjs scripts/*.mjs; do node --check \"$f\" || exit 1; done"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

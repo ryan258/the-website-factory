@@ -2,7 +2,6 @@
 """Focused scaffold isolation and static-check failure-path tests; no network."""
 import importlib.util
 import html
-import os
 import re
 from pathlib import Path
 import subprocess

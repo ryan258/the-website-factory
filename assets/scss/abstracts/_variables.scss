@@ -24,8 +24,8 @@ $ink-grid: color.change($ink, $alpha: .09);
 // Muted text on an ink background (the closing call to action).
 $muted-on-ink: color.mix($ink, $line, 14%);
 
-// Accent per preset tone. Mirrored by the tone map in scripts/factory.py, which
-// writes the selected accent into data/site.yaml when a client copy is scaffolded.
+// Accent per preset tone. Must match data/tones.json (scripts/test_factory.py checks), which
+// scripts/factory.py validates presets against and copies into a scaffolded data/site.yaml.
 $tones: ("yellow": #ffc400, "clay": #edb08e, "sage": #b9d7bb, "blue": #a6cef7);
 
 $font: brand.$font_family, Arial, sans-serif;

@@ -10,9 +10,20 @@ import tarfile
 import tempfile
 import urllib.request
 import shutil
-import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+
+# SHA-256 of the official release archives for the pinned .sass-version. With a match here,
+# setup needs no GitHub API call (and no token or rate limit). A version not listed falls back
+# to the digest GitHub's release API publishes. Update both together when bumping the pin.
+PINNED = {
+    '1.104.1': {
+        'linux-x64': '85f31863aa62a1ba93158105609b94206fe9e17a37ad2855a69c543f83d1abae',
+        'linux-arm64': '0bc2be53e11bd16462b577d5fe2f4c776287ed371d5aba2f7211cfd385a5c8ed',
+        'macos-x64': 'a1c614f4e35641d7a62658beaa1b500962cbf9ac6c568718db4f55505d5490e9',
+        'macos-arm64': '1ef58a518ab901c1c4f08890537e111f690c375d984927dafd1decb1c5e6b680',
+    },
+}
 
 def fetch(url):
     headers = {'User-Agent': 'website-starter-setup'}
@@ -33,13 +44,18 @@ def main():
     if destination.exists():
         raise SystemExit('Local Dart Sass already exists. Run scripts/build.py to check its version; setup does not overwrite it.')
     name = f'dart-sass-{version}-{system}-{machine}.tar.gz'
-    release = json.loads(fetch(f'https://api.github.com/repos/sass/dart-sass/releases/tags/{version}'))
-    asset = next(a for a in release['assets'] if a['name'] == name)
-    digest = asset.get('digest', '')
-    if not digest.startswith('sha256:'):
-        raise SystemExit('Official release has no SHA-256 digest. Install manually; automatic setup stopped.')
-    payload = fetch(asset['browser_download_url'])
-    if hashlib.sha256(payload).hexdigest() != digest.split(':', 1)[1]:
+    expected = PINNED.get(version, {}).get(f'{system}-{machine}')
+    if expected:
+        url = f'https://github.com/sass/dart-sass/releases/download/{version}/{name}'
+    else:
+        release = json.loads(fetch(f'https://api.github.com/repos/sass/dart-sass/releases/tags/{version}'))
+        asset = next(a for a in release['assets'] if a['name'] == name)
+        digest = asset.get('digest', '')
+        if not digest.startswith('sha256:'):
+            raise SystemExit('Official release has no SHA-256 digest. Install manually; automatic setup stopped.')
+        expected, url = digest.split(':', 1)[1], asset['browser_download_url']
+    payload = fetch(url)
+    if hashlib.sha256(payload).hexdigest() != expected:
         raise SystemExit('Compiler download digest mismatch; nothing installed.')
     destination.parent.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(dir=destination.parent) as temporary:

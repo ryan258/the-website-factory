@@ -91,6 +91,9 @@ Client copies must start without inherited approvals, historical performance gua
 | Planner compilation regression tests | `scripts/test_from_plan.py` |
 | Cloudflare contact endpoint test harness | `scripts/check_contact.sh` |
 | Contact endpoint failure paths (no account needed) | `scripts/test_contact_endpoint.mjs` |
+| Read or export stored enquiries (read-only, via wrangler) | `scripts/enquiries.py` |
+| Enquiry reader tests (stand-in wrangler, no account) | `scripts/test_enquiries.py` |
+| Accent tone colors (mirrored by Sass `$tones`) | `data/tones.json` |
 | Cloudflare setup and deployment runbook | `docs/cloudflare-setup.md` |
 | Contact form Pages Function endpoint | `functions/api/contact.js` |
 | Internal inventory and dotfile protection middleware | `functions/_middleware.js` |
@@ -99,7 +102,7 @@ Client copies must start without inherited approvals, historical performance gua
 | Planning workspace behavior and persistence checks | `scripts/check_workflow.cjs` |
 | Agency delivery workflow guide | `docs/agency-workflow.md` |
 | Practical component library guide | `docs/component-library.md` |
-| Planning workspace acceptance evidence | `docs/workflow-acceptance.md` |
+| Acceptance evidence, current and historical | `docs/acceptance.md` |
 | Strategic direction, milestone status, and planned evolution | `roadmap.md` |
 
 ## Build and preview
@@ -168,10 +171,13 @@ python3 scripts/check_site.py
 python3 scripts/test_factory.py
 python3 scripts/test_starter.py
 python3 scripts/test_from_plan.py
+python3 scripts/test_enquiries.py
 node scripts/test_contact_endpoint.mjs
 sh scripts/check_contact.sh
 # Or run all unit/contract tests at once:
 npm test
+# Lint for real mistakes (needs: pip install ruff==0.15.8):
+npm run lint
 ```
 
 The focused starter test creates an isolated temporary client copy, changes branding and metrics, builds it under a subpath, checks its output, and deliberately introduces a broken link to prove the checker fails. It also verifies refusal to overwrite an existing destination. Temporary output is removed after the test.

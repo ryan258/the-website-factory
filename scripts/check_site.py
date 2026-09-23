@@ -45,6 +45,9 @@ def check(output, noindex=None):
         if len(set(values))!=len(values) or not all(values): errors.append(f'{field}: empty or duplicate values')
     descriptions=[p.meta.get('description','') for p in pages.values()]
     if not all(descriptions) or len(set(descriptions))!=len(descriptions):errors.append('Descriptions: empty or duplicate values')
+    # An indexable build is a public release; it must name its real domain, not the placeholder.
+    placeholder=[p.canonical for p in pages.values() if (urlparse(p.canonical).hostname or '').endswith('example.invalid')]
+    if not noindex and placeholder:errors.append(f'Indexable build still uses the placeholder domain: {placeholder[0]}. Build with --base-url set to the real domain.')
     for file,p in pages.items():
         label=str(file.relative_to(output))
         if p.h1!=1:errors.append(f'{label}: expected one H1')

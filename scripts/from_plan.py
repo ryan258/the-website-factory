@@ -251,7 +251,8 @@ def main():
         if target_preset_path.exists() and not args.force:
             parser.error(f'{target_preset_path.relative_to(ROOT)} already exists. Choose another --name, '
                          'or add --force to replace it.')
-        temp_target = target_preset_path.with_suffix('.tmp.json')
+        # A hidden .tmp name: an interrupted write can never be read as a preset by *.json globs.
+        temp_target = target_preset_path.with_name(f'.{slug}.json.tmp')
         temp_target.write_text(json.dumps(preset, indent=2) + '\n')
         temp_target.replace(target_preset_path)
         print(f"Preset successfully compiled and verified: {target_preset_path}")

@@ -20,6 +20,12 @@ class FactoryTests(unittest.TestCase):
         result=subprocess.run(['python3',str(root/'scripts/build.py'),*args],env=build.environment(),capture_output=True,text=True)
         self.assertEqual(result.returncode==0,ok,result.stdout+result.stderr)
         return result
+    def test_tone_colors_have_one_source(self):
+        import re
+        tones=json.loads((ROOT/'data/tones.json').read_text())
+        scss=(ROOT/'assets/scss/abstracts/_variables.scss').read_text()
+        sass_map=dict(re.findall(r'"(\w+)":\s*(#[0-9a-fA-F]{6})',re.search(r'\$tones:\s*\(([^)]*)\)',scss).group(1)))
+        self.assertEqual(sass_map,tones,'$tones in _variables.scss must match data/tones.json')
     def test_four_presets_build_at_root_and_subpath(self):
         with tempfile.TemporaryDirectory(prefix='factory-presets-') as tmp:
             for slug in ('agency','contractor','consultant','local-service'):

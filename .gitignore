@@ -9,3 +9,5 @@ reports/
 __pycache__/
 *.py[cod]
 public-workshop/
+enquiries*.csv
+enquiries*.json

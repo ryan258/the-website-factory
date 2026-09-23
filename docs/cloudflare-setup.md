@@ -175,7 +175,9 @@ Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the ca
 
 ### Security & Privacy Protections
 
-- **Rate Limiting:** `functions/api/contact.js` tracks IP submission frequency in KV (`ratelimit:<ip>`), returning HTTP 429 if more than 5 enquiries arrive within a 10-minute window. KV is eventually consistent, so this is a best-effort limit: a fast burst can exceed it. Rate-limit keys share the `ENQUIRY` namespace, so list enquiries with `--prefix enquiry:`.
+- **Rate Limiting:** `functions/api/contact.js` counts submissions per visitor in KV under `ratelimit:<hash>`, a SHA-256 hash of the IP address (never the raw address), and returns HTTP 429 after 5 enquiries within 10 minutes. Add a `RATE_LIMIT_SALT` secret so the hash cannot be reversed by trying every address. KV is eventually consistent, so this is a best-effort limit: a fast burst can exceed it. Counters share the `ENQUIRY` namespace unless you bind a separate `RATE_LIMIT` KV namespace, so list enquiries with `--prefix enquiry:` (as `scripts/enquiries.py` does).
+- **Cross-site Posts:** a POST whose `Origin` header names another website is refused with HTTP 403.
+- **No-JavaScript Errors:** visitors without JavaScript get a small HTML error page with a link back to the form, not raw JSON.
 - **Data Retention TTL:** Enquiries are stored with a 90-day expiration TTL in KV to avoid hoarding personal information indefinitely.
 - **Privacy Notice:** `/privacy/` tells visitors what the form stores, for how long, and how to ask for deletion. Keep it in step with any change to the form or these settings.
 - **Webhook Delivery:** Setting the `NOTIFICATION_WEBHOOK` secret enables immediate POST notification forwarding for new submissions. A webhook that answers with an error status or takes more than 10 seconds counts as a failed delivery. Without a webhook, nobody is alerted: someone must check the KV store on a schedule.
@@ -247,6 +249,16 @@ submitted message content:
 ```sh
 npx wrangler kv key get --binding ENQUIRY --remote "<paste-key-name>"
 ```
+
+To list or export every stored enquiry later (read-only; needs `npx wrangler login`):
+
+```sh
+python3 scripts/enquiries.py list
+python3 scripts/enquiries.py export --format csv -o enquiries.csv
+```
+
+An export contains personal data. Keep it out of the repository (`.gitignore` covers
+`enquiries*.csv` and `enquiries*.json`) and delete it when you are done.
 
 **Do not skip this test.** It is the only proof that a real customer's message reaches
 you. A form that looks fine and quietly drops enquiries is worse than no form.
