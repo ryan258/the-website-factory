@@ -175,6 +175,9 @@ def apply_preset(destination, slug, name):
 if __name__=='__main__':
     import sys
     errors=validate()
+    if '--json' in sys.argv[1:]:
+        from report import emit
+        sys.exit(emit(errors))
     if errors: print('\n'.join(errors),file=sys.stderr)
     else: print('Factory configuration passed: content, variants, dependencies, page links, and assets.')
     sys.exit(bool(errors))

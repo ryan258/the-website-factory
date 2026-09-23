@@ -13,9 +13,10 @@
     "test:factory": "python3 scripts/test_factory.py",
     "test:integration": "sh scripts/check_contact.sh",
     "from-plan": "python3 scripts/from_plan.py",
-    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py && python3 scripts/test_enquiries.py",
+    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py && python3 scripts/test_enquiries.py && python3 scripts/test_schemas.py",
     "test:enquiries": "python3 scripts/test_enquiries.py",
-    "lint": "ruff check scripts && for f in assets/js/*.js functions/*.js functions/api/*.js scripts/*.cjs scripts/*.mjs; do node --check \"$f\" || exit 1; done"
+    "lint": "ruff check scripts && for f in assets/js/*.js functions/*.js functions/api/*.js scripts/*.cjs scripts/*.mjs; do node --check \"$f\" || exit 1; done",
+    "schemas": "python3 scripts/schemas.py"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

@@ -50,6 +50,10 @@ def check(output, noindex=None):
     if not noindex and placeholder:errors.append(f'Indexable build still uses the placeholder domain: {placeholder[0]}. Build with --base-url set to the real domain.')
     for file,p in pages.items():
         label=str(file.relative_to(output))
+        # Unconfirmed facts are marked "To be confirmed" (scripts/from_plan.py, draft_plan.py); a public release must not show one.
+        if not noindex:
+            found=re.search(r'(?i)to be confirmed|lorem ipsum',file.read_text())
+            if found:errors.append(f'{label}: placeholder text "{found.group(0)}" in an indexable build; replace it with a confirmed fact')
         if p.h1!=1:errors.append(f'{label}: expected one H1')
         if len(p.title)>=60:errors.append(f'{label}: title must be under 60 characters')
         if len(p.meta.get('description',''))>=155:errors.append(f'{label}: description must be under 155 characters')
@@ -88,8 +92,12 @@ def check(output, noindex=None):
     return errors
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('output',nargs='?',default=str(ROOT/'public'));args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('output',nargs='?',default=str(ROOT/'public'))
+    parser.add_argument('--json',action='store_true',help='Print a machine-readable result with an error code per problem');args=parser.parse_args()
     errors=check(Path(args.output).resolve())
+    if args.json:
+        from report import emit
+        return emit(errors,output=args.output,noindex=noindex_expected())
     if errors:print('\n'.join(errors),file=sys.stderr);return 1
     print(f'Static checks passed: unique metadata, H1, robots ({"noindex" if noindex_expected() else "indexable"}), references, anchors, and compressed CSS/JS budgets.');return 0
 if __name__=='__main__':sys.exit(main())

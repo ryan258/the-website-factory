@@ -113,32 +113,44 @@ def main():
     parser.add_argument('--base-url')
     parser.add_argument('--serve', action='store_true')
     parser.add_argument('--port', type=int, default=1313)
+    parser.add_argument('--json', action='store_true', help='Print a machine-readable result instead of prose')
     args = parser.parse_args()
+    if args.json and args.serve:
+        parser.error('--json and --serve cannot be combined.')
+    def fail(message):
+        # Every failure goes through here, so --json always gets a structured answer.
+        if args.json:
+            from report import emit
+            raise SystemExit(emit([line for line in message.splitlines() if line.strip()] or [message]))
+        parser.error(message)
     args.destination = args.destination or ('public-workshop' if args.workshop else 'public')
     if args.workshop and (ROOT/args.destination).resolve() == (ROOT/'public').resolve():
-        parser.error('Workshop output must be separate from public; omit --destination or choose another directory.')
+        fail('Workshop output must be separate from public; omit --destination or choose another directory.')
     errors = validate(ROOT, workshop=True if args.workshop else None)
     if errors:
-        parser.error("Invalid factory configuration:\n" + "\n".join(errors))
+        if args.json:
+            from report import emit
+            return emit(errors)
+        fail("Invalid factory configuration:\n" + "\n".join(errors))
     env = environment()
     for binary, pin in [('hugo', '.hugo-version'), ('sass', '.sass-version')]:
         exe = shutil.which(binary, path=env['PATH'])
         if not exe:
-            parser.error(f'{binary} is missing. See README.md; run scripts/setup.py for Dart Sass.')
+            fail(f'{binary} is missing. See README.md; run scripts/setup.py for Dart Sass.')
         command = [exe, 'version' if binary == 'hugo' else '--version']
         result = subprocess.run(command, env=env, cwd=ROOT, capture_output=True, text=True)
         version = (ROOT / pin).read_text().strip()
         if result.returncode or not re.search(r'(?<![\d.])' + re.escape(version) + r'(?![\d.])', result.stdout):
-            parser.error(f'{binary}: expected {version}; found {result.stdout.strip() or result.stderr.strip()}')
+            fail(f'{binary}: expected {version}; found {result.stdout.strip() or result.stderr.strip()}')
         if binary == 'hugo' and '+extended' not in result.stdout:
-            parser.error('Hugo Extended is required.')
+            fail('Hugo Extended is required.')
     cmd = ['hugo', '--minify', '--gc']
     if args.base_url:
         cmd += ['--baseURL', args.base_url]
     destination = (ROOT/args.destination).absolute()
     resolved = destination.resolve()
     if resolved == ROOT or resolved in ROOT.parents or any(resolved == ROOT/x or ROOT/x in resolved.parents for x in ('assets','content','data','layouts','static','scripts','docs','node_modules','.tools')):
-        parser.error('Destination must be a build directory, never a source or parent directory.')
+        fail('Destination must be a build directory, never a source or parent directory.')
     try:
         with tempfile.TemporaryDirectory(prefix='factory-build-') as temporary:
             temporary = Path(temporary)
@@ -156,16 +168,25 @@ def main():
             output = temporary/'output'
             result = subprocess.run(cmd + data_args + ['--contentDir',str(temporary/'content'),'--destination',str(output)], cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if result.returncode or re.search(r'(?m)^WARN\b', result.stdout):
+                if args.json:
+                    from report import emit
+                    return emit([l for l in result.stdout.splitlines() if re.match(r'(ERROR|WARN)\b', l)] or ['hugo build failed'])
                 print(result.stdout, file=sys.stderr)
                 return result.returncode or 1
             from check_site import check
             errors = check(output.resolve())
             if errors:
+                if args.json:
+                    from report import emit
+                    return emit(errors)
                 print('\n'.join(errors),file=sys.stderr)
                 return 1
             publish_output(output, destination)
     except (OSError, ValueError) as error:
-        parser.error(str(error))
+        fail(str(error))
+    if args.json:
+        from report import emit
+        return emit([], output=args.destination)
     print(f'Build and generated-output checks passed: {args.destination}')
     if args.serve:
         from functools import partial
