@@ -10,15 +10,25 @@ Verified locally on the `main` branch with Hugo Extended 0.166.0 and Dart Sass 1
 | Check | Result |
 | --- | --- |
 | Build and generated-output checks (`scripts/build.py`, `scripts/check_site.py`) | Pass |
-| Factory tests (`scripts/test_factory.py`) | 13 pass |
+| Factory tests (`scripts/test_factory.py`, all 7 sample presets as client copies) | 13 pass |
 | Client-copy tests (`scripts/test_starter.py`) | 6 pass |
 | Plan compiler tests (`scripts/test_from_plan.py`) | 11 pass |
 | Enquiry reader tests (`scripts/test_enquiries.py`, stand-in wrangler) | 4 pass |
+| Schema and `--json` report tests (`scripts/test_schemas.py`) | 8 pass |
+| Claims check tests (`scripts/test_claims.py`); live preset `--strict` | 7 pass; 0 open claims |
+| AI drafting and brief-to-copy (`scripts/test_ai.py`, stand-in API) | 4 pass |
+| MCP server (`scripts/test_mcp.py`) | 7 pass |
+| Eval grader (`scripts/test_evals.py`); saved bakery draft | 5 pass; score 1.00 |
+| Handover report (`scripts/test_handover.py`) | 2 pass |
+| Palettes, outside form service, llms.txt (`scripts/test_library.py`) | 7 pass |
+| Contrast (`scripts/contrast.py`): site theme and 5 palettes, light and dark | Pass (4.5:1 minimum) |
 | Contact endpoint cases (`scripts/test_contact_endpoint.mjs`) | 25 pass |
 | Local Pages integration (`sh scripts/check_contact.sh`) | Pass |
 | Lint (`npm run lint`: ruff pyflakes rules, `node --check`) | Pass |
 | Browser checks, public site: Home, Services, Contact, Privacy, receipt; light/dark; 320–1200 px; axe WCAG A/AA | Pass |
-| Workshop, component, and planner browser checks | Pass |
+| Browser checks on clinic, restaurant, and non-profit client copies | Pass |
+| Workshop (7 compositions), component, and planner browser checks | Pass |
+| Visual regression PNG codec self-test; baseline record and compare on this machine | Pass |
 
 The public `258webco` site has four pages (Home, Services, Contact, Privacy) plus the
 contact receipt. It shows no fictional case studies. The contact form stays disabled
@@ -28,6 +38,8 @@ endpoint on together.
 ### Not verified
 
 - No Lighthouse run. No hosted HTTPS, compression, cache, or CSP check.
+- No live Claude API call: AI drafting was tested against a local stand-in, and only the bakery brief has a saved draft (hand-written to the same rules).
+- The preview and production deploy workflows have not been run against Cloudflare.
 - No live form submission, live enquiry export, or real Cloudflare deployment.
 - No manual keyboard, screen-reader, zoom, or real-device review. Automated axe checks do
   not establish full WCAG conformance.

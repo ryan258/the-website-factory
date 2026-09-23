@@ -27,7 +27,7 @@ python3 scripts/build.py        # validate → build in a temp dir → check →
 python3 scripts/check_site.py   # re-check generated output
 python3 scripts/build.py --serve --port 1313
 # http://127.0.0.1:1313/            the selected composition
-# http://127.0.0.1:1313/site-kit/   every module + all five business compositions
+# http://127.0.0.1:1313/site-kit/   every module + the sample business compositions
 # http://127.0.0.1:1313/site-kit/style-guide/   tokens, type scale, buttons, states
 ```
 

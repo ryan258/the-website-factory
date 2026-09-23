@@ -10,9 +10,9 @@ The operating cycle is **brief → scope → assemble → client review → veri
 
 This adopts the master-and-sculpt approach used in the sibling `jones-construction` project. Shared patterns can inform this implementation; contractor-specific content, business claims, approvals, and integrations must remain specific to their client.
 
-**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, five business presets, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact.
+**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, eight business presets, five contrast-checked palettes, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact; the live `258webco` preset has Home, Services, Contact, and Privacy.
 
-**Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/` to create or resume a client project. Work through its brief, page plan, wireframe copy, review, and design handoff. Exported project plans can be compiled directly into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, consultant, local-service, and 258webco compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
+**Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/` to create or resume a client project. Work through its brief, page plan, wireframe copy, review, and design handoff. Exported project plans can be compiled directly into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, consultant, local-service, clinic, restaurant, and non-profit compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
 See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical client plays, vertical presets, and monetization ideas. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
 
@@ -53,7 +53,7 @@ The workshop is an internal development surface, omitted from the default agency
 
 Each page declares its ordered section selection and variants through validated JSON configuration. Business identity, editorial content, visual theme, and page composition have separate configuration surfaces.
 
-Choose from agency, contractor, consultant, local-service, and 258webco presets. Presets select an initial composition; they do not establish which services a business offers or supply approved copy. Typography, imagery, colors, tone, and layout remain editable.
+Choose from the agency, contractor, consultant, local-service, clinic, restaurant, nonprofit, and 258webco presets, and optionally a palette (`--palette studio|forest|harbor|terracotta|plum`). Presets select an initial composition; they do not establish which services a business offers or supply approved copy. Typography, imagery, colors, tone, and layout remain editable.
 
 ### Complete selection and removal
 
@@ -104,6 +104,35 @@ Client copies must start without inherited approvals, historical performance gua
 | Practical component library guide | `docs/component-library.md` |
 | Acceptance evidence, current and historical | `docs/acceptance.md` |
 | Strategic direction, milestone status, and planned evolution | `roadmap.md` |
+| JSON Schemas for presets and AI plans (generated) | `schemas/`, `scripts/schemas.py` |
+| Claims to confirm (prices, counts, ratings, absolutes) | `scripts/claims.py` |
+| AI brief-to-plan drafting (Claude API) | `scripts/draft_plan.py` |
+| One command: brief to checked client copy | `scripts/factory_run.py` |
+| MCP server for agents (registered in `.mcp.json`) | `scripts/mcp_server.py` |
+| Eval harness for AI drafts, with test briefs | `scripts/eval_plans.py`, `evals/` |
+| Handover report | `scripts/handover.py` |
+| Visual regression screenshots (local) | `scripts/visual_check.cjs` |
+| Color palettes and contrast check | `data/palettes.json`, `scripts/contrast.py` |
+| Manual preview deploys | `.github/workflows/preview.yml` |
+
+## AI and agent tools
+
+These tools let an AI assistant, or a person, go from a client brief to a checked draft site without inventing facts. Every draft keeps `noindex` on, the form off, and each unknown marked "To be confirmed". A public build fails while any placeholder remains.
+
+| Task | Command |
+| --- | --- |
+| Draft a page plan from a brief (paid API call) | `python3 scripts/draft_plan.py brief.md -o plan.json` |
+| Brief (or plan) to a built client copy | `python3 scripts/factory_run.py brief.md ../client` or `--plan plan.json` |
+| Claims the business must confirm | `python3 scripts/claims.py` (`--strict` in CI) |
+| Machine-readable results | add `--json` to `factory.py`, `build.py`, or `check_site.py` |
+| Score AI drafts | `python3 scripts/eval_plans.py` (free, saved drafts) or `--live` (paid) |
+| Handover report | `python3 scripts/handover.py --build` |
+| Screenshot comparison | `node scripts/visual_check.cjs --update`, then `node scripts/visual_check.cjs` |
+
+- **Claude API:** `draft_plan.py` uses `claude-opus-5` with structured output that must match `schemas/plan.schema.json`. Install the SDK with `pip install -r requirements-dev.txt`. Set `ANTHROPIC_API_KEY`, or log in with `ant auth login`. A declined request retries on Anthropic's recommended fallback model (`fallbacks: "default"`).
+- **MCP:** Claude Code loads `scripts/mcp_server.py` from `.mcp.json`. Tools: `list_modules`, `list_presets`, `get_preset`, `get_schema`, `validate_preset`, `check_claims`, `compile_plan`, `build_site`, `check_site`, `create_client_site`, and `draft_plan`. The tool descriptions name any side effect. None of them commit, deploy, or turn on a form.
+- **Approving claims:** once the business confirms a claim, add its text to the preset's `approved_claims`. Client copies start with none.
+- **Schemas:** after editing `data/modules.json` or `data/tones.json`, run `python3 scripts/schemas.py`. CI fails when the schema files are out of date.
 
 ## Build and preview
 
@@ -163,7 +192,7 @@ Add a case study by copying an existing `content/work/*.md` file and updating it
 
 ## Local quality checks
 
-The Python checks require no package installation. They fail with a nonzero exit code for build warnings, missing links/assets, duplicate metadata, unexpected robots/noindex state, incorrect H1 counts, or oversized compressed CSS/JS bundles.
+The Python checks need no package installation, except `test_ai.py` (the `anthropic` SDK from `requirements-dev.txt`). They fail with a nonzero exit code for build warnings, missing links/assets, duplicate metadata, unexpected robots/noindex state, incorrect H1 counts, or oversized compressed CSS/JS bundles.
 
 ```sh
 python3 scripts/build.py
@@ -172,11 +201,20 @@ python3 scripts/test_factory.py
 python3 scripts/test_starter.py
 python3 scripts/test_from_plan.py
 python3 scripts/test_enquiries.py
+python3 scripts/test_schemas.py    # schemas and --json reports
+python3 scripts/test_claims.py
+python3 scripts/test_ai.py         # AI drafting against a local stand-in API
+python3 scripts/test_mcp.py
+python3 scripts/test_evals.py
+python3 scripts/test_handover.py
+python3 scripts/test_library.py    # palettes, outside form services, llms.txt
+python3 scripts/contrast.py
 node scripts/test_contact_endpoint.mjs
 sh scripts/check_contact.sh
 # Or run all unit/contract tests at once:
+pip install -r requirements-dev.txt
 npm test
-# Lint for real mistakes (needs: pip install ruff==0.15.8):
+# Lint for real mistakes:
 npm run lint
 ```
 
@@ -215,7 +253,7 @@ Automated checks do not establish manual keyboard, screen-reader, field INP, liv
 
 The generated site can be served by any static host. `wrangler.toml` is an optional, pinned Cloudflare Pages recipe; the deployment URL sets canonical URLs. It neither deploys nor connects an account. `_headers` is a Cloudflare/Netlify-style header file enforcing strict security defaults including CSP, clickjacking prevention, `Strict-Transport-Security: max-age=31536000; includeSubDomains`, and `no-store`/`noindex` rules for internal build inventories. Cloudflare Pages middleware (`functions/_middleware.js`) returns 404 for `/.factory-build.json` and hidden dotfiles, except the public `/.well-known/` folder. `wrangler.toml` declares the `ENQUIRY` KV namespace. Compression, HTTPS, cache headers, and CSP must be verified at the actual host.
 
-The current **form backend is a Cloudflare Pages Function** (`functions/api/contact.js`), not a generic multi-provider adapter. On hosts without Pages Functions keep delivery disabled until a real integration is implemented. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment and binds `ENQUIRY` (KV). Rendering the form does not open the endpoint: it accepts a submission only when the deployment both binds a destination and sets `ENQUIRY_ENABLED = "true"`, and it acknowledges receipt only after the durable write succeeds — a failed write is a 502 for both the JavaScript and no-JavaScript paths, never a receipt page. Stored submissions set a 90-day retention TTL (`expirationTtl`), each client IP gets a best-effort limit of 5 submissions per 10 minutes (KV updates are not instant, so a fast burst can exceed it), and alerts can be sent to `NOTIFICATION_WEBHOOK`; a webhook that answers with an error or takes more than 10 seconds counts as a failed delivery. With no binding or no explicit intake the endpoint returns 503 and accepts nothing. `wrangler.toml` defaults to `ENQUIRY_ENABLED = "false"` to keep intake safely disabled in source control until explicitly configured. CI verification in `.github/workflows/deploy.yml` runs `sh scripts/check_contact.sh` as an automated integration gate on push and PR, while production deployment is strictly gated behind manual owner authorization (`workflow_dispatch`). Its **Accept enquiries** input switches the rendered form and `ENQUIRY_ENABLED` on together, in the workflow's own checkout, and the job fails if they disagree, so a live form is never built against a closed endpoint. A scaffolded client copy inherits neither: its `wrangler.toml` is generated unconfigured, with no namespace id, bucket, or notification address from this project. The contact form never sends email (Pages Functions cannot bind `send_email`); it stores enquiries and can alert a `NOTIFICATION_WEBHOOK`. When the selected preset has a `privacy` page, the footer and the enabled form link to it. Step-by-step account setup, including the domain, the enquiry store, and notification email, is in [docs/cloudflare-setup.md](docs/cloudflare-setup.md). Verify the endpoint before enabling it with `sh scripts/check_contact.sh`, which builds a form-enabled site, serves it with `wrangler pages dev` against a local KV binding, and exercises the accepted, stored, redirected, rejected, unconfigured, and bindings-without-intake paths. It deploys nothing and needs no Cloudflare account. `node scripts/test_contact_endpoint.mjs` covers offline verification: storage errors, notification errors, unopened intake, retention TTL, IP rate limiting, and webhook failure handling. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
+The default **form backend is a Cloudflare Pages Function** (`functions/api/contact.js`). On another host, set `params.formAction` in `hugo.toml` (or `HUGO_PARAMS_FORMACTION`) to an outside form service's `https://` address. The service should answer the form's JSON request with `{"ok": true}`; Formspree does. The build adds that one origin to the built CSP, and the form notice names the service. If the site has a privacy page, update it to name the service too. Set `HUGO_PARAMS_FORMENABLED=true` only after the owner authorizes deployment and binds `ENQUIRY` (KV). Rendering the form does not open the endpoint: it accepts a submission only when the deployment both binds a destination and sets `ENQUIRY_ENABLED = "true"`, and it acknowledges receipt only after the durable write succeeds — a failed write is a 502 for both the JavaScript and no-JavaScript paths, never a receipt page. Stored submissions set a 90-day retention TTL (`expirationTtl`), each client IP gets a best-effort limit of 5 submissions per 10 minutes (KV updates are not instant, so a fast burst can exceed it), and alerts can be sent to `NOTIFICATION_WEBHOOK`; a webhook that answers with an error or takes more than 10 seconds counts as a failed delivery. With no binding or no explicit intake the endpoint returns 503 and accepts nothing. `wrangler.toml` defaults to `ENQUIRY_ENABLED = "false"` to keep intake safely disabled in source control until explicitly configured. CI verification in `.github/workflows/deploy.yml` runs `sh scripts/check_contact.sh` as an automated integration gate on push and PR, while production deployment is strictly gated behind manual owner authorization (`workflow_dispatch`). Its **Accept enquiries** input switches the rendered form and `ENQUIRY_ENABLED` on together, in the workflow's own checkout, and the job fails if they disagree, so a live form is never built against a closed endpoint. A scaffolded client copy inherits neither: its `wrangler.toml` is generated unconfigured, with no namespace id, bucket, or notification address from this project. The contact form never sends email (Pages Functions cannot bind `send_email`); it stores enquiries and can alert a `NOTIFICATION_WEBHOOK`. When the selected preset has a `privacy` page, the footer and the enabled form link to it. Step-by-step account setup, including the domain, the enquiry store, and notification email, is in [docs/cloudflare-setup.md](docs/cloudflare-setup.md). Verify the endpoint before enabling it with `sh scripts/check_contact.sh`, which builds a form-enabled site, serves it with `wrangler pages dev` against a local KV binding, and exercises the accepted, stored, redirected, rejected, unconfigured, and bindings-without-intake paths. It deploys nothing and needs no Cloudflare account. `node scripts/test_contact_endpoint.mjs` covers offline verification: storage errors, notification errors, unopened intake, retention TTL, IP rate limiting, and webhook failure handling. The enabled form uses a same-origin HTML POST with a honeypot; optional small JavaScript provides status and retains input on failure. No-JavaScript error handling depends on the host.
 
 No inbox or account is configured. No form test is sent by the local checks. Test both submission paths with synthetic data only after explicit authorization, and verify actual receipt rather than trusting the success page. Do not enable indexing, use the fictional domain, or replace sample claims with unsupported claims.
 

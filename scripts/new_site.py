@@ -9,7 +9,25 @@ from factory import apply_palette, apply_preset, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts')
-FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json')
+FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json',
+         '.mcp.json', 'requirements-dev.txt', 'ruff.toml')
+# These test the master itself (every preset, the scaffold, the eval fixtures), so they cannot
+# pass in a one-preset client copy. The copy's npm test runs checks that fit a client site.
+MASTER_ONLY_TESTS = ('test_factory.py', 'test_starter.py', 'test_from_plan.py', 'test_schemas.py', 'test_claims.py',
+                     'test_ai.py', 'test_mcp.py', 'test_evals.py', 'test_handover.py', 'test_library.py', 'test_enquiries.py')
+CLIENT_TEST = ('python3 scripts/factory.py && python3 scripts/check_site.py && python3 scripts/claims.py '
+               '&& python3 scripts/contrast.py && node scripts/test_contact_endpoint.mjs')
+
+def client_package(destination):
+    """Point npm scripts at checks that exist and make sense in a client copy."""
+    package = destination / 'package.json'
+    data = json.loads(package.read_text())
+    scripts = data.get('scripts', {})
+    for name, command in list(scripts.items()):
+        if any(test in command for test in MASTER_ONLY_TESTS) or 'eval_plans.py' in command:
+            del scripts[name]
+    scripts['test'] = CLIENT_TEST
+    package.write_text(json.dumps(data, indent=2) + '\n')
 
 def available_presets():
     """Every preset in data/presets, including ones compiled by scripts/from_plan.py."""
@@ -131,6 +149,9 @@ def create(destination, name, preset="agency", palette=None):
         for filename in FILES:
             shutil.copy2(ROOT / filename, destination / filename)
         (destination / 'docs').mkdir()
+        for test in MASTER_ONLY_TESTS:
+            (destination / 'scripts' / test).unlink(missing_ok=True)
+        client_package(destination)
         shutil.copy2(ROOT / 'docs/starter-guide.md', destination / 'docs/starter-guide.md')
         shutil.copy2(ROOT / 'docs/factory-guide.md', destination / 'docs/factory-guide.md')
         shutil.copy2(ROOT / 'docs/agency-workflow.md', destination / 'docs/agency-workflow.md')

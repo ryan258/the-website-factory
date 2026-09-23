@@ -2,7 +2,7 @@
 
 Follow [the agency delivery cycle](agency-workflow.md) in the master: agree the brief and scope before selecting components. The agency storefront is the default build. Run `python3 scripts/build.py --workshop --serve --port 1314` for internal planning at `http://127.0.0.1:1314/site-kit/`; workshop output goes to `public-workshop`.
 
-The master includes five business compositions (`agency`, `contractor`, `consultant`, `local-service`, `258webco`), a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
+The master includes eight business compositions (`agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`), a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
 
 ## Start a separate copy
 
@@ -10,7 +10,7 @@ The master includes five business compositions (`agency`, `contractor`, `consult
 python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor
 ```
 
-Choose `agency`, `contractor`, `consultant`, `local-service`, or `258webco`. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated agency project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
+Choose `agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, or `258webco`. Add `--palette` with a name from `data/palettes.json` to start from a contrast-checked color set. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated agency project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
 
 ## Compiling presets from the planning workshop
 

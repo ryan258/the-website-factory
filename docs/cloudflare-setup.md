@@ -298,6 +298,12 @@ A push to `main` runs the checks only. It never deploys.
 
 **You should see:** both jobs green. Then do the live test enquiry from step 8.
 
+To share a draft without touching the live site, run **Actions → Preview Deployment →
+Run workflow** and pick `site` or `workshop`. It publishes to
+`https://preview-site.258webco.pages.dev` or `https://preview-workshop.258webco.pages.dev`,
+always with search engines blocked and the form off. Anyone with the link can open it; add
+Cloudflare Access to `*.258webco.pages.dev` if the workshop must stay private.
+
 ---
 
 ## What to do when you change the site later

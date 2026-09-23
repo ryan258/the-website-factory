@@ -3,7 +3,7 @@
 **Review date:** 2026-09-23
 **Reviewed commit:** `1459cf5` (branch `claude/jolly-planck-xmitzy`, same as `main`)
 
-> **Status update (2026-09-23):** Items **C1–C3** and **H1–H6** in Part 4 are now fixed on `main`. See Milestone 7 in `roadmap.md`. All Medium items (**M1–M13**) and the Low items are also fixed, except the code reformat (see Low: a linter was added instead). Part 5 proposals are still open.
+> **Status update (2026-09-23):** Every Part 4 fix is done on `main`, except the code reformat (a linter was added instead). Part 5 is done too, except live preview in the planner (blocked by the site's security rules), cloud saving (outside the static-site design), and splitting the planner code (deferred). See Milestones 7 and 8 in `roadmap.md`.
 
 ## TL;DR
 

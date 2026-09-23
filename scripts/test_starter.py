@@ -93,6 +93,20 @@ class StarterTests(unittest.TestCase):
             guide=(dest/'docs/cloudflare-setup.md').read_text()
             self.assertIn('Cedar & Stone',guide)
             self.assertNotIn('Email Routing',guide)
+    def test_copy_gets_client_checks_and_agent_tools(self):
+        import json
+        with tempfile.TemporaryDirectory() as tmp:
+            dest=scaffold.create(Path(tmp)/'client','Client Checks','clinic')
+            scripts=json.loads((dest/'package.json').read_text())['scripts']
+            self.assertEqual(scripts['test'],scaffold.CLIENT_TEST)
+            for test in scaffold.MASTER_ONLY_TESTS:
+                self.assertFalse((dest/'scripts'/test).exists(),test)
+                self.assertFalse(any(test in command for command in scripts.values()),test)
+            for command in scripts.values():
+                for name in re.findall(r'scripts/([\w.-]+)',command):
+                    self.assertTrue((dest/'scripts'/name).is_file(),f'npm script needs missing scripts/{name}')
+            for kept in ('.mcp.json','requirements-dev.txt','ruff.toml','scripts/mcp_server.py','scripts/handover.py'):
+                self.assertTrue((dest/kept).is_file(),kept)
     def test_empty_output_fails(self):
         with tempfile.TemporaryDirectory() as tmp:self.assertTrue(static.check(Path(tmp)))
 if __name__=='__main__':unittest.main()
