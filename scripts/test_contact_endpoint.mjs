@@ -2,6 +2,7 @@
    The endpoint is called directly with stub bindings; check_contact.sh covers the real ones. */
 import assert from 'node:assert/strict';
 import {onRequestPost} from '../functions/api/contact.js';
+import {onRequest as middleware} from '../functions/_middleware.js';
 
 const VALID = 'name=Test+Person&email=test%40example.com&project-type=Not+sure+yet&budget=Under+10k&message=Hello';
 const post = (env, {json = true, body = VALID, headers = {}} = {}) => onRequestPost({
@@ -128,11 +129,44 @@ check('rate limiting restricts submissions from same IP to 5 per window', async 
   assert.match((await rateLimitedRes.json()).error, /Too many enquiries/);
 });
 
+const withFetch = async (stub, fn) => {
+  const original = globalThis.fetch;
+  globalThis.fetch = stub;
+  try { await fn(); } finally { globalThis.fetch = original; }
+};
+const WEBHOOK = {...ENABLED, NOTIFICATION_WEBHOOK: 'https://hooks.example.invalid/alert'};
+
+check('a webhook-only site does not acknowledge when the webhook answers with an error', () =>
+  withFetch(async () => new Response('down', {status: 500}), async () => {
+    const response = await post(WEBHOOK);
+    assert.equal(response.status, 502);
+  }));
+
+check('a webhook-only site acknowledges when the webhook accepts', () =>
+  withFetch(async () => new Response('ok', {status: 200}), async () => {
+    assert.equal((await post(WEBHOOK)).status, 200);
+  }));
+
+check('a stored enquiry is still acknowledged when the webhook fails', () =>
+  withFetch(async () => new Response('down', {status: 500}), async () => {
+    const ENQUIRY = store();
+    assert.equal((await post({...WEBHOOK, ENQUIRY})).status, 200);
+    assert.equal(ENQUIRY.written.filter(([key]) => key.startsWith('enquiry:')).length, 1);
+  }));
+
+check('middleware hides dotfiles but serves /.well-known/', async () => {
+  const visit = path => middleware({request: new Request('https://example.invalid' + path), next: async () => new Response('ok')});
+  assert.equal((await visit('/.factory-build.json')).status, 404);
+  assert.equal((await visit('/.git/config')).status, 404);
+  assert.equal((await visit('/.well-known/security.txt')).status, 200);
+  assert.equal((await visit('/contact/')).status, 200);
+});
+
 let failures = 0;
 for (const [name, fn] of cases) {
   try { await fn(); } catch (error) { failures++; console.error(`FAIL: ${name}\n  ${error.message}`); }
 }
 console.log(failures
   ? `Contact endpoint checks FAILED: ${failures} of ${cases.length}`
-  : `Contact endpoint checks passed: ${cases.length} cases, including storage failure, notification failure, and unopened intake.`);
+  : `Contact endpoint checks passed: ${cases.length} cases, including storage failure, notification failure, webhook errors, unopened intake, and dotfile protection.`);
 process.exitCode = failures ? 1 : 0;

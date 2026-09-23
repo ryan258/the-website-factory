@@ -20,7 +20,9 @@ Exported project plans from `/site-kit/` can be converted directly into validate
 python3 scripts/from_plan.py path/to/plan.json --name "my-preset" --write
 ```
 
-This compiles the planner JSON into `data/presets/<name>.json`, normalizes the page hierarchy (ensuring `home` first and `contact` last), injects mandatory hero headers and services, maps sections to schema contracts in `data/modules.json`, and validates the output against `scripts/factory.py`.
+This compiles the planner JSON into `data/presets/<name>.json`, normalizes the page hierarchy (ensuring `home` first and `contact` last), injects mandatory hero headers and services, maps sections to schema contracts in `data/modules.json`, and validates the output against `scripts/factory.py` in a scratch copy, so a preview or a failed compile never changes `data/presets/`. `--write` refuses to replace an existing preset unless you add `--force`.
+
+The compiler never invents facts. Anything the plan leaves out (prices, dates, places, service copy) is written as `To confirm with the client.`, and the command lists every section that still contains it. Replace each one with confirmed copy before client review.
 
 ## Edit the composition
 

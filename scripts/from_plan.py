@@ -4,11 +4,21 @@ import argparse
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from factory import validate
+
+# Every value the plan did not supply carries this marker, so no invented fact
+# (a price, a date, a place, a service claim) can pass as approved copy.
+TO_CONFIRM = 'To confirm with the client.'
+
+def placeholders(preset):
+    """List the content keys that still contain unconfirmed placeholder copy."""
+    return sorted(key for key, block in preset['sections'].items() if TO_CONFIRM in json.dumps(block))
 
 def slugify(text):
     slug = re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
@@ -18,8 +28,8 @@ def parse_items(text, default_title="Detail"):
     lines = [line.strip().lstrip('-*•0123456789. ') for line in (text or '').splitlines() if line.strip()]
     if not lines:
         return [
-            {"title": f"{default_title} 1", "text": "Essential feature and practical benefit."},
-            {"title": f"{default_title} 2", "text": "Clear expectations and verified delivery."}
+            {"title": f"{default_title} 1", "text": TO_CONFIRM},
+            {"title": f"{default_title} 2", "text": TO_CONFIRM}
         ]
     items = []
     for i, line in enumerate(lines[:8]):
@@ -73,7 +83,7 @@ def convert_plan_to_preset(project_data, registry):
             'purpose': 'Direct enquiry path for new client projects.',
             'sections': [
                 {'kind': 'hero', 'variant': 'compact', 'title': 'Get in touch', 'body': 'Start a project conversation.'},
-                {'kind': 'contact', 'title': 'Contact details', 'body': 'Available Monday to Friday.'}
+                {'kind': 'contact', 'title': 'Contact details', 'body': TO_CONFIRM}
             ]
         }
 
@@ -88,7 +98,7 @@ def convert_plan_to_preset(project_data, registry):
             'kind': 'services',
             'variant': 'cards',
             'title': 'Core services',
-            'body': 'Consulting: Strategic advice.\nImplementation: High-speed delivery.\nSupport: Reliable care.'
+            'body': ''
         })
 
     # Order pages with home first, contact last
@@ -157,7 +167,7 @@ def convert_plan_to_preset(project_data, registry):
 
             if 'items' in req_fields:
                 if isinstance(s.get('items'), list) and s['items']:
-                    items = [{"title": str(it.get('title','Feature')), "text": str(it.get('text','Detail'))} for it in s['items']]
+                    items = [{"title": str(it.get('title') or 'Item'), "text": str(it.get('text') or TO_CONFIRM)} for it in s['items']]
                 else:
                     items = parse_items(s.get('body'), default_title=kind.capitalize())
                 
@@ -166,21 +176,21 @@ def convert_plan_to_preset(project_data, registry):
                     if 'group' in item_req:
                         it.setdefault('group', 'Core')
                     if 'value' in item_req:
-                        it.setdefault('value', '$100')
+                        it.setdefault('value', TO_CONFIRM)
                     if 'when' in item_req:
-                        it.setdefault('when', 'Every Monday')
+                        it.setdefault('when', TO_CONFIRM)
                     if 'place' in item_req:
-                        it.setdefault('place', 'Main Studio')
+                        it.setdefault('place', TO_CONFIRM)
                     if 'url' in item_req:
                         it.setdefault('url', '/contact/')
                         it.setdefault('link_label', 'Enquire')
                     if kind == 'comparison':
-                        it.setdefault('scope', 'Standard')
-                        it.setdefault('best', 'Tailored')
+                        it.setdefault('scope', TO_CONFIRM)
+                        it.setdefault('best', TO_CONFIRM)
                 content_block['items'] = items
 
             if 'notice' in req_fields:
-                content_block['notice'] = (s.get('notice') or s.get('a11y') or "Details confirmed upon project brief.").strip()
+                content_block['notice'] = (s.get('notice') or s.get('a11y') or TO_CONFIRM).strip()
 
             preset['sections'][content_key] = content_block
 
@@ -197,6 +207,7 @@ def main():
     parser.add_argument('plan', help='Path to planner JSON export file')
     parser.add_argument('--name', help='Override preset identifier/slug')
     parser.add_argument('--write', action='store_true', help='Save preset directly to data/presets/<slug>.json')
+    parser.add_argument('--force', action='store_true', help='With --write, replace an existing preset of the same name')
     args = parser.parse_args()
 
     plan_path = Path(args.plan)
@@ -210,31 +221,34 @@ def main():
     if args.name:
         slug = slugify(args.name)
 
-    # Test validation
-    target_preset_path = ROOT / 'data/presets' / f"{slug}.json"
-    temp_target = target_preset_path.with_suffix('.tmp.json')
-    temp_target.write_text(json.dumps(preset, indent=2) + '\n')
-    
-    try:
-        # Validate against factory rules
-        temp_target.replace(target_preset_path)
-        errors = validate(ROOT)
-        if errors:
-            print("Validation errors in generated preset:", file=sys.stderr)
-            for err in errors:
-                print(f"  - {err}", file=sys.stderr)
-            if not args.write and target_preset_path.exists():
-                target_preset_path.unlink(missing_ok=True)
-            return 1
-        
-        if args.write:
-            print(f"Preset successfully compiled and verified: {target_preset_path}")
-        else:
-            target_preset_path.unlink(missing_ok=True)
-            print(json.dumps(preset, indent=2))
-        return 0
-    finally:
-        temp_target.unlink(missing_ok=True)
+    target = ROOT / 'data/presets' / f"{slug}.json"
+    if args.write and target.exists() and not args.force:
+        parser.error(f'{target.relative_to(ROOT)} already exists. Choose another --name, or pass --force to replace it.')
+
+    # Validate against the factory rules in a scratch copy of data/, so a preview or a
+    # failed compile never writes, replaces, or deletes a real preset.
+    with tempfile.TemporaryDirectory(prefix='from-plan-') as scratch:
+        scratch = Path(scratch)
+        shutil.copytree(ROOT / 'data', scratch / 'data')
+        for folder in ('assets', 'content'):
+            (scratch / folder).symlink_to(ROOT / folder, target_is_directory=True)
+        (scratch / 'data/presets' / f"{slug}.json").write_text(json.dumps(preset, indent=2) + '\n')
+        errors = validate(scratch)
+    if errors:
+        print("Validation errors in generated preset:", file=sys.stderr)
+        for err in errors:
+            print(f"  - {err}", file=sys.stderr)
+        return 1
+
+    pending = placeholders(preset)
+    if pending:
+        print(f"Needs client copy before review ({len(pending)} sections contain '{TO_CONFIRM}'): " + ', '.join(pending), file=sys.stderr)
+    if args.write:
+        target.write_text(json.dumps(preset, indent=2) + '\n')
+        print(f"Preset compiled and verified: {target}")
+    else:
+        print(json.dumps(preset, indent=2))
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -101,8 +101,12 @@ form works. Agree who monitors enquiries, and how often, before launch.
 """)
 
 
+def presets():
+    """Every preset in the master; adding a JSON file is enough to offer a new one."""
+    return sorted(path.stem for path in (ROOT / 'data/presets').glob('*.json'))
+
 def create(destination, name, preset="agency"):
-    if preset not in ("agency", "contractor", "consultant", "local-service", "258webco"):
+    if preset not in presets():
         raise ValueError("Unknown business preset.")
     errors = validate(ROOT)
     if errors:
@@ -161,7 +165,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('destination')
     parser.add_argument('--name', required=True)
-    parser.add_argument('--preset', choices=['agency', 'contractor', 'consultant', 'local-service', '258webco'], default='agency')
+    parser.add_argument('--preset', choices=presets(), default='agency')
     args = parser.parse_args()
     try:
         destination = create(args.destination, args.name, args.preset)

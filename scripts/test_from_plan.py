@@ -2,13 +2,14 @@
 """Tests for scripts/from_plan.py planner-to-preset converter."""
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 import sys
 sys.path.insert(0, str(ROOT / 'scripts'))
-from from_plan import convert_plan_to_preset
+from from_plan import TO_CONFIRM, convert_plan_to_preset, placeholders
 from factory import validate
 
 class FromPlanTests(unittest.TestCase):
@@ -85,6 +86,31 @@ class FromPlanTests(unittest.TestCase):
             self.assertEqual(errors, [], f"Validation failed with: {errors}")
         finally:
             target.unlink(missing_ok=True)
+
+    def test_missing_facts_are_marked_not_invented(self):
+        plan = {"name": "Quick Site", "pages": [{"name": "Home", "sections": [
+            {"kind": "pricing", "title": "Plans", "body": "Basic\nPlus"}]}]}
+        _, preset = convert_plan_to_preset(plan, self.registry)
+        text = json.dumps(preset)
+        for invented in ('$100', 'Every Monday', 'Main Studio', 'Monday to Friday', 'High-speed delivery'):
+            self.assertNotIn(invented, text)
+        self.assertIn(TO_CONFIRM, text)
+        self.assertTrue(placeholders(preset))
+
+    def test_preview_never_touches_an_existing_preset(self):
+        existing = ROOT / 'data/presets/agency.json'
+        before = existing.read_bytes()
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = Path(tmp) / 'plan.json'
+            plan.write_text(json.dumps({"name": "Agency", "pages": [{"name": "Home", "sections": []}]}))
+            script = str(ROOT / 'scripts/from_plan.py')
+            preview = subprocess.run(['python3', script, str(plan), '--name', 'agency'], capture_output=True, text=True)
+            self.assertEqual(preview.returncode, 0, preview.stderr)
+            self.assertEqual(existing.read_bytes(), before)
+            write = subprocess.run(['python3', script, str(plan), '--name', 'agency', '--write'], capture_output=True, text=True)
+            self.assertNotEqual(write.returncode, 0)
+            self.assertIn('already exists', write.stderr)
+            self.assertEqual(existing.read_bytes(), before)
 
 if __name__ == '__main__':
     unittest.main()

@@ -169,10 +169,10 @@ Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the ca
 
 ### Security & Privacy Protections
 
-- **Rate Limiting:** `functions/api/contact.js` tracks IP submission frequency in KV (`ratelimit:<ip>`), returning HTTP 429 if more than 5 enquiries arrive within a 10-minute window.
+- **Rate Limiting:** `functions/api/contact.js` tracks IP submission frequency in KV (`ratelimit:<ip>`), returning HTTP 429 if more than 5 enquiries arrive within a 10-minute window. KV is eventually consistent, so this is a best-effort limit: a fast burst can exceed it. Rate-limit keys share the `ENQUIRY` namespace, so list enquiries with `--prefix enquiry:`.
 - **Data Retention TTL:** Enquiries are stored with a 90-day expiration TTL in KV to avoid hoarding personal information indefinitely.
-- **Webhook Delivery:** Setting `NOTIFICATION_WEBHOOK = "https://..."` enables immediate POST notification forwarding for new submissions.
-- **Internal Artifact & Dotfile Protection:** `functions/_middleware.js` intercepts and returns HTTP 404 for `/.factory-build.json` and hidden dotfiles, backed by `static/_headers` with `X-Robots-Tag: noindex, nofollow, noarchive` and `Cache-Control: no-store`.
+- **Webhook Delivery:** Setting `NOTIFICATION_WEBHOOK = "https://..."` enables immediate POST notification forwarding for new submissions. A webhook that answers with an error status or takes more than 10 seconds counts as a failed delivery. Without a webhook, nobody is alerted: someone must check the KV store on a schedule.
+- **Internal Artifact & Dotfile Protection:** `functions/_middleware.js` intercepts and returns HTTP 404 for `/.factory-build.json` and hidden dotfiles (the public `/.well-known/` folder stays reachable), backed by `static/_headers` with `X-Robots-Tag: noindex, nofollow, noarchive` and `Cache-Control: no-store`.
 
 ---
 

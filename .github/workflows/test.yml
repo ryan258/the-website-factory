@@ -1,26 +1,17 @@
-name: Deploy Hugo Site to Cloudflare Pages
+name: Test
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
 
-# A newer push waits for the running deploy instead of racing it to Cloudflare.
-concurrency:
-  group: deploy-production
-  cancel-in-progress: false
+permissions:
+  contents: read
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      deployments: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
@@ -38,23 +29,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/setup.py
 
-      - name: Build Site (Production)
+      - name: Build Site (Production settings)
         run: |
-          rm -rf public
           HUGO_PARAMS_FORMENABLED=true HUGO_PARAMS_NOINDEX=false \
             python3 scripts/build.py --base-url https://258webco.com/
 
-      - name: Verify Generated Site Quality Gates
+      - name: Run Checks and Tests
         run: |
           HUGO_PARAMS_NOINDEX=false python3 scripts/check_site.py public
           python3 scripts/test_factory.py
           python3 scripts/test_starter.py
           python3 scripts/test_from_plan.py
           node scripts/test_contact_endpoint.mjs
-
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy public --project-name=258webco

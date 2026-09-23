@@ -183,3 +183,48 @@
     font-size: .7rem;
   }
 }
+
+// Former inline style attributes. The site CSP (static/_headers) allows no inline
+// styles, so they live here; !important keeps the precedence an inline style had.
+.sg-x1 { margin-bottom: 16px !important; font-size: 1.1rem !important; }
+.sg-x2 { background: var(--paper) !important; }
+.sg-x3 { background: var(--ink) !important; }
+.sg-x4 { background: var(--mist) !important; }
+.sg-x5 { background: var(--line) !important; }
+.sg-x6 { background: var(--accent) !important; }
+.sg-x7 { background: var(--link) !important; }
+.sg-x8 { background: var(--muted) !important; }
+.sg-x9 { background: #ffc400 !important; }
+.sg-x10 { background: #edb08e !important; }
+.sg-x11 { background: #b9d7bb !important; }
+.sg-x12 { background: #a6cef7 !important; }
+.sg-x13 { font-size: clamp(2.6rem, 5.8vw, 4.5rem) !important; margin: 0 !important; line-height: 1.15 !important; font-weight: 650 !important; letter-spacing: -0.045em !important; }
+.sg-x14 { margin: 0 !important; font-size: clamp(1.8rem, 3.2vw, 2.65rem) !important; line-height: 1.15 !important; font-weight: 650 !important; letter-spacing: -0.045em !important; }
+.sg-x15 { margin: 0 !important; font-size: 1.4rem !important; line-height: 1.15 !important; font-weight: 650 !important; letter-spacing: -0.045em !important; }
+.sg-x16 { margin: 0 !important; font-size: 1rem !important; line-height: 1.6 !important; max-width: 48ch !important; }
+.sg-x17 { margin: 0 !important; font-size: 1.125rem !important; line-height: 1.6 !important; max-width: 65ch !important; }
+.sg-x18 { margin: 0 !important; font-size: 0.68rem !important; font-weight: 650 !important; letter-spacing: 0.12em !important; }
+.sg-x19 { margin: 0 !important; font-size: 0.75rem !important; max-width: 85ch !important; }
+.sg-x20 { width: 4px !important; }
+.sg-x21 { width: 8px !important; }
+.sg-x22 { width: 16px !important; }
+.sg-x23 { width: 24px !important; }
+.sg-x24 { width: 32px !important; }
+.sg-x25 { width: 48px !important; }
+.sg-x26 { width: 64px !important; }
+.sg-x27 { width: 96px !important; }
+.sg-x28 { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important; gap: 16px !important; font-size: .85rem !important; }
+.sg-x29 { border: 1px solid var(--line) !important; padding: 16px !important; }
+.sg-x30 { margin-top: 6px !important; color: var(--muted) !important; }
+.sg-x31 { margin: 0 !important; }
+.sg-x32 { margin: 0 !important; width: 44px !important; height: 44px !important; font-size: 0.9rem !important; }
+.sg-x33 { margin-bottom: 24px !important; }
+.sg-x34 { margin-top: 16px !important; display: inline-block !important; }
+.sg-x35 { display: grid !important; gap: 20px !important; max-width: 600px !important; }
+.sg-x36 { display: block !important; font-weight: 600 !important; margin-bottom: 8px !important; }
+.sg-x37 { width: 100% !important; padding: 12px 14px !important; border: 1px solid var(--line) !important; background: var(--paper) !important; color: var(--ink) !important; }
+.sg-x38 { opacity: 0.5 !important; cursor: not-allowed !important; }
+.sg-x39 { margin-top: 8px !important; }
+.sg-x40 { margin-bottom: 32px !important; }
+.sg-x41 { color: inherit !important; text-decoration: underline !important; }
+.sg-x42 { border-color: var(--accent) !important; font-weight: 600 !important; }

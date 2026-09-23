@@ -1,4 +1,4 @@
 {
   "title": "Home",
-  "description": "The Website Factory: a fictional agency website composition."
+  "description": "Fast, accessible websites for small businesses. Handcrafted, lightweight, and built to do their job."
 }

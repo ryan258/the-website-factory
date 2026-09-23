@@ -1,4 +1,4 @@
 {
   "title": "Services",
-  "description": "Explore the sample services and approach at The Website Factory."
+  "description": "Marketing sites, landing pages, redesigns, speed audits, care plans, and design systems."
 }

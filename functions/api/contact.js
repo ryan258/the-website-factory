@@ -19,7 +19,8 @@ export async function onRequestPost({request, env}) {
   try { form = await request.formData(); } catch { return reply(400, {error: 'Submission could not be read.'}); }
   if (String(form.get('website') || '').trim()) return done(200, {ok: true}); // Honeypot: accept, discard.
 
-  // Rate limiting by client IP via KV (max 5 requests per 10 minutes)
+  // Best-effort rate limit by client IP via KV (max 5 per 10 minutes). KV is eventually
+  // consistent and has no atomic increment, so a fast burst can get past it.
   const ip = request.headers.get('cf-connecting-ip') || '';
   if (ip && env.ENQUIRY && typeof env.ENQUIRY.get === 'function') {
     const rlKey = `ratelimit:${ip}`;
@@ -58,14 +59,17 @@ export async function onRequestPost({request, env}) {
   // Webhook notification (Pages-compatible delivery path)
   if (env.NOTIFICATION_WEBHOOK) {
     try {
-      await fetch(env.NOTIFICATION_WEBHOOK, {
+      // fetch only throws on network failure, so a 4xx/5xx answer is checked here.
+      const response = await fetch(env.NOTIFICATION_WEBHOOK, {
         method: 'POST',
+        signal: AbortSignal.timeout(10000),
         headers: {'content-type': 'application/json'},
         body: JSON.stringify({
           text: `New website enquiry from ${enquiry.name} (${enquiry.email}):\n${enquiry.message}`,
           enquiry,
         }),
       });
+      if (!response.ok) throw new Error(`Webhook answered ${response.status}`);
     } catch {
       if (!stored && !env.EMAIL) return reply(502, {error: 'Delivery could not be confirmed.'});
     }
