@@ -25,7 +25,7 @@ def project_slug(name):
 def write_deployment(destination, name):
     """Write an unconfigured Wrangler file and a client-specific setup guide.
 
-    The master's wrangler.toml names live resources (an R2 bucket, an ENQUIRY KV id) and
+    The master's wrangler.toml names live resources (an ENQUIRY KV id, a Pages project) and
     its setup guide names a live domain and mailbox. Neither is copied: a new instance
     must create and declare its own, so it can never write into the master's namespace.
     """

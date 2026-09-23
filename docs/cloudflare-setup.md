@@ -93,7 +93,7 @@ everywhere below instead.
 ## Step 4 — Make the box that enquiries get stored in
 
 When someone fills in the contact form, the message is saved here first. This is the
-safety net: even if the notification email fails, the message is not lost.
+safety net: even if a notification fails, the message is not lost.
 
 ```sh
 npx wrangler kv namespace create ENQUIRY
@@ -137,17 +137,16 @@ starts without it — can never write into the namespace above:
 ENQUIRY_ENABLED = "true"
 ```
 
-In `wrangler.toml`, this defaults to `"false"`. Change it to `"true"` and deploy again when you are ready to accept enquiries. Without it every submission is refused with a 503 and nothing is stored — safe, but silent to you.
+In `wrangler.toml`, this stays `"false"` in source control. Without `"true"` every submission is refused with a 503 and nothing is stored — safe, but silent to you.
 
-**The dashboard cannot turn this on.** When a Pages project has a `wrangler.toml`, Cloudflare treats that file as the only source of its variables and bindings. A value typed into **Settings → Variables and Secrets** does not override it. Whatever `wrangler.toml` says at deploy time is what the live site uses.
+**The form and the endpoint must be switched on together.** The page's form (`HUGO_PARAMS_FORMENABLED`) and the endpoint (`ENQUIRY_ENABLED`) are two settings. If the form is on but the endpoint is off, every visitor gets an error.
+
+- **From GitHub (recommended):** run the deploy workflow with **Accept enquiries** ticked. It sets both in its own copy of the project and checks they agree before publishing. Nothing is committed.
+- **From your own machine:** change `ENQUIRY_ENABLED` to `"true"`, build with `HUGO_PARAMS_FORMENABLED=true` (step 7), deploy (step 8), then change it back to `"false"` before you commit.
+
+**The dashboard cannot turn this on.** When a Pages project has a `wrangler.toml`, Cloudflare treats that file as the only source of its variables and bindings. A value typed into **Settings → Variables and Secrets** does not override it. Whatever `wrangler.toml` says at deploy time is what the live site uses. Secrets, such as `NOTIFICATION_WEBHOOK`, are the exception: add them with `npx wrangler pages secret put NOTIFICATION_WEBHOOK --project-name 258webco`.
 
 After deploying, check the live endpoint answers: a form submission should return a success page, not "could not confirm delivery". A 503 means intake is still off.
-
-If image assets use Cloudflare R2 (`wrangler.toml` declares `IMAGES_BUCKET = "258webco-images"`), create the bucket:
-
-```sh
-npx wrangler r2 bucket create 258webco-images
-```
 
 ---
 
@@ -172,13 +171,14 @@ replacing it with Cloudflare Email Routing. Do these in order.
 
 Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the catch-all) directly to your Gmail.
 
-*(Note: Cloudflare Pages configuration files reject `[[send_email]]` bindings, which are supported only in Workers. Enquiries submitted through the contact form are durably stored in the `ENQUIRY` KV namespace with automatic 90-day retention TTL (`expirationTtl: 7776000`), where they can be queried or processed without loss. Client submissions are rate-limited to 5 per 10 minutes per IP via KV. Optional real-time alerts can be dispatched via `NOTIFICATION_WEBHOOK` in `[vars]`. The public contact notice reflects this as storage-only until an external worker/service test confirms live email receipt).*
+*(Note: this is mail sent to your domain. The contact form does not use it. Cloudflare Pages cannot send email, so the contact form has no email path. Enquiries are stored in the `ENQUIRY` KV namespace for 90 days (`expirationTtl: 7776000`). For real-time alerts, add a `NOTIFICATION_WEBHOOK` secret (see step 4).)*
 
 ### Security & Privacy Protections
 
 - **Rate Limiting:** `functions/api/contact.js` tracks IP submission frequency in KV (`ratelimit:<ip>`), returning HTTP 429 if more than 5 enquiries arrive within a 10-minute window. KV is eventually consistent, so this is a best-effort limit: a fast burst can exceed it. Rate-limit keys share the `ENQUIRY` namespace, so list enquiries with `--prefix enquiry:`.
 - **Data Retention TTL:** Enquiries are stored with a 90-day expiration TTL in KV to avoid hoarding personal information indefinitely.
-- **Webhook Delivery:** Setting `NOTIFICATION_WEBHOOK = "https://..."` enables immediate POST notification forwarding for new submissions. A webhook that answers with an error status or takes more than 10 seconds counts as a failed delivery. Without a webhook, nobody is alerted: someone must check the KV store on a schedule.
+- **Privacy Notice:** `/privacy/` tells visitors what the form stores, for how long, and how to ask for deletion. Keep it in step with any change to the form or these settings.
+- **Webhook Delivery:** Setting the `NOTIFICATION_WEBHOOK` secret enables immediate POST notification forwarding for new submissions. A webhook that answers with an error status or takes more than 10 seconds counts as a failed delivery. Without a webhook, nobody is alerted: someone must check the KV store on a schedule.
 - **Internal Artifact & Dotfile Protection:** `functions/_middleware.js` intercepts and returns HTTP 404 for `/.factory-build.json` and hidden dotfiles (the public `/.well-known/` folder stays reachable), backed by `static/_headers` with `X-Robots-Tag: noindex, nofollow, noarchive` and `Cache-Control: no-store`.
 
 ---
@@ -202,9 +202,15 @@ at this point, so there is no rush and nothing is broken in public.
 
 ## Step 7 — Build the real site
 
+The recommended way to publish is the GitHub workflow (see **Deploying from GitHub**
+below). It does steps 7 and 8 for you. Use these two steps only to deploy from your own
+machine.
+
 Up to now every build has been a private draft: the contact form is switched off, and
 every page tells search engines to ignore it. This command turns both of those off and
-builds the public version.
+builds the public version. Before running it with the form on, set
+`ENQUIRY_ENABLED = "true"` in `wrangler.toml` (step 4), or the live form refuses every
+message. Set it back to `"false"` after deploying.
 
 ```sh
 rm -rf public
@@ -266,11 +272,27 @@ address, because that is the address customers will actually use.
 
 ---
 
+## Deploying from GitHub
+
+A push to `main` runs the checks only. It never deploys.
+
+1. Once: in the repository, **Settings → Secrets and variables → Actions**, add
+   `CLOUDFLARE_API_TOKEN` (with **Cloudflare Pages: Edit**) and `CLOUDFLARE_ACCOUNT_ID`.
+2. Open **Actions → CI Quality Gates & Pages Deployment → Run workflow**.
+3. Tick **Authorize production release**.
+4. Tick **Accept enquiries** to publish with the contact form on. The workflow switches
+   the form and the endpoint on together, checks they agree, and fails if they do not.
+   Leave it unticked to publish with the form off.
+
+**You should see:** both jobs green. Then do the live test enquiry from step 8.
+
+---
+
 ## What to do when you change the site later
 
 1. Edit content and settings.
 2. `python3 scripts/build.py` and look at it locally.
-3. When happy, repeat **step 7** and **step 8**.
+3. When happy, push to `main`, then run the workflow as in **Deploying from GitHub**.
 
 That is the whole loop. You never touch the Cloudflare dashboard again unless you are
 adding a domain or changing how you get notified.
@@ -283,9 +305,10 @@ adding a domain or changing how you get notified.
 |---|---|---|
 | `Refusing to write generated output` | The `public/` folder contains files the build does not own | `rm -rf public` and build again |
 | `hugo: expected 0.166.0` | Wrong Hugo version installed | See README.md for the pinned install |
-| `Configuration file for Pages projects does not support "send_email"` | Pages configuration does not support `send_email` in `wrangler.toml` (Workers-only) | Keep `[[send_email]]` commented out in `wrangler.toml`; enquiries are stored in KV |
+| `Configuration file for Pages projects does not support "send_email"` | Pages configuration does not support `send_email` in `wrangler.toml` (Workers-only) | Remove any `[[send_email]]` block; enquiries are stored in KV |
+| Every live form submission fails with 503 | The form was built on, but `ENQUIRY_ENABLED` was `"false"` at deploy time | Deploy with the workflow's **Accept enquiries** ticked, or see step 4 |
 | Form says "could not confirm delivery" | The endpoint refused the message | Run `sh scripts/check_contact.sh` to find out which check failed |
-| Form works but no email received | Submissions are stored directly in KV; Pages Functions do not dispatch emails without an external worker binding | Query KV keys directly using step 8 |
+| Form works but no email received | The form never sends email; submissions are stored in KV | Query KV keys directly using step 8, or add a `NOTIFICATION_WEBHOOK` secret |
 | `Authentication error` from wrangler | Login expired | `npx wrangler login` again |
 
 ---

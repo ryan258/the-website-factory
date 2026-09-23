@@ -10,7 +10,12 @@ on:
   workflow_dispatch:
     inputs:
       confirm_release:
-        description: 'Authorize production release to 258webco.com (indexable & form-enabled)'
+        description: 'Authorize production release to 258webco.com (indexable)'
+        required: true
+        type: boolean
+        default: false
+      accept_enquiries:
+        description: 'Accept enquiries: switch the contact form on and open /api/contact'
         required: true
         type: boolean
         default: false
@@ -23,6 +28,7 @@ jobs:
   verify:
     name: Verify Quality Gates
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -88,6 +94,7 @@ jobs:
     needs: verify
     if: github.event_name == 'workflow_dispatch' && inputs.confirm_release == true
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     # A newer release waits for the running one instead of racing it to Cloudflare.
     concurrency:
       group: deploy-production
@@ -126,15 +133,40 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/setup.py
 
+      # The form and the endpoint are switched on together or not at all. wrangler.toml is the
+      # only source of Pages variables, so a form built "on" against ENQUIRY_ENABLED = "false"
+      # would refuse every visitor. The committed file stays "false"; only this checkout changes.
+      - name: Set Enquiry Intake
+        env:
+          ACCEPT: ${{ inputs.accept_enquiries }}
+        run: |
+          if [ "$ACCEPT" = "true" ]; then
+            sed -i 's/^ENQUIRY_ENABLED = "false"$/ENQUIRY_ENABLED = "true"/' wrangler.toml
+            echo "HUGO_PARAMS_FORMENABLED=true" >> "$GITHUB_ENV"
+          else
+            echo "HUGO_PARAMS_FORMENABLED=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check Form and Endpoint Agree
+        run: |
+          if ! grep -q "^ENQUIRY_ENABLED = \"$HUGO_PARAMS_FORMENABLED\"$" wrangler.toml; then
+            echo "::error::The form is '$HUGO_PARAMS_FORMENABLED' but wrangler.toml does not set ENQUIRY_ENABLED to match."
+            exit 1
+          fi
+
       - name: Build Production Site (258webco)
         run: |
           rm -rf public
-          HUGO_PARAMS_FORMENABLED=true HUGO_PARAMS_NOINDEX=false \
-            python3 scripts/build.py --base-url https://258webco.com/
+          HUGO_PARAMS_NOINDEX=false python3 scripts/build.py --base-url https://258webco.com/
 
       - name: Verify Production Output
         run: |
           HUGO_PARAMS_NOINDEX=false python3 scripts/check_site.py public
+          if grep -q 'action=/api/contact' public/contact/index.html; then built=true; else built=false; fi
+          if [ "$built" != "$HUGO_PARAMS_FORMENABLED" ]; then
+            echo "::error::The contact form was built with delivery '$built', expected '$HUGO_PARAMS_FORMENABLED'."
+            exit 1
+          fi
 
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

@@ -6,7 +6,7 @@
 
 **Current Baseline (2026-09-22):**
 - **Architecture & Build:** Pinned Hugo Extended 0.166.0 + Dart Sass 1.104.1 via Hugo Pipes (`@use`, css.Sass, `hugo:vars`). System-independent Python build helper (`scripts/build.py`) with preflight output reconciliation protecting untracked static assets (`.html`, `.js`, `.css`, `.map`), colliding, parent-conflicting, or edited files, plus crash-resilient manifest recording for interrupted publications. Optimized, self-hosted Inter variable font subsetted to 20.5 KB. Configurable search-engine visibility (`hugo.toml` `params.noindex`, `HUGO_PARAMS_NOINDEX` env var).
-- **Hosting & Forms:** Cloudflare Pages default (`wrangler.toml` with `ENQUIRY_ENABLED = "false"` safe default) with same-origin Pages Function (`functions/api/contact.js`) for durable enquiry storage in Cloudflare KV (`ENQUIRY`) with 90-day data retention TTL (`expirationTtl`), client IP rate limiting (best-effort 5 submissions per 10 minutes), optional `NOTIFICATION_WEBHOOK` forwarding with HTTP response validation (`res.ok`), explicit per-deployment intake gating (`ENQUIRY_ENABLED = "true"`), durable storage-first acknowledgment (502 on storage failure; best-effort email notification once stored), optional R2 image bucket declaration (`IMAGES_BUCKET`), and strict security middleware/headers blocking access to internal build inventories (`functions/_middleware.js`, `static/_headers`).
+- **Hosting & Forms:** Cloudflare Pages default (`wrangler.toml` with `ENQUIRY_ENABLED = "false"` safe default) with same-origin Pages Function (`functions/api/contact.js`) for durable enquiry storage in Cloudflare KV (`ENQUIRY`) with 90-day data retention TTL (`expirationTtl`), client IP rate limiting (best-effort 5 submissions per 10 minutes), optional `NOTIFICATION_WEBHOOK` forwarding with HTTP response validation (`res.ok`), explicit per-deployment intake gating (`ENQUIRY_ENABLED = "true"`), durable storage-first acknowledgment (502 on storage failure; best-effort email notification once stored), and strict security middleware/headers blocking access to internal build inventories (`functions/_middleware.js`, `static/_headers`).
 - **Component & Module Library:** 30 module families spanning 61 variants across heroes, services, features, case studies, logos/partners, team/business credentials, process steps, timeline/milestones, bento clusters, FAQs, pricing, comparison, practical decision support, hours, policies, and contact modules. Decoupled contact form service items across preset pages. Contracts enforced via `data/modules.json` and `scripts/factory.py`.
 - **Visual Workshop & Living Style Guide:** Reference catalog at `/site-kit/catalog/` showcasing all 61 variants with native disclosure controls, plus an interactive Living Style Guide at `/site-kit/style-guide/` detailing design tokens, typography specimens, spacing scales, and atomic UI primitives. Low-fidelity workflow editor with 2 MB project backup limits and undo.
 - **Business Presets:** 5 foundational business archetypes (`agency`, `contractor`, `consultant`, `local-service`, `258webco`) defined in `data/presets/*.json`, with `258webco` as the active studio preset.
@@ -44,7 +44,7 @@
 
 ### Milestone 5: Cloudflare Pages Deployment & Contact Function Integration
 - Migrated default hosting & form delivery from Netlify Forms to Cloudflare Pages Functions (`functions/api/contact.js`).
-- Implemented durable delivery path: durable KV storage (`ENQUIRY`) and optional notification email (`EMAIL`) via Cloudflare Email Routing, with honeypot spam protection, length checks, and progressive-enhancement no-JS HTML redirect (`303 See Other`).
+- Implemented durable delivery path: durable KV storage (`ENQUIRY`), with honeypot spam protection, length checks, and progressive-enhancement no-JS HTML redirect (`303 See Other`).
 - Enforced explicit intake authorization (`ENQUIRY_ENABLED = "true"`) and storage-first receipt guarantee (returns 502 on storage failure without acknowledging receipt).
 - Hardened client scaffolding in `scripts/new_site.py` to write unconfigured deployment files, preventing client copies from inheriting live bucket names, KV IDs, or active intake variables.
 - Built local test harness (`scripts/check_contact.sh` and `scripts/test_contact_endpoint.mjs`) validating accepted, stored, redirected, rejected, unopened-intake, and failure paths.
@@ -62,6 +62,13 @@
 - Extended output reconciliation in `scripts/build.py` to prevent untracked `.js`, `.css`, and `.map` files from lingering in production builds.
 - Optimized self-hosted variable Inter font to 20.5 KB.
 - Integrated automated verification quality gates and local Pages integration tests (`sh scripts/check_contact.sh`) into `.github/workflows/deploy.yml`, gating production releases on explicit owner confirmation (`workflow_dispatch`).
+
+### Milestone 7: Launch Readiness Corrections (2026-09-23)
+- Production deploy switches the contact form and `ENQUIRY_ENABLED` on together through one **Accept enquiries** workflow input, and fails if they disagree.
+- Added a privacy notice page to the `258webco` preset, linked from the footer and the enabled form.
+- Removed the fictional Work page and case-study claims from the `258webco` preset.
+- Removed the unusable Pages email path from `functions/api/contact.js`, the unused `IMAGES_BUCKET` binding, and the duplicate pull request workflow; aligned the Pages project name and added CI and browser-launch timeouts.
+- See `docs/project-review.md` for the full review and remaining proposals.
 
 ---
 

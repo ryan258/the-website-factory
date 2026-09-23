@@ -85,6 +85,11 @@ def publish_output(source, destination):
         for name in stale:
             (destination / name).unlink(missing_ok=True)
             recorded.pop(name, None)
+            # A retired page leaves its folder behind; remove folders this emptied.
+            parent = (destination / name).parent
+            while parent != destination and parent.is_dir() and not any(parent.iterdir()):
+                parent.rmdir()
+                parent = parent.parent
     except Exception:
         store()
         raise

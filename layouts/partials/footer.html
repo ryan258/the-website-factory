@@ -12,6 +12,7 @@
 <div class="footer__bottom">
 <span>© {{ now.Year }} {{ hugo.Data.site.wordmark }} {{ hugo.Data.site.notice }}</span>
 <span>{{ hugo.Data.site.address }}</span>
+{{ if (index hugo.Data.presets hugo.Data.factory.preset).pages.privacy }}<a href="{{ partial "url.html" "/privacy/" }}">Privacy</a>{{ end }}
 <a href="{{ partial "url.html" hugo.Data.site.primary_cta.url }}">{{ hugo.Data.site.footer_cta }} <span aria-hidden="true">↗</span>
 </a>
 </div>

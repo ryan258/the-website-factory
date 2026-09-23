@@ -25,11 +25,13 @@ const store = () => {
   };
 };
 const failing = message => ({put: async () => { throw new Error(message); }});
-const mailer = () => {
-  const sent = [];
-  return {sent, send: async message => { sent.push(message); }};
+// Runs fn with fetch replaced, so webhook calls never leave the process.
+const withFetch = async (stub, fn) => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = stub;
+  try { return await fn(); } finally { globalThis.fetch = originalFetch; }
 };
-const failingMailer = () => ({send: async () => { throw new Error('mailbox unavailable'); }});
+const HOOK = {NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify'};
 const ENABLED = {ENQUIRY_ENABLED: 'true'};
 
 const cases = [];
@@ -64,21 +66,30 @@ check('a failed store is an error for the page submission too', async () => {
 
 check('a stored enquiry survives a notification failure', async () => {
   const ENQUIRY = store();
-  const response = await post({...ENABLED, ENQUIRY, EMAIL: failingMailer(), ENQUIRY_TO: 'a@b.invalid', ENQUIRY_FROM: 'c@d.invalid'});
+  const response = await withFetch(async () => { throw new Error('network down'); },
+    () => post({...ENABLED, ...HOOK, ENQUIRY}));
   assert.equal(response.status, 200);
-  assert.equal(ENQUIRY.written.length, 1);
+  assert.equal(ENQUIRY.written.filter(([key]) => key.startsWith('enquiry:')).length, 1);
 });
 
 check('notification-only delivery still fails loudly', async () => {
-  const response = await post({...ENABLED, EMAIL: failingMailer(), ENQUIRY_TO: 'a@b.invalid', ENQUIRY_FROM: 'c@d.invalid'});
+  const response = await withFetch(async () => { throw new Error('network down'); },
+    () => post({...ENABLED, ...HOOK}));
   assert.equal(response.status, 502);
 });
 
 check('a stored enquiry is also notified', async () => {
-  const EMAIL = mailer();
-  await post({...ENABLED, ENQUIRY: store(), EMAIL, ENQUIRY_TO: 'a@b.invalid', ENQUIRY_FROM: 'c@d.invalid'});
-  assert.equal(EMAIL.sent.length, 1);
-  assert.match(EMAIL.sent[0].text, /message: Hello/);
+  const sent = [];
+  await withFetch(async (url, init) => { sent.push(JSON.parse(init.body)); return new Response('ok'); },
+    () => post({...ENABLED, ...HOOK, ENQUIRY: store()}));
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].enquiry.message, 'Hello');
+});
+
+check('an email binding alone does not open intake', async () => {
+  // Pages Functions cannot bind send_email; an EMAIL binding is not a delivery path.
+  const response = await post({...ENABLED, EMAIL: {send: async () => {}}});
+  assert.equal(response.status, 503);
 });
 
 check('bindings alone do not open intake', async () => {
@@ -165,28 +176,10 @@ check('rate limiting restricts burst submissions from same IP beyond window limi
   assert.equal(statuses.slice(5).every(s => s === 429), true);
 });
 
-check('a delivered webhook is acknowledged even when email then fails', async () => {
-  const originalFetch = globalThis.fetch;
-  try {
-    globalThis.fetch = async () => new Response('{"ok":true}', {status: 200});
-    const response = await post({...ENABLED, NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify',
-      EMAIL: failingMailer(), ENQUIRY_TO: 'a@b.invalid', ENQUIRY_FROM: 'c@d.invalid'});
-    assert.equal(response.status, 200);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
-check('a failed webhook and failed email with no store is refused', async () => {
-  const originalFetch = globalThis.fetch;
-  try {
-    globalThis.fetch = async () => new Response('down', {status: 503});
-    const response = await post({...ENABLED, NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify',
-      EMAIL: failingMailer(), ENQUIRY_TO: 'a@b.invalid', ENQUIRY_FROM: 'c@d.invalid'});
-    assert.equal(response.status, 502);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
+check('a webhook that times out with no store is refused', async () => {
+  const response = await withFetch(async () => { throw new DOMException('timed out', 'TimeoutError'); },
+    () => post({...ENABLED, ...HOOK}));
+  assert.equal(response.status, 502);
 });
 
 check('a stored enquiry is still acknowledged when the webhook fails', async () => {

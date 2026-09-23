@@ -1,15 +1,11 @@
-name = "website-factory"
+name = "258webco"
 pages_build_output_dir = "public"
 compatibility_date = "2026-01-01"
 
-[[r2_buckets]]
-binding = "IMAGES_BUCKET"
-bucket_name = "258webco-images"
-
 # --- Contact form delivery -------------------------------------------------
-# /api/contact needs somewhere to put an enquiry (the KV namespace below, or an email
-# binding) AND an explicit ENQUIRY_ENABLED = "true". Missing either, it returns 503 and
-# the site is a preview that cannot receive mail.
+# /api/contact needs somewhere to put an enquiry (the KV namespace below, or a
+# NOTIFICATION_WEBHOOK secret) AND an explicit ENQUIRY_ENABLED = "true". Missing
+# either, it returns 503 and the site is a preview that cannot receive mail.
 # docs/cloudflare-setup.md walks through filling these in.
 
 # Where enquiries are stored. Create with: npx wrangler kv namespace create ENQUIRY
@@ -17,20 +13,17 @@ bucket_name = "258webco-images"
 binding = "ENQUIRY"
 id = "ea6f0db631da4aaeb78c786a4581214c"
 
-# Notification email: Note that Cloudflare Pages does not support the send_email
-# binding in wrangler.toml (only Workers do). Enquiries are safely stored in KV.
-# [[send_email]]
-# name = "EMAIL"
-# destination_address = "ryanleejwebdev@gmail.com"
+# Notifications: Pages Functions cannot bind send_email (only Workers can), so there is
+# no email path. For alerts, add a NOTIFICATION_WEBHOOK secret on the Pages project.
 
 # Intake is deliberate, not a side effect of the bindings above: /api/contact refuses
 # every submission unless the deployment sets ENQUIRY_ENABLED to "true". A copy of this
 # project starts without it, so an inherited namespace can never receive its enquiries.
-# Confirm this variable is present on the Pages project after deploying.
+# Keep "false" here. The production workflow (.github/workflows/deploy.yml) sets it to
+# "true" in its own checkout only when the owner ticks "Accept enquiries", and builds the
+# form switched on in the same step, so the form and the endpoint always agree.
 [vars]
 ENQUIRY_ENABLED = "false"
-# ENQUIRY_TO = "ryanleejwebdev@gmail.com"
-# ENQUIRY_FROM = "forms@258webco.com"
 
 # --- Building --------------------------------------------------------------
 # Preferred: build locally, where the Hugo and Dart Sass pins are verified, then

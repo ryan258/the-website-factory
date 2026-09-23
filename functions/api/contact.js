@@ -14,7 +14,7 @@ export async function onRequestPost({request, env}) {
   // Intake is an explicit per-deployment decision. Inherited bindings alone never open
   // this endpoint: ENQUIRY_ENABLED must be set to "true" for the deployment that owns them.
   const open = String(env.ENQUIRY_ENABLED || '').trim().toLowerCase() === 'true';
-  if (!open || (!env.ENQUIRY && !env.EMAIL && !env.NOTIFICATION_WEBHOOK)) return reply(503, {error: 'This site is not configured to accept enquiries.'});
+  if (!open || (!env.ENQUIRY && !env.NOTIFICATION_WEBHOOK)) return reply(503, {error: 'This site is not configured to accept enquiries.'});
   let form;
   try { form = await request.formData(); } catch { return reply(400, {error: 'Submission could not be read.'}); }
   if (String(form.get('website') || '').trim()) return done(200, {ok: true}); // Honeypot: accept, discard.
@@ -57,9 +57,10 @@ export async function onRequestPost({request, env}) {
       return reply(502, {error: 'Your enquiry could not be stored, so it has not been received. Please try again.'});
     }
   }
-  // Webhook notification (Pages-compatible delivery path)
-  let webhookOk = false;
+  // Webhook notification: best effort once a copy is stored, and the only delivery path
+  // when no store is bound. Pages Functions cannot bind send_email, so there is no email path.
   if (env.NOTIFICATION_WEBHOOK) {
+    let webhookOk = false;
     try {
       const res = await fetch(env.NOTIFICATION_WEBHOOK, {
         method: 'POST',
@@ -74,21 +75,8 @@ export async function onRequestPost({request, env}) {
     } catch {
       webhookOk = false;
     }
-    if (!webhookOk && !stored && !env.EMAIL) {
+    if (!webhookOk && !stored) {
       return reply(502, {error: 'Delivery could not be confirmed.'});
-    }
-  }
-  // Notification is best effort once a copy is stored or the webhook confirmed delivery,
-  // and the only path when neither did. Reporting failure after a delivered webhook would
-  // invite the visitor to send the same enquiry twice.
-  if (env.EMAIL) {
-    try {
-      await env.EMAIL.send({
-        to: env.ENQUIRY_TO, from: env.ENQUIRY_FROM, subject: 'Website enquiry',
-        text: Object.entries(enquiry).map(([field, value]) => `${field}: ${value}`).join('\n'),
-      });
-    } catch {
-      if (!stored && !webhookOk) return reply(502, {error: 'Delivery could not be confirmed.'});
     }
   }
   return done(200, {ok: true});

@@ -24,7 +24,8 @@ function paths(variable) {
 
 /* Browser launch options shared by every check: CHROME_PATH selects a local browser. */
 function launchOptions() {
-  return {headless: true, ...(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {})};
+  // A browser that cannot start fails after a minute instead of hanging the whole check.
+  return {headless: true, timeout: 60000, ...(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {})};
 }
 
 /* Site-wide response headers from static/_headers (the `/*` block), so local checks see the

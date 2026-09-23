@@ -70,7 +70,12 @@ class StarterTests(unittest.TestCase):
             dest=scaffold.create(Path(tmp)/'client','Cedar & Stone','contractor')
             master=(ROOT/'wrangler.toml').read_text()
             # Whatever the master is configured with today: ids, buckets, addresses, project name.
-            secrets={m for m in re.findall(r'(?m)^\s*(?:id|bucket_name|name|destination_address|ENQUIRY_TO|ENQUIRY_FROM)\s*=\s*"([^"]+)"',master)}
+            secrets={m for m in re.findall(r'(?m)^\s*(?:id|bucket_name|destination_address|ENQUIRY_TO|ENQUIRY_FROM)\s*=\s*"([^"]+)"',master)}
+            # The Pages project name is also a preset name the copied README may list, so it
+            # only counts as inherited if the copy would deploy to it.
+            project=re.search(r'(?m)^name\s*=\s*"([^"]+)"',master).group(1)
+            self.assertNotIn(f'"{project}"',(dest/'wrangler.toml').read_text())
+            self.assertNotIn(f'--project-name {project}\n',(dest/'docs/cloudflare-setup.md').read_text())
             secrets|=set(re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+',master))
             self.assertTrue(secrets,'the master must actually be configured for this test to mean anything')
             copied=[p for p in dest.rglob('*') if p.is_file() and p.suffix in ('.toml','.md','.json','.yaml')]

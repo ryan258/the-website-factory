@@ -1,127 +1,35 @@
-# Happy Path: Deploying 258webco.com to Cloudflare
+# Happy Path: Putting 258webco.com Live
 
-This is the fastest, cleanest path to get **258webco.com** live with working forms, durable KV storage, domain email routing, and optional webhook alerts.
+A short checklist. Each step links to the full instructions in
+[docs/cloudflare-setup.md](docs/cloudflare-setup.md), which is the single deploy guide.
 
----
-
-## 1. Cloudflare Dashboard: Direct Email & Domain Setup
-
-Cloudflare Email Routing forwards direct messages sent to your domain (e.g., `ryan@258webco.com`) to your personal inbox. *(Note: Website contact form submissions are stored directly in KV storage; Email Routing handles direct person-to-person mail).*
-
-1. **Activate Email Routing**:
-   - In Cloudflare, select domain **258webco.com**.
-   - In the left sidebar, click **DNS** → **Records**.
-   - Click the **Email Routing** sub-tab at the top of the records page.
-   - Click **Enable Email Routing** and accept the suggested DNS records (replaces any previous MX records).
-2. **Verify Destination Address**:
-   - Add `ryanleejwebdev@gmail.com` as a destination address.
-   - Open Gmail, find Cloudflare's verification email, and click the link. *(Required before Email Routing works)*.
-3. **Configure Forwarding Rules**:
-   - **Custom address**: `ryan@258webco.com` → forward to `ryanleejwebdev@gmail.com`.
-   - **Catch-all rule**: forward all remaining `@258webco.com` mail to `ryanleejwebdev@gmail.com`.
-4. **Smoke test direct email**:
-   - Send an email from a phone or alternate account to `ryan@258webco.com`. Confirm it lands in your Gmail.
+**A push to `main` does not deploy.** It only runs the checks. Deploying is a manual,
+owner-only step (step 5).
 
 ---
 
-## 2. Cloudflare Project & Bindings Setup
+## One-time setup
 
-Run these commands from your local project terminal (`~/Projects/the-website-factory`):
+1. **Log Wrangler in** — `npx wrangler login` ([guide step 2](docs/cloudflare-setup.md#step-2--log-the-deploy-tool-in)).
+2. **Create the Pages project** — `npx wrangler pages project create 258webco --production-branch main` ([guide step 3](docs/cloudflare-setup.md#step-3--make-the-website-project)).
+3. **Check the enquiry store** — the `ENQUIRY` KV namespace id is already in `wrangler.toml`. Do not add it in the dashboard: `wrangler.toml` is the only place Cloudflare reads it from ([guide step 4](docs/cloudflare-setup.md#step-4--make-the-box-that-enquiries-get-stored-in)).
+4. **Set up domain email forwarding** (optional, for mail sent to `@258webco.com`) ([guide step 5](docs/cloudflare-setup.md#step-5--set-up-mail-on-the-domain)). This is separate from the contact form.
+5. **Add GitHub secrets** — in the repository, **Settings → Secrets and variables → Actions**, add `CLOUDFLARE_API_TOKEN` (with **Cloudflare Pages: Edit**) and `CLOUDFLARE_ACCOUNT_ID`.
 
-1. **Log in to Wrangler** (if not already authenticated):
+## Every release
+
+1. **Run the checks locally** — `sh scripts/check_contact.sh` should end with `Contact endpoint checks passed`.
+2. **Push to `main`.** The **Verify Quality Gates** job must pass.
+3. **Deploy** — in GitHub, open **Actions → CI Quality Gates & Pages Deployment → Run workflow**:
+   - Tick **Authorize production release**.
+   - Tick **Accept enquiries** to switch the contact form on. This turns on both the form and the endpoint together. Leave it unticked to publish with the form switched off.
+4. **Attach the domain** (first release only) ([guide step 9](docs/cloudflare-setup.md#step-9--put-your-real-domain-on-it)).
+5. **Send a real test enquiry** and confirm it is stored:
    ```sh
-   npx wrangler login
+   npx wrangler kv key list --binding ENQUIRY --remote --prefix enquiry:
    ```
 
-2. **Create the Pages Project**:
-   ```sh
-   npx wrangler pages project create 258webco --production-branch main
-   ```
+## Good to know
 
-3. **Verify KV Namespace in `wrangler.toml`**:
-   The KV namespace is configured in [wrangler.toml](wrangler.toml):
-   ```toml
-   [[kv_namespaces]]
-   binding = "ENQUIRY"
-   id = "ea6f0db631da4aaeb78c786a4581214c"
-   ```
-   *(Note: Cloudflare Pages Functions run without `[[send_email]]` bindings, which are supported only in Workers. The Pages Function at `functions/api/contact.js` automatically uses `ENQUIRY` KV for durable zero-loss enquiry storage. To receive push notifications for new submissions, set the `NOTIFICATION_WEBHOOK` secret or check KV directly).*
-
-4. **Attach KV Binding in Cloudflare Pages Dashboard**:
-   Go to Cloudflare Dashboard → **Workers & Pages** → **258webco** → **Settings** → **Bindings**:
-   - Under **KV namespace bindings**, verify or add:
-     - Variable name: `ENQUIRY`
-     - KV namespace: `ENQUIRY` (`ea6f0db631da4aaeb78c786a4581214c`)
-
----
-
-## 3. Verify Locally
-
-Run the preflight suite to confirm the static site and the contact Pages Function pass all gates:
-
-```sh
-sh scripts/check_contact.sh
-```
-
-**Expected output:**
-```
-Contact endpoint checks passed: accepted, stored, redirected, rejected, and unconfigured paths.
-```
-
----
-
-## 4. Deploy
-
-You can deploy immediately from the CLI, or let GitHub Actions deploy on push.
-
-### Option A: Immediate CLI Deploy (Fastest)
-
-Build the production release with form delivery enabled and search indexing turned on:
-
-```sh
-rm -rf public
-HUGO_PARAMS_FORMENABLED=true HUGO_PARAMS_NOINDEX=false \
-  python3 scripts/build.py --base-url https://258webco.com/
-```
-
-Deploy the verified build output (including `functions/api/contact.js`):
-
-```sh
-npx wrangler pages deploy public --project-name 258webco
-```
-
-### Option B: Automatic Deployment via GitHub Actions
-
-1. In your GitHub repository, go to **Settings** → **Secrets and variables** → **Actions**.
-2. Add these repository secrets:
-   - `CLOUDFLARE_API_TOKEN`: Cloudflare API token with **Cloudflare Pages: Edit** permission.
-   - `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID (found in the dashboard URL or via `npx wrangler whoami`).
-3. Commit and push to `main`. The `.github/workflows/deploy.yml` workflow will automatically setup Hugo Extended 0.166.0, compile Dart Sass 1.104.1, build the site, and deploy via Wrangler.
-
----
-
-## 5. Attach Custom Domain (258webco.com)
-
-1. In the Cloudflare dashboard, go to **Workers & Pages** → **258webco**.
-2. Click the **Custom domains** tab along the top.
-3. Click **Set up a custom domain**.
-4. Type `258webco.com` and click **Continue** → **Activate domain**.
-5. *(Optional)* Click **Set up a custom domain** again to add `www.258webco.com`.
-6. Confirm DNS record activation. Cloudflare automatically handles the DNS routing and issues SSL/TLS certificates (typically active in 1–2 minutes).
-
----
-
-## 6. Live Verification (Smoke Test)
-
-1. Open `https://258webco.com/contact/` in your browser (or your preview at `https://258webco.pages.dev/contact/`).
-2. Fill out and submit the form with a test message.
-3. Confirm:
-   - Success state appears on the page ("Thank you. Your enquiry has been received.").
-   - Backup enquiry is recorded in Cloudflare KV:
-     ```sh
-     npx wrangler kv key list --binding ENQUIRY --remote
-     ```
-   - Inspect the stored message payload:
-     ```sh
-     npx wrangler kv key get --binding ENQUIRY --remote "<key-from-list-above>"
-     ```
+- The contact form stores enquiries in Cloudflare KV for 90 days. It does not send email: Cloudflare Pages cannot. For alerts, add a `NOTIFICATION_WEBHOOK` secret on the Pages project.
+- The privacy notice at `/privacy/` describes exactly this. If you change what the form collects or where it goes, update that page too.

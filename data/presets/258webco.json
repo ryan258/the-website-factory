@@ -24,11 +24,6 @@
           "content": "services-preview"
         },
         {
-          "module": "work",
-          "variant": "gallery",
-          "content": "work-featured"
-        },
-        {
           "module": "process",
           "variant": "steps",
           "content": "process"
@@ -87,29 +82,19 @@
         }
       ]
     },
-    "work": {
-      "title": "Work",
-      "description": "Featured projects and design systems with measured before and after speed scores.",
+    "privacy": {
+      "title": "Privacy",
+      "description": "What 258 Web Co. stores when you send the contact form, how long we keep it, and how to ask us to delete it.",
       "sections": [
         {
           "module": "hero",
           "variant": "compact",
-          "content": "intro-work"
+          "content": "intro-privacy"
         },
         {
-          "module": "work",
-          "variant": "gallery",
-          "content": "work"
-        },
-        {
-          "module": "before-after",
-          "variant": "panels",
-          "content": "before-after"
-        },
-        {
-          "module": "cta",
-          "variant": "band",
-          "content": "cta"
+          "module": "policies",
+          "variant": "open",
+          "content": "privacy"
         }
       ]
     }
@@ -124,8 +109,8 @@
         "url": "/contact/"
       },
       "secondary": {
-        "label": "See our work",
-        "url": "/work/"
+        "label": "See our services",
+        "url": "/services/"
       },
       "note": "Custom web development \u00b7 Modern engineering",
       "art": "factory"
@@ -190,38 +175,6 @@
           ]
         }
       ]
-    },
-    "work": {
-      "label": "Selected work",
-      "title": "Different businesses. Considered solutions.",
-      "intro": "Selected projects illustrating tailored design and high-performance engineering.",
-      "items": [
-        {
-          "title": "Fieldwork",
-          "text": "An approachable home for a neighborhood studio.",
-          "image": "images/fieldwork.png",
-          "url": "/work/fieldwork/"
-        },
-        {
-          "title": "Forma",
-          "text": "A calm, structured portfolio for a design practice.",
-          "image": "images/forma.png",
-          "url": "/work/forma/"
-        },
-        {
-          "title": "Common Ground",
-          "text": "A welcoming digital space for a community business.",
-          "image": "images/common-ground.png",
-          "url": "/work/common-ground/"
-        },
-        {
-          "title": "Northline",
-          "text": "A direct, purposeful site for a growing service business.",
-          "image": "images/northline.png",
-          "url": "/work/northline/"
-        }
-      ],
-      "notice": "Selected case studies and production design systems."
     },
     "process": {
       "label": "How it works",
@@ -386,21 +339,6 @@
         }
       ]
     },
-    "before-after": {
-      "label": "The difference",
-      "title": "From scattered information to a clear next step.",
-      "items": [
-        {
-          "title": "Before \u00b7 example",
-          "text": "A crowded page, unclear services, and no obvious way to get in touch."
-        },
-        {
-          "title": "After \u00b7 example",
-          "text": "A focused introduction, useful detail, and a contact path where it belongs."
-        }
-      ],
-      "notice": "An illustrative content transformation, not a measured client result."
-    },
     "intro-services": {
       "label": "A digital studio",
       "title": "The right help for what comes next.",
@@ -423,17 +361,6 @@
       "note": "Direct collaboration",
       "art": "factory"
     },
-    "intro-work": {
-      "label": "A digital studio",
-      "title": "Work with its own character.",
-      "intro": "Selected case studies with verified performance gains and responsive design systems.",
-      "action": {
-        "label": "Get in touch",
-        "url": "/contact/"
-      },
-      "note": "Production projects \u00b7 Measured results",
-      "art": "factory"
-    },
     "services-preview": {
       "label": "What we do",
       "title": "The right help, in the right place.",
@@ -452,26 +379,6 @@
           "text": "Keep what works, fix what gets in the way, and rebuild around the next step."
         }
       ]
-    },
-    "work-featured": {
-      "label": "Selected work",
-      "title": "Two recent examples.",
-      "intro": "Featured projects showing modern architecture and verified speed scores.",
-      "items": [
-        {
-          "title": "Fieldwork",
-          "text": "An approachable home for a neighborhood studio.",
-          "image": "images/fieldwork.png",
-          "url": "/work/fieldwork/"
-        },
-        {
-          "title": "Forma",
-          "text": "A calm, structured portfolio for a design practice.",
-          "image": "images/forma.png",
-          "url": "/work/forma/"
-        }
-      ],
-      "notice": "Measured performance improvements across live production sites."
     },
     "process-detail": {
       "label": "How it works",
@@ -495,6 +402,47 @@
           "text": "After your approval we verify the forms and the speed scores on the real host, then hand over the source and a short guide."
         }
       ]
+    },
+    "intro-privacy": {
+      "label": "Privacy",
+      "title": "What we keep, and for how long.",
+      "intro": "This site has no analytics, advertising, or tracking scripts. The only personal information we receive is what you choose to send through the contact form.",
+      "action": {
+        "label": "Contact us",
+        "url": "/contact/"
+      }
+    },
+    "privacy": {
+      "label": "Privacy notice",
+      "title": "How we handle your enquiry.",
+      "intro": "Plain answers about the information you send us.",
+      "items": [
+        {
+          "title": "What we collect",
+          "text": "When you send the contact form, we receive your name, email address, company (if you give one), project type, budget range, your message, and the time it arrived."
+        },
+        {
+          "title": "Why we collect it",
+          "text": "Only to read your enquiry and reply to you. We do not add you to a mailing list, and we do not sell or rent your information."
+        },
+        {
+          "title": "Where it is stored",
+          "text": "Your enquiry is stored with our hosting provider, Cloudflare. We may also send a copy to a private notification service so we see new messages quickly."
+        },
+        {
+          "title": "How long we keep it",
+          "text": "Stored enquiries are deleted automatically after 90 days. If we start working together, we keep the project emails we need to do that work."
+        },
+        {
+          "title": "Spam protection",
+          "text": "To stop repeated automated submissions, we keep a short count linked to your internet (IP) address. It expires automatically after 10 minutes."
+        },
+        {
+          "title": "Your choices",
+          "text": "You can ask us to show you or delete the information you sent. Send a message through the contact form and say what you would like us to do."
+        }
+      ],
+      "notice": "Last updated 23 September 2026. We will update this page if anything here changes."
     }
   }
 }
