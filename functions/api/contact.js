@@ -4,33 +4,56 @@
 const LIMITS = {name: 120, email: 254, company: 160, 'project-type': 80, budget: 80, message: 5000};
 const OPTIONAL = new Set(['company']);
 const reply = (status, body) => new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json'}});
+const escapeHTML = text => String(text).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+// A visitor without JavaScript sees this instead of raw JSON. No inline style or script, so
+// the strict CSP in static/_headers still applies.
+const errorPage = (status, message) => new Response(`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Your enquiry was not sent</title></head>
+<body><main><h1>Your enquiry was not sent</h1><p>${escapeHTML(message)}</p>
+<p><a href="/contact/">Go back to the contact form</a></p></main></body></html>
+`, {status, headers: {'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store'}});
+// Chat tools read webhook text as markup: <!channel> or @here would ping a whole team.
+const chatSafe = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/@/g, '@\u200b');
+// Rate-limit keys hold a hash, never the raw address. Set RATE_LIMIT_SALT as a secret so the
+// hash cannot be reversed by trying every address.
+const ipKey = async (ip, salt) => {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt || 'enquiry-rate-limit'}:${ip}`));
+  return [...new Uint8Array(digest)].slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join('');
+};
 
 export async function onRequestPost({request, env}) {
   // A form posted without JavaScript expects a page, not JSON.
   const wantsPage = !(request.headers.get('accept') || '').includes('application/json');
-  const done = (status, body) => wantsPage && status < 400
-    ? Response.redirect(new URL('/contact/received/', request.url), 303)
-    : reply(status, body);
+  const done = (status, body) => {
+    if (!wantsPage) return reply(status, body);
+    return status < 400 ? Response.redirect(new URL('/contact/received/', request.url), 303) : errorPage(status, body.error);
+  };
   // Intake is an explicit per-deployment decision. Inherited bindings alone never open
   // this endpoint: ENQUIRY_ENABLED must be set to "true" for the deployment that owns them.
   const open = String(env.ENQUIRY_ENABLED || '').trim().toLowerCase() === 'true';
-  if (!open || (!env.ENQUIRY && !env.NOTIFICATION_WEBHOOK)) return reply(503, {error: 'This site is not configured to accept enquiries.'});
+  if (!open || (!env.ENQUIRY && !env.NOTIFICATION_WEBHOOK)) return done(503, {error: 'This site is not configured to accept enquiries.'});
+  // Browsers send Origin with a form POST. One from another website is not our form.
+  const origin = request.headers.get('origin');
+  if (origin && origin !== new URL(request.url).origin) return done(403, {error: 'Enquiries must be sent from this website.'});
   let form;
-  try { form = await request.formData(); } catch { return reply(400, {error: 'Submission could not be read.'}); }
+  try { form = await request.formData(); } catch { return done(400, {error: 'Submission could not be read.'}); }
   if (String(form.get('website') || '').trim()) return done(200, {ok: true}); // Honeypot: accept, discard.
 
   // Best-effort IP-based rate limiting via KV (max 5 requests per 10-minute window).
   // Cloudflare KV is an eventually consistent store without distributed atomic increments;
   // this provides practical burst throttling against single-IP abuse rather than a strict mutex.
+  // An optional RATE_LIMIT namespace keeps these counters out of the enquiry store.
   const ip = request.headers.get('cf-connecting-ip') || '';
-  if (ip && env.ENQUIRY && typeof env.ENQUIRY.get === 'function') {
-    const rlKey = `ratelimit:${ip}`;
+  const limiter = env.RATE_LIMIT || env.ENQUIRY;
+  if (ip && limiter && typeof limiter.get === 'function') {
     try {
-      const current = parseInt(await env.ENQUIRY.get(rlKey) || '0', 10);
+      const rlKey = `ratelimit:${await ipKey(ip, env.RATE_LIMIT_SALT)}`;
+      const current = parseInt(await limiter.get(rlKey) || '0', 10);
       if (current >= 5) {
-        return reply(429, {error: 'Too many enquiries submitted. Please wait before trying again.'});
+        return done(429, {error: 'Too many enquiries submitted. Please wait before trying again.'});
       }
-      await env.ENQUIRY.put(rlKey, String(current + 1), {expirationTtl: 600});
+      await limiter.put(rlKey, String(current + 1), {expirationTtl: 600});
     } catch {
       // Best-effort rate limiting; do not block users if KV get fails
     }
@@ -39,11 +62,11 @@ export async function onRequestPost({request, env}) {
   const enquiry = {};
   for (const [field, limit] of Object.entries(LIMITS)) {
     const value = String(form.get(field) || '').trim();
-    if (!value && !OPTIONAL.has(field)) return reply(400, {error: `Missing required field: ${field}.`});
-    if (value.length > limit) return reply(400, {error: `${field} exceeds the maximum length of ${limit} characters.`});
+    if (!value && !OPTIONAL.has(field)) return done(400, {error: `Missing required field: ${field}.`});
+    if (value.length > limit) return done(400, {error: `${field} exceeds the maximum length of ${limit} characters.`});
     enquiry[field] = value;
   }
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(enquiry.email)) return reply(400, {error: 'Enter a valid email address.'});
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(enquiry.email)) return done(400, {error: 'Enter a valid email address.'});
   enquiry.received = new Date().toISOString();
   // The durable copy is the receipt: nothing is acknowledged until the write succeeds.
   // 90-day retention prevents indefinitely hoarding personal data in KV.
@@ -54,7 +77,7 @@ export async function onRequestPost({request, env}) {
       await env.ENQUIRY.put(`enquiry:${enquiry.received}:${crypto.randomUUID()}`, JSON.stringify(enquiry), {expirationTtl: TTL_SECONDS});
       stored = true;
     } catch {
-      return reply(502, {error: 'Your enquiry could not be stored, so it has not been received. Please try again.'});
+      return done(502, {error: 'Your enquiry could not be stored, so it has not been received. Please try again.'});
     }
   }
   // Webhook notification: best effort once a copy is stored, and the only delivery path
@@ -67,7 +90,7 @@ export async function onRequestPost({request, env}) {
         signal: AbortSignal.timeout(10000),
         headers: {'content-type': 'application/json'},
         body: JSON.stringify({
-          text: `New website enquiry from ${enquiry.name} (${enquiry.email}):\n${enquiry.message}`,
+          text: chatSafe(`New website enquiry from ${enquiry.name} (${enquiry.email}):\n${enquiry.message}`),
           enquiry,
         }),
       });
@@ -76,7 +99,7 @@ export async function onRequestPost({request, env}) {
       webhookOk = false;
     }
     if (!webhookOk && !stored) {
-      return reply(502, {error: 'Delivery could not be confirmed.'});
+      return done(502, {error: 'Delivery could not be confirmed.'});
     }
   }
   return done(200, {ok: true});

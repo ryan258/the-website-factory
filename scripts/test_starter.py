@@ -88,6 +88,9 @@ class StarterTests(unittest.TestCase):
             self.assertNotIn('\n[[kv_namespaces]]',wrangler)
             self.assertNotIn('\n[vars]',wrangler)
             self.assertIn('ENQUIRY_ENABLED',wrangler)  # documented, deliberately not set
+            site=(dest/'data/site.yaml').read_text()
+            self.assertNotIn('Chicago',site,'the master business location must not carry into a copy')
+            self.assertIn('organization: {"type": "Organization"}',site)
             guide=(dest/'docs/cloudflare-setup.md').read_text()
             self.assertIn('Cedar & Stone',guide)
             self.assertNotIn('Email Routing',guide)

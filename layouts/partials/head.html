@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ .Permalink }}">
 <meta property="og:image" content="{{ $social.Permalink }}">
-<meta property="og:image:alt" content="{{ hugo.Data.site.name }}. {{ hugo.Data.site.social.heading }}">
+<meta property="og:image:alt" content="{{ strings.TrimSuffix "." hugo.Data.site.name }}. {{ hugo.Data.site.social.heading }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $title }}">
 <meta name="twitter:description" content="{{ .Description | default hugo.Data.site.description }}">
@@ -21,4 +21,4 @@
 <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | relURL }}">
 <link rel="preload" href="{{ hugo.Data.site.font.file | relURL }}" as="font" type="font/woff2" crossorigin>{{ $vars := merge hugo.Data.site.theme (dict "font_family" hugo.Data.site.font.family "font_url" (hugo.Data.site.font.file | relURL)) }}{{ $css := resources.Get "scss/main.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/main.css" "vars" $vars) | minify | fingerprint "sha384" }}<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">{{ if eq .Section "site-kit" }}{{ $kitCSS := resources.Get "scss/workshop.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/workshop.css" "vars" $vars) | minify | fingerprint "sha384" }}<link rel="stylesheet" href="{{ $kitCSS.RelPermalink }}" integrity="{{ $kitCSS.Data.Integrity }}">{{ end }}{{ if eq .Section "contact" }}{{ $js := resources.Get "js/contact.js" | minify | fingerprint "sha384" }}<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer>
-</script>{{ end }}{{ if .IsHome }}{{ $org := dict "@context" "https://schema.org" "@type" "Organization" "name" hugo.Data.site.name "url" site.BaseURL "description" hugo.Data.site.description }}<script type="application/ld+json">{{ $org | jsonify | safeJS }}</script>{{ end }}
+</script>{{ end }}{{ if .IsHome }}{{ $info := hugo.Data.site.organization | default dict }}{{ $org := dict "@context" "https://schema.org" "@type" ($info.type | default "Organization") "name" hugo.Data.site.name "url" site.BaseURL "description" hugo.Data.site.description }}{{ with $info.area_served }}{{ $org = merge $org (dict "areaServed" .) }}{{ end }}{{ with $info.locality }}{{ $org = merge $org (dict "address" (dict "@type" "PostalAddress" "addressLocality" . "addressRegion" ($info.region | default "") "addressCountry" ($info.country | default ""))) }}{{ end }}{{ if and hugo.Data.site.email (ne hugo.Data.site.email "hello@example.invalid") }}{{ $org = merge $org (dict "email" hugo.Data.site.email) }}{{ end }}<script type="application/ld+json">{{ $org | jsonify | safeJS }}</script>{{ end }}

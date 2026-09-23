@@ -195,6 +195,50 @@ check('a stored enquiry is still acknowledged when the webhook fails', async () 
   }
 });
 
+check('a no-JavaScript error is a readable page, not JSON', async () => {
+  const response = await post({...ENABLED, ENQUIRY: store()}, {json: false, body: 'name=A'});
+  assert.equal(response.status, 400);
+  assert.match(response.headers.get('content-type'), /text\/html/);
+  const page = await response.text();
+  assert.match(page, /Missing required field/);
+  assert.match(page, /href="\/contact\/"/);
+});
+
+check('a post from another website is refused', async () => {
+  const ENQUIRY = store();
+  const response = await post({...ENABLED, ENQUIRY}, {headers: {origin: 'https://elsewhere.invalid'}});
+  assert.equal(response.status, 403);
+  assert.equal(ENQUIRY.written.length, 0);
+  const same = await post({...ENABLED, ENQUIRY}, {headers: {origin: 'https://example.invalid'}});
+  assert.equal(same.status, 200);
+});
+
+check('rate limiting never stores the raw IP address', async () => {
+  const ENQUIRY = store();
+  await post({...ENABLED, ENQUIRY}, {headers: {'cf-connecting-ip': '203.0.113.77'}});
+  const keys = ENQUIRY.written.map(([key]) => key);
+  assert.ok(keys.some(key => /^ratelimit:[0-9a-f]{32}$/.test(key)), keys.join(', '));
+  assert.ok(!keys.join(' ').includes('203.0.113.77'));
+});
+
+check('a RATE_LIMIT namespace keeps counters out of the enquiry store', async () => {
+  const ENQUIRY = store(), RATE_LIMIT = store();
+  await post({...ENABLED, ENQUIRY, RATE_LIMIT}, {headers: {'cf-connecting-ip': '203.0.113.78'}});
+  assert.ok(ENQUIRY.written.every(([key]) => key.startsWith('enquiry:')));
+  assert.equal(RATE_LIMIT.written.length, 1);
+});
+
+check('webhook text cannot ping a whole chat channel', async () => {
+  const sent = [];
+  const body = 'name=%3C%21channel%3E&email=test%40example.com&project-type=A&budget=B&message=%40here+hello';
+  await withFetch(async (url, init) => { sent.push(JSON.parse(init.body)); return new Response('ok'); },
+    () => post({...ENABLED, ...HOOK, ENQUIRY: store()}, {body}));
+  assert.equal(sent.length, 1);
+  assert.ok(!sent[0].text.includes('<!channel>'), sent[0].text);
+  assert.ok(!sent[0].text.includes('@here'), sent[0].text);
+  assert.equal(sent[0].enquiry.name, '<!channel>', 'the structured copy stays exact');
+});
+
 check('middleware hides dotfiles but serves /.well-known/', async () => {
   const visit = path => middleware({request: new Request('https://example.invalid' + path),
     next: async () => new Response('served', {status: 200})});

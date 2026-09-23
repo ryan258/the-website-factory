@@ -7,6 +7,13 @@ address: "Chicago, IL · Remote nationwide"
 email: ""
 hours: ""
 location: "Chicago, IL · Remote nationwide"
+# Search-engine business details (schema.org). Only facts you would state publicly.
+organization:
+  type: "ProfessionalService"
+  area_served: "United States"
+  locality: "Chicago"
+  region: "IL"
+  country: "US"
 primary_cta:
   label: "Start a project"
   url: "/contact/"
