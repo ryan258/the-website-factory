@@ -128,6 +128,42 @@ check('rate limiting restricts submissions from same IP to 5 per window', async 
   assert.match((await rateLimitedRes.json()).error, /Too many enquiries/);
 });
 
+check('webhook-only deployment returns 502 when webhook returns HTTP 500', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => new Response('Internal Server Error', {status: 500});
+    const response = await post({ENQUIRY_ENABLED: 'true', NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify'});
+    assert.equal(response.status, 502);
+    assert.match((await response.json()).error, /Delivery could not be confirmed/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+check('webhook-only deployment returns 200 when webhook succeeds', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => new Response('{"ok":true}', {status: 200});
+    const response = await post({ENQUIRY_ENABLED: 'true', NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify'});
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).ok, true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+check('rate limiting restricts burst submissions from same IP beyond window limit', async () => {
+  const ENQUIRY = store();
+  const headers = {'cf-connecting-ip': '198.51.100.22'};
+  const results = [];
+  for (let i = 0; i < 7; i++) {
+    results.push(await post({...ENABLED, ENQUIRY}, {headers}));
+  }
+  const statuses = results.map(r => r.status);
+  assert.equal(statuses.slice(0, 5).every(s => s === 200), true);
+  assert.equal(statuses.slice(5).every(s => s === 429), true);
+});
+
 let failures = 0;
 for (const [name, fn] of cases) {
   try { await fn(); } catch (error) { failures++; console.error(`FAIL: ${name}\n  ${error.message}`); }

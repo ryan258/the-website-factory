@@ -19,7 +19,9 @@ export async function onRequestPost({request, env}) {
   try { form = await request.formData(); } catch { return reply(400, {error: 'Submission could not be read.'}); }
   if (String(form.get('website') || '').trim()) return done(200, {ok: true}); // Honeypot: accept, discard.
 
-  // Rate limiting by client IP via KV (max 5 requests per 10 minutes)
+  // Best-effort IP-based rate limiting via KV (max 5 requests per 10-minute window).
+  // Cloudflare KV is an eventually consistent store without distributed atomic increments;
+  // this provides practical burst throttling against single-IP abuse rather than a strict mutex.
   const ip = request.headers.get('cf-connecting-ip') || '';
   if (ip && env.ENQUIRY && typeof env.ENQUIRY.get === 'function') {
     const rlKey = `ratelimit:${ip}`;
@@ -38,7 +40,7 @@ export async function onRequestPost({request, env}) {
   for (const [field, limit] of Object.entries(LIMITS)) {
     const value = String(form.get(field) || '').trim();
     if (!value && !OPTIONAL.has(field)) return reply(400, {error: `Missing required field: ${field}.`});
-    if (value.length > limit) return reply(400, {error: `Field is too long: ${field}.`});
+    if (value.length > limit) return reply(400, {error: `${field} exceeds the maximum length of ${limit} characters.`});
     enquiry[field] = value;
   }
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(enquiry.email)) return reply(400, {error: 'Enter a valid email address.'});
@@ -57,8 +59,9 @@ export async function onRequestPost({request, env}) {
   }
   // Webhook notification (Pages-compatible delivery path)
   if (env.NOTIFICATION_WEBHOOK) {
+    let webhookOk = false;
     try {
-      await fetch(env.NOTIFICATION_WEBHOOK, {
+      const res = await fetch(env.NOTIFICATION_WEBHOOK, {
         method: 'POST',
         headers: {'content-type': 'application/json'},
         body: JSON.stringify({
@@ -66,8 +69,12 @@ export async function onRequestPost({request, env}) {
           enquiry,
         }),
       });
+      webhookOk = res && res.ok;
     } catch {
-      if (!stored && !env.EMAIL) return reply(502, {error: 'Delivery could not be confirmed.'});
+      webhookOk = false;
+    }
+    if (!webhookOk && !stored && !env.EMAIL) {
+      return reply(502, {error: 'Delivery could not be confirmed.'});
     }
   }
   // Notification is best effort once a copy is stored, and the only path when none is.
