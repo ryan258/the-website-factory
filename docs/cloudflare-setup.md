@@ -131,10 +131,7 @@ starts without it — can never write into the namespace above:
 ENQUIRY_ENABLED = "true"
 ```
 
-That block is already in `wrangler.toml`. After deploying, confirm it arrived: **Workers
-& Pages → your project → Settings → Variables and Secrets** should list
-`ENQUIRY_ENABLED`. If it does not, add it there and redeploy. Without it every
-submission is refused with a 503 and nothing is stored — safe, but silent to you.
+In `wrangler.toml`, this defaults to `"false"`. Change it to `"true"` (or configure `ENQUIRY_ENABLED = "true"` in the Cloudflare Dashboard under **Workers & Pages → your project → Settings → Variables and Secrets**) when you are ready to accept enquiries. Without it every submission is refused with a 503 and nothing is stored — safe, but silent to you.
 
 If image assets use Cloudflare R2 (`wrangler.toml` declares `IMAGES_BUCKET = "258webco-images"`), create the bucket:
 

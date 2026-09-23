@@ -22,6 +22,8 @@ python3 scripts/from_plan.py path/to/plan.json --name "my-preset" --write
 
 This compiles the planner JSON into `data/presets/<name>.json`, normalizes the page hierarchy (ensuring `home` first and `contact` last), injects mandatory hero headers and services, maps sections to schema contracts in `data/modules.json`, and validates the output against `scripts/factory.py`.
 
+Running without `--write` previews the validated preset JSON to stdout and validates completely in-memory, leaving existing preset files on disk untouched even if the plan shares a slug.
+
 ## Edit the composition
 
 `data/factory.json` selects the preset. Its `workshop` flag controls whether the review catalog is included by the build helper. The selected `data/presets/<preset>.json` contains:

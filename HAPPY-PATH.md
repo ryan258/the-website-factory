@@ -1,12 +1,12 @@
 # Happy Path: Deploying 258webco.com to Cloudflare
 
-This is the fastest, cleanest path to get **258webco.com** live with working forms, durable KV storage, and Gmail notifications.
+This is the fastest, cleanest path to get **258webco.com** live with working forms, durable KV storage, domain email routing, and optional webhook alerts.
 
 ---
 
-## 1. Cloudflare Dashboard: Email & Domain Setup
+## 1. Cloudflare Dashboard: Direct Email & Domain Setup
 
-Cloudflare recently relocated zone-level Email Routing. Follow this exact path:
+Cloudflare Email Routing forwards direct messages sent to your domain (e.g., `ryan@258webco.com`) to your personal inbox. *(Note: Website contact form submissions are stored directly in KV storage; Email Routing handles direct person-to-person mail).*
 
 1. **Activate Email Routing**:
    - In Cloudflare, select domain **258webco.com**.
@@ -15,11 +15,11 @@ Cloudflare recently relocated zone-level Email Routing. Follow this exact path:
    - Click **Enable Email Routing** and accept the suggested DNS records (replaces any previous MX records).
 2. **Verify Destination Address**:
    - Add `ryanleejwebdev@gmail.com` as a destination address.
-   - Open Gmail, find Cloudflare's verification email, and click the link. *(Required before notifications work)*.
+   - Open Gmail, find Cloudflare's verification email, and click the link. *(Required before Email Routing works)*.
 3. **Configure Forwarding Rules**:
    - **Custom address**: `ryan@258webco.com` → forward to `ryanleejwebdev@gmail.com`.
    - **Catch-all rule**: forward all remaining `@258webco.com` mail to `ryanleejwebdev@gmail.com`.
-4. **Smoke test email**:
+4. **Smoke test direct email**:
    - Send an email from a phone or alternate account to `ryan@258webco.com`. Confirm it lands in your Gmail.
 
 ---
@@ -45,7 +45,7 @@ Run these commands from your local project terminal (`~/Projects/the-website-fac
    binding = "ENQUIRY"
    id = "ea6f0db631da4aaeb78c786a4581214c"
    ```
-   *(Note: Cloudflare Pages configuration files reject `send_email` bindings — only Workers support that block in config files. The Pages Function at `functions/api/contact.js` automatically uses `ENQUIRY` KV for durable zero-loss enquiry storage).*
+   *(Note: Cloudflare Pages Functions run without `[[send_email]]` bindings, which are supported only in Workers. The Pages Function at `functions/api/contact.js` automatically uses `ENQUIRY` KV for durable zero-loss enquiry storage. To receive push notifications for new submissions, set the `NOTIFICATION_WEBHOOK` secret or check KV directly).*
 
 4. **Attach KV Binding in Cloudflare Pages Dashboard**:
    Go to Cloudflare Dashboard → **Workers & Pages** → **258webco** → **Settings** → **Bindings**:
