@@ -1,12 +1,77 @@
-name: Deploy Hugo Site to Cloudflare Pages
+name: CI Quality Gates & Pages Deployment
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      confirm_release:
+        description: 'Authorize production release to 258webco.com (indexable & form-enabled)'
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  verify:
+    name: Verify Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.166.0'
+          extended: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Setup Dart Sass
+        run: python3 scripts/setup.py
+
+      - name: Build Safe Verification Baseline
+        run: |
+          rm -rf public
+          python3 scripts/build.py
+
+      - name: Verify Static & Unit Quality Gates
+        run: |
+          python3 scripts/check_site.py public
+          python3 scripts/test_factory.py
+          python3 scripts/test_starter.py
+          python3 scripts/test_from_plan.py
+          node scripts/test_contact_endpoint.mjs
+
+      - name: Verify Enabled Form & Pages Local KV Integration Gate
+        run: sh scripts/check_contact.sh
+
   deploy:
+    name: Publish Production Release (Owner Authorized)
+    needs: verify
+    if: github.event_name == 'workflow_dispatch' && inputs.confirm_release == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,22 +93,27 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
       - name: Setup Dart Sass
         run: python3 scripts/setup.py
 
-      - name: Build Site (Production)
+      - name: Build Production Site (258webco)
         run: |
           rm -rf public
           HUGO_PARAMS_FORMENABLED=true HUGO_PARAMS_NOINDEX=false \
             python3 scripts/build.py --base-url https://258webco.com/
 
-      - name: Verify Generated Site Quality Gates
+      - name: Verify Production Output
         run: |
           HUGO_PARAMS_NOINDEX=false python3 scripts/check_site.py public
-          python3 scripts/test_factory.py
-          python3 scripts/test_starter.py
-          python3 scripts/test_from_plan.py
-          node scripts/test_contact_endpoint.mjs
 
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
