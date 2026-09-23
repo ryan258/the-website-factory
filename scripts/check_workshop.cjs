@@ -41,7 +41,7 @@ const expectedVariants=Object.values(JSON.parse(fs.readFileSync(path.join(ROOT,'
   const question=page.locator('#example-faq-accordion summary').first();await question.focus();await page.keyboard.press('Enter');
   if(!await question.evaluate(e=>e.parentElement.open))failures.push('keyboard FAQ');
   await page.setViewportSize({width:390,height:844});await page.goto(base+'site-kit/catalog/');await page.screenshot({path:path.join(out,'workshop-mobile.png'),fullPage:true});
-  for(const slug of ['agency','contractor','consultant','local-service']){
+  for(const slug of ['agency','contractor','consultant','local-service','clinic','restaurant','nonprofit']){
    await page.setViewportSize({width:1440,height:1000});await page.goto(base+'site-kit/'+slug+'/');
    await page.screenshot({path:path.join(out,slug+'-desktop.png'),fullPage:true});
    // Hero button labels and targets come from the preset, not from this script.

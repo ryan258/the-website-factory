@@ -1,0 +1,349 @@
+{
+  "name": "Olive & Ember",
+  "label": "Seasonal food, shared tables",
+  "tone": "clay",
+  "description": "A fictional neighborhood restaurant composition with a menu, events, hours, and directions.",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Fictional restaurant website: the menu, upcoming evenings, opening hours, and how to find us.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "split",
+          "content": "hero"
+        },
+        {
+          "module": "services",
+          "variant": "cards",
+          "content": "services"
+        },
+        {
+          "module": "menu",
+          "variant": "cards",
+          "content": "menu-preview"
+        },
+        {
+          "module": "hours",
+          "variant": "table",
+          "content": "hours"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "services": {
+      "title": "Menu",
+      "description": "Fictional restaurant menu, private dining, and upcoming events.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-services"
+        },
+        {
+          "module": "menu",
+          "variant": "table",
+          "content": "menu"
+        },
+        {
+          "module": "services",
+          "variant": "rows",
+          "content": "services"
+        },
+        {
+          "module": "events",
+          "variant": "agenda",
+          "content": "events"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "about": {
+      "title": "About",
+      "description": "The fictional kitchen and team behind Olive & Ember.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-about"
+        },
+        {
+          "module": "about",
+          "variant": "editorial",
+          "content": "about"
+        },
+        {
+          "module": "team",
+          "variant": "cards",
+          "content": "team"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Book a table, ask about private dining, or find Olive & Ember.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-contact"
+        },
+        {
+          "module": "contact",
+          "variant": "panel",
+          "content": "contact"
+        },
+        {
+          "module": "visit",
+          "variant": "cards",
+          "content": "visit"
+        },
+        {
+          "module": "hours",
+          "variant": "list",
+          "content": "hours"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "hero": {
+      "label": "Seasonal food, shared tables",
+      "title": "Good food, made to share.",
+      "intro": "A neighborhood restaurant cooking with the seasons. Come for dinner, stay for the conversation.",
+      "action": {
+        "label": "Ask about a table",
+        "url": "/contact/"
+      },
+      "secondary": {
+        "label": "See the menu",
+        "url": "/services/"
+      },
+      "note": "Fictional business \u00b7 Sample composition",
+      "art": "arch"
+    },
+    "services": {
+      "label": "Ways to join us",
+      "title": "More than dinner.",
+      "intro": "Replace these with what the restaurant actually offers.",
+      "items": [
+        {
+          "title": "Dinner",
+          "text": "A seasonal menu for sharing around the table."
+        },
+        {
+          "title": "Private dining",
+          "text": "Ask about bringing a group together."
+        },
+        {
+          "title": "Takeaway",
+          "text": "Details to be confirmed."
+        }
+      ]
+    },
+    "menu-preview": {
+      "label": "From the menu",
+      "title": "A taste of the season.",
+      "intro": "Dishes and prices are placeholders.",
+      "items": [
+        {
+          "title": "Grilled flatbread",
+          "text": "Warm bread from the fire.",
+          "value": "Price to be confirmed"
+        },
+        {
+          "title": "Seasonal salad",
+          "text": "What is fresh this week.",
+          "value": "Price to be confirmed"
+        },
+        {
+          "title": "Slow-cooked stew",
+          "text": "A dish for sharing.",
+          "value": "Price to be confirmed"
+        }
+      ],
+      "notice": "Sample dishes. Replace them with the real menu before publishing."
+    },
+    "menu": {
+      "label": "Menu",
+      "title": "This season\u2019s menu.",
+      "intro": "Dishes and prices are placeholders.",
+      "items": [
+        {
+          "title": "Grilled flatbread",
+          "text": "Warm bread from the fire.",
+          "value": "Price to be confirmed"
+        },
+        {
+          "title": "Seasonal salad",
+          "text": "What is fresh this week.",
+          "value": "Price to be confirmed"
+        },
+        {
+          "title": "Slow-cooked stew",
+          "text": "A dish for sharing.",
+          "value": "Price to be confirmed"
+        },
+        {
+          "title": "Dessert of the day",
+          "text": "Ask what is on today.",
+          "value": "Price to be confirmed"
+        }
+      ],
+      "notice": "Sample menu. Confirm dishes, prices, and allergy information before publishing."
+    },
+    "events": {
+      "label": "Upcoming",
+      "title": "Evenings at the restaurant.",
+      "intro": "Event details are placeholders.",
+      "items": [
+        {
+          "title": "Supper club",
+          "text": "A set menu shared at one long table.",
+          "when": "Date to be confirmed",
+          "place": "Main dining room"
+        },
+        {
+          "title": "Guest chef night",
+          "text": "An evening with a visiting cook.",
+          "when": "Date to be confirmed",
+          "place": "Main dining room"
+        }
+      ],
+      "notice": "Fictional events."
+    },
+    "hours": {
+      "label": "Opening hours",
+      "title": "When we are open.",
+      "intro": "Hours shown here are placeholders.",
+      "items": [
+        {
+          "title": "Tuesday to Saturday",
+          "text": "Hours to be confirmed"
+        },
+        {
+          "title": "Sunday",
+          "text": "Hours to be confirmed"
+        },
+        {
+          "title": "Monday",
+          "text": "Closed or hours to be confirmed"
+        }
+      ],
+      "notice": "Fictional hours. Confirm real opening times before publishing."
+    },
+    "about": {
+      "label": "Our kitchen",
+      "title": "Cooking with the seasons.",
+      "intro": "Good food, made to share.",
+      "body": "This is a fictional restaurant composition. Replace this story with the real kitchen, people, and suppliers.",
+      "aside": "Cook simply. Share generously."
+    },
+    "team": {
+      "label": "The people",
+      "title": "Who you will meet.",
+      "items": [
+        {
+          "title": "Marco Bell",
+          "text": "Sample profile \u00b7 Head cook",
+          "initials": "MB"
+        },
+        {
+          "title": "Ana Ruiz",
+          "text": "Sample profile \u00b7 Front of house",
+          "initials": "AR"
+        }
+      ],
+      "notice": "Fictional names and roles for layout demonstration."
+    },
+    "visit": {
+      "label": "Finding us",
+      "title": "Getting here.",
+      "intro": "Directions and access details are placeholders.",
+      "items": [
+        {
+          "title": "Address",
+          "text": "Example street \u00b7 Details awaiting confirmation"
+        },
+        {
+          "title": "Getting here",
+          "text": "Public transport and parking details to be confirmed."
+        },
+        {
+          "title": "Access",
+          "text": "Step-free access details to be confirmed."
+        }
+      ],
+      "notice": "Fictional location details."
+    },
+    "cta": {
+      "label": "Next step",
+      "title": "Planning a meal together?",
+      "intro": "Ask about a table or a private evening.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      }
+    },
+    "intro-services": {
+      "label": "Menu",
+      "title": "What we are cooking.",
+      "intro": "Seasonal dishes, made to share.",
+      "action": {
+        "label": "Ask about a table",
+        "url": "/contact/"
+      }
+    },
+    "intro-about": {
+      "label": "About",
+      "title": "The kitchen and the people.",
+      "intro": "A small team cooking with the seasons.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      }
+    },
+    "intro-contact": {
+      "label": "Contact",
+      "title": "Book, ask, or find us.",
+      "intro": "Send a message about a table or a private evening.",
+      "action": {
+        "label": "Send a message",
+        "url": "/contact/"
+      }
+    },
+    "contact": {
+      "label": "Start here",
+      "title": "Get in touch.",
+      "intro": "Ask about a table, a private evening, or dietary needs. This demonstration does not send messages.",
+      "items": [
+        {
+          "title": "Email",
+          "text": "hello@example.invalid"
+        },
+        {
+          "title": "A useful first message",
+          "text": "What you need and any timing that matters."
+        },
+        {
+          "title": "What happens next",
+          "text": "Agree on a real response process before enabling contact delivery."
+        }
+      ],
+      "notice": "Fictional contact information. Message delivery is disabled."
+    }
+  }
+}

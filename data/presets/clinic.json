@@ -1,0 +1,338 @@
+{
+  "name": "Willow Street Clinic",
+  "label": "Calm, clear care",
+  "tone": "sage",
+  "description": "A fictional community clinic composition with services, visit preparation, hours, and directions.",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Fictional clinic website: services, what to bring, opening hours, and how to find us.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "split",
+          "content": "hero"
+        },
+        {
+          "module": "services",
+          "variant": "cards",
+          "content": "services"
+        },
+        {
+          "module": "preparation",
+          "variant": "checklist",
+          "content": "preparation"
+        },
+        {
+          "module": "hours",
+          "variant": "table",
+          "content": "hours"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "services": {
+      "title": "Services",
+      "description": "Fictional clinic services, how appointments work, and common questions.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-services"
+        },
+        {
+          "module": "services",
+          "variant": "rows",
+          "content": "services"
+        },
+        {
+          "module": "process",
+          "variant": "steps",
+          "content": "process"
+        },
+        {
+          "module": "faq",
+          "variant": "accordion",
+          "content": "faq"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "about": {
+      "title": "About",
+      "description": "The fictional team behind Willow Street Clinic and how they work.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-about"
+        },
+        {
+          "module": "about",
+          "variant": "split",
+          "content": "about"
+        },
+        {
+          "module": "team",
+          "variant": "cards",
+          "content": "team"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Contact Willow Street Clinic, find the building, and check opening hours.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-contact"
+        },
+        {
+          "module": "contact",
+          "variant": "panel",
+          "content": "contact"
+        },
+        {
+          "module": "visit",
+          "variant": "details",
+          "content": "visit"
+        },
+        {
+          "module": "hours",
+          "variant": "list",
+          "content": "hours"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "hero": {
+      "label": "Calm, clear care",
+      "title": "Care that starts with listening.",
+      "intro": "A neighborhood clinic for everyday health questions, with time to explain what happens next.",
+      "action": {
+        "label": "Ask a question",
+        "url": "/contact/"
+      },
+      "secondary": {
+        "label": "See our services",
+        "url": "/services/"
+      },
+      "note": "Fictional business \u00b7 Sample composition",
+      "art": "orbit"
+    },
+    "services": {
+      "label": "What we offer",
+      "title": "Everyday care, close to home.",
+      "intro": "Replace these with the services the clinic actually provides.",
+      "items": [
+        {
+          "title": "General appointments",
+          "text": "Talk through a new concern or a question about your health."
+        },
+        {
+          "title": "Follow-up visits",
+          "text": "Review how things are going after an earlier appointment."
+        },
+        {
+          "title": "Health checks",
+          "text": "Book a routine check at a time that suits you."
+        }
+      ]
+    },
+    "preparation": {
+      "label": "Before your visit",
+      "title": "What to bring.",
+      "intro": "A little preparation makes the appointment easier.",
+      "items": [
+        {
+          "title": "A list of your questions",
+          "text": "Write them down so nothing is forgotten."
+        },
+        {
+          "title": "Any current medicines",
+          "text": "Bring the names, or the packets themselves."
+        },
+        {
+          "title": "Relevant letters or results",
+          "text": "Anything from other appointments that may help."
+        }
+      ],
+      "notice": "Sample guidance. Replace it with the clinic\u2019s own advice."
+    },
+    "hours": {
+      "label": "Opening hours",
+      "title": "When we are open.",
+      "intro": "Hours shown here are placeholders.",
+      "items": [
+        {
+          "title": "Monday to Friday",
+          "text": "Hours to be confirmed"
+        },
+        {
+          "title": "Saturday",
+          "text": "Hours to be confirmed"
+        },
+        {
+          "title": "Sunday",
+          "text": "Closed or hours to be confirmed"
+        }
+      ],
+      "notice": "Fictional hours. Confirm real opening times before publishing."
+    },
+    "process": {
+      "label": "How it works",
+      "title": "From booking to follow-up.",
+      "items": [
+        {
+          "title": "Book",
+          "text": "Choose a time that works for you."
+        },
+        {
+          "title": "Visit",
+          "text": "Talk through your concern with a clinician."
+        },
+        {
+          "title": "Plan",
+          "text": "Agree on the next steps together."
+        },
+        {
+          "title": "Follow up",
+          "text": "Check in if anything changes."
+        }
+      ]
+    },
+    "faq": {
+      "label": "Common questions",
+      "title": "Before you book.",
+      "items": [
+        {
+          "title": "Do I need a referral?",
+          "text": "Replace this answer with the clinic\u2019s actual policy."
+        },
+        {
+          "title": "Can I bring someone with me?",
+          "text": "Replace this answer with the clinic\u2019s actual policy."
+        },
+        {
+          "title": "Is this a real clinic?",
+          "text": "No. This is a fictional demonstration of the website system."
+        }
+      ]
+    },
+    "about": {
+      "label": "About us",
+      "title": "A small clinic with time to talk.",
+      "intro": "Care that starts with listening.",
+      "body": "This is a fictional clinic composition. Replace this story with the real people, approach, and history of the practice.",
+      "aside": "Listen first. Explain clearly. Follow up."
+    },
+    "team": {
+      "label": "The people",
+      "title": "Who you will meet.",
+      "items": [
+        {
+          "title": "Jordan Lee",
+          "text": "Sample profile \u00b7 Clinician",
+          "initials": "JL"
+        },
+        {
+          "title": "Priya Shah",
+          "text": "Sample profile \u00b7 Practice coordinator",
+          "initials": "PS"
+        }
+      ],
+      "notice": "Fictional names and roles for layout demonstration."
+    },
+    "visit": {
+      "label": "Finding us",
+      "title": "Getting here.",
+      "intro": "Directions and access details are placeholders.",
+      "items": [
+        {
+          "title": "Address",
+          "text": "Example street \u00b7 Details awaiting confirmation"
+        },
+        {
+          "title": "Getting here",
+          "text": "Public transport and parking details to be confirmed."
+        },
+        {
+          "title": "Access",
+          "text": "Step-free access details to be confirmed."
+        }
+      ],
+      "notice": "Fictional location details."
+    },
+    "cta": {
+      "label": "Next step",
+      "title": "Have a question about a visit?",
+      "intro": "Send a message and we will explain the next step.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      }
+    },
+    "intro-services": {
+      "label": "Services",
+      "title": "What we offer.",
+      "intro": "Everyday care, explained clearly.",
+      "action": {
+        "label": "Ask a question",
+        "url": "/contact/"
+      }
+    },
+    "intro-about": {
+      "label": "About",
+      "title": "The people behind the clinic.",
+      "intro": "A small team with time to talk.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      }
+    },
+    "intro-contact": {
+      "label": "Contact",
+      "title": "Visit or get in touch.",
+      "intro": "Find us, check our hours, or send a message.",
+      "action": {
+        "label": "Send a message",
+        "url": "/contact/"
+      }
+    },
+    "contact": {
+      "label": "Start here",
+      "title": "Get in touch.",
+      "intro": "Ask a question about an appointment or a service. This demonstration does not send messages.",
+      "items": [
+        {
+          "title": "Email",
+          "text": "hello@example.invalid"
+        },
+        {
+          "title": "A useful first message",
+          "text": "What you need and any timing that matters."
+        },
+        {
+          "title": "What happens next",
+          "text": "Agree on a real response process before enabling contact delivery."
+        }
+      ],
+      "notice": "Fictional contact information. Message delivery is disabled."
+    }
+  }
+}

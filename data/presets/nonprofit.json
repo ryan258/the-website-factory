@@ -1,0 +1,320 @@
+{
+  "name": "Common Table Collective",
+  "label": "Neighbors helping neighbors",
+  "tone": "blue",
+  "description": "A fictional community non-profit composition with programs, volunteering, support routes, and a timeline.",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Fictional non-profit website: programs, how to get help, how to volunteer, and how to get in touch.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "split",
+          "content": "hero"
+        },
+        {
+          "module": "services",
+          "variant": "cards",
+          "content": "services"
+        },
+        {
+          "module": "support",
+          "variant": "routes",
+          "content": "support"
+        },
+        {
+          "module": "timeline",
+          "variant": "vertical",
+          "content": "timeline"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "services": {
+      "title": "Programs",
+      "description": "Fictional community programs, how they work, and common questions.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-services"
+        },
+        {
+          "module": "services",
+          "variant": "rows",
+          "content": "services"
+        },
+        {
+          "module": "process",
+          "variant": "steps",
+          "content": "process"
+        },
+        {
+          "module": "faq",
+          "variant": "accordion",
+          "content": "faq"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "about": {
+      "title": "About",
+      "description": "The fictional volunteers and story behind Common Table Collective.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-about"
+        },
+        {
+          "module": "about",
+          "variant": "split",
+          "content": "about"
+        },
+        {
+          "module": "team",
+          "variant": "cards",
+          "content": "team"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Contact Common Table Collective to get help, volunteer, or ask a question.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-contact"
+        },
+        {
+          "module": "contact",
+          "variant": "panel",
+          "content": "contact"
+        },
+        {
+          "module": "faq",
+          "variant": "open",
+          "content": "faq"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "hero": {
+      "label": "Neighbors helping neighbors",
+      "title": "Help that starts next door.",
+      "intro": "A volunteer-run collective sharing food, skills, and time with the people around us.",
+      "action": {
+        "label": "Get involved",
+        "url": "/contact/"
+      },
+      "secondary": {
+        "label": "See our programs",
+        "url": "/services/"
+      },
+      "note": "Fictional business \u00b7 Sample composition",
+      "art": "tiles"
+    },
+    "services": {
+      "label": "Our programs",
+      "title": "Ways we help.",
+      "intro": "Replace these with the programs the organization actually runs.",
+      "items": [
+        {
+          "title": "Community pantry",
+          "text": "Share food with neighbors who need it."
+        },
+        {
+          "title": "Skill sharing",
+          "text": "Learn practical skills from volunteers."
+        },
+        {
+          "title": "Neighbor check-ins",
+          "text": "Friendly visits for people who would like company."
+        }
+      ]
+    },
+    "support": {
+      "label": "Find your way in",
+      "title": "How to take part.",
+      "intro": "Choose the route that fits you.",
+      "items": [
+        {
+          "title": "Get help",
+          "text": "Tell us what would make a difference.",
+          "url": "/contact/",
+          "link_label": "Get in touch"
+        },
+        {
+          "title": "Volunteer",
+          "text": "Offer an hour or a skill.",
+          "url": "/contact/",
+          "link_label": "Offer to help"
+        },
+        {
+          "title": "Donate goods",
+          "text": "Ask what is needed this week.",
+          "url": "/contact/",
+          "link_label": "Ask what is needed"
+        }
+      ],
+      "notice": "Routes lead to the contact form in this demonstration."
+    },
+    "timeline": {
+      "label": "Our story",
+      "title": "How we started.",
+      "items": [
+        {
+          "title": "The idea",
+          "text": "Neighbors noticed a need and started talking.",
+          "phase": "Phase 1"
+        },
+        {
+          "title": "The first pantry",
+          "text": "A shared shelf became a regular pantry day.",
+          "phase": "Phase 2"
+        },
+        {
+          "title": "Growing together",
+          "text": "More volunteers joined and new programs began.",
+          "phase": "Phase 3"
+        }
+      ]
+    },
+    "process": {
+      "label": "How it works",
+      "title": "Simple steps.",
+      "items": [
+        {
+          "title": "Reach out",
+          "text": "Send a message or visit on a pantry day."
+        },
+        {
+          "title": "Talk it through",
+          "text": "A volunteer listens and explains the options."
+        },
+        {
+          "title": "Take part",
+          "text": "Join a program in the way that suits you."
+        },
+        {
+          "title": "Stay in touch",
+          "text": "Tell us what is working and what is not."
+        }
+      ]
+    },
+    "faq": {
+      "label": "Common questions",
+      "title": "Before you get involved.",
+      "items": [
+        {
+          "title": "Do I need to register?",
+          "text": "Replace this answer with the organization\u2019s actual process."
+        },
+        {
+          "title": "Can I volunteer once?",
+          "text": "Replace this answer with the organization\u2019s actual process."
+        },
+        {
+          "title": "Is this a real organization?",
+          "text": "No. This is a fictional demonstration of the website system."
+        }
+      ]
+    },
+    "about": {
+      "label": "About us",
+      "title": "Run by neighbors, for neighbors.",
+      "intro": "Help that starts next door.",
+      "body": "This is a fictional non-profit composition. Replace this story with the real people, history, and way the organization works.",
+      "aside": "Show up. Listen. Share what we can."
+    },
+    "team": {
+      "label": "The people",
+      "title": "Who you will meet.",
+      "items": [
+        {
+          "title": "Dana Brooks",
+          "text": "Sample profile \u00b7 Volunteer coordinator",
+          "initials": "DB"
+        },
+        {
+          "title": "Leo Park",
+          "text": "Sample profile \u00b7 Pantry lead",
+          "initials": "LP"
+        }
+      ],
+      "notice": "Fictional names and roles for layout demonstration."
+    },
+    "cta": {
+      "label": "Next step",
+      "title": "Want to get involved?",
+      "intro": "Send a message and a volunteer will explain the next step.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      }
+    },
+    "intro-services": {
+      "label": "Programs",
+      "title": "What we do together.",
+      "intro": "Food, skills, and time, shared locally.",
+      "action": {
+        "label": "Get involved",
+        "url": "/contact/"
+      }
+    },
+    "intro-about": {
+      "label": "About",
+      "title": "The people behind the collective.",
+      "intro": "Volunteers who live nearby.",
+      "action": {
+        "label": "Get in touch",
+        "url": "/contact/"
+      }
+    },
+    "intro-contact": {
+      "label": "Contact",
+      "title": "Get help, volunteer, or ask.",
+      "intro": "Send a message and a volunteer will reply.",
+      "action": {
+        "label": "Send a message",
+        "url": "/contact/"
+      }
+    },
+    "contact": {
+      "label": "Start here",
+      "title": "Get in touch.",
+      "intro": "Ask for help, offer to volunteer, or ask a question. This demonstration does not send messages.",
+      "items": [
+        {
+          "title": "Email",
+          "text": "hello@example.invalid"
+        },
+        {
+          "title": "A useful first message",
+          "text": "What you need and any timing that matters."
+        },
+        {
+          "title": "What happens next",
+          "text": "Agree on a real response process before enabling contact delivery."
+        }
+      ],
+      "notice": "Fictional contact information. Message delivery is disabled."
+    }
+  }
+}

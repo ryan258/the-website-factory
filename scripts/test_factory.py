@@ -26,9 +26,9 @@ class FactoryTests(unittest.TestCase):
         scss=(ROOT/'assets/scss/abstracts/_variables.scss').read_text()
         sass_map=dict(re.findall(r'"(\w+)":\s*(#[0-9a-fA-F]{6})',re.search(r'\$tones:\s*\(([^)]*)\)',scss).group(1)))
         self.assertEqual(sass_map,tones,'$tones in _variables.scss must match data/tones.json')
-    def test_four_presets_build_at_root_and_subpath(self):
+    def test_presets_build_at_root_and_subpath(self):
         with tempfile.TemporaryDirectory(prefix='factory-presets-') as tmp:
-            for slug in ('agency','contractor','consultant','local-service'):
+            for slug in ('agency','contractor','consultant','local-service','clinic','restaurant','nonprofit'):
                 with self.subTest(preset=slug):
                     dest=new_site.create(Path(tmp)/slug,'Review Studio',slug)
                     self.assertEqual(factory.validate(dest),[])

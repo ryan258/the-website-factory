@@ -110,6 +110,19 @@ $preview-pale: #e3eee0;
   transform: rotate(15deg);
 }
 
+.art-clinic i {
+  border-radius: 50%;
+}
+
+.art-restaurant i {
+  border-radius: 50% 50% 0 0;
+  transform: rotate(-8deg);
+}
+
+.art-nonprofit i {
+  border-radius: 24px 24px 50% 50%;
+}
+
 .kit-preset__pill {
   display: inline-block;
   position: relative;
