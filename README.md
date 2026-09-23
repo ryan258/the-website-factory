@@ -53,7 +53,7 @@ The workshop is an internal development surface, omitted from the default agency
 
 Each page declares its ordered section selection and variants through validated JSON configuration. Business identity, editorial content, visual theme, and page composition have separate configuration surfaces.
 
-Choose from the agency, contractor, consultant, local-service, clinic, restaurant, nonprofit, and 258webco presets, and optionally a palette (`--palette studio|forest|harbor|terracotta|plum`). Presets select an initial composition; they do not establish which services a business offers or supply approved copy. Typography, imagery, colors, tone, and layout remain editable.
+Choose from the agency, contractor, consultant, local-service, clinic, restaurant, nonprofit, and 258webco presets, and optionally a palette (`--palette studio|forest|harbor|terracotta|plum`) and a font pairing (`--fonts modern|editorial|warm|friendly|readable`). Presets select an initial composition; they do not establish which services a business offers or supply approved copy. Typography, imagery, colors, tone, and layout remain editable.
 
 ### Complete selection and removal
 
@@ -184,7 +184,7 @@ The new name appears in the header, footer, page titles, structured data, and ge
 | Process steps and variants | Selected preset JSON |
 | Case-study copy, images, scores, LCP, page weights | `content/work/*.md` |
 
-Use plain text in YAML values; templates escape content. Preserve YAML indentation. Theme values use six-digit hex colors. Font configuration accepts a local `static/fonts/*.woff2` file, a plain family name, and the existing variable-font weight range. Include the font's license. Changing colors or fonts requires fresh contrast/layout/budget checks; a valid color string alone is not an accessibility guarantee.
+Use plain text in YAML values; templates escape content. Preserve YAML indentation. Theme values use six-digit hex colors. Fonts are self-hosted `static/fonts/*.woff2` files, each with an `OFL-<name>.txt` license beside it. `data/site.yaml` sets a body font and an optional heading font, each with its weight range and a `serif` or `sans-serif` fallback, plus heading letter spacing. `data/fonts.json` holds five ready pairings (modern, editorial, warm, friendly, readable). Start a copy with one using `--fonts NAME`; the copy keeps only the font files it uses. Validation fails on a missing file or license, and the output check fails if a page preloads more than 90 KB of fonts. Changing colors or fonts requires fresh contrast/layout/budget checks; a valid color string alone is not an accessibility guarantee.
 
 Hugo passes theme values to Dart Sass through `hugo:vars`, compiles `@use` modules, minifies and fingerprints the stylesheet, and adds SRI. Font preloads and CSS URLs follow the base URL's path. Spacing, layout widths, and breakpoints remain developer-owned Sass tokens. The small factory illustration and default icon are reusable artwork; replace `partials/hero-art.html`, `partials/mark.html`, `static/favicon.svg`, and the touch icon if a client has its own visual identity. The social-card background is `assets/images/social-base.png`; text is generated at build time.
 

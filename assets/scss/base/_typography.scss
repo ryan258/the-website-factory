@@ -1,12 +1,23 @@
+@use 'sass:string';
 @use 'hugo:vars' as brand;
 @use '../abstracts/functions' as f;
 
 @font-face {
-  font-family: brand.$font_family;
+  font-family: "#{brand.$font_family}";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: string.unquote("#{brand.$font_weights}");
   font-display: swap;
   src: url("#{brand.$font_url}") format('woff2');
+}
+
+@if "#{brand.$heading_family}" != "#{brand.$font_family}" {
+  @font-face {
+    font-family: "#{brand.$heading_family}";
+    font-style: normal;
+    font-weight: string.unquote("#{brand.$heading_weights}");
+    font-display: swap;
+    src: url("#{brand.$heading_url}") format('woff2');
+  }
 }
 
 body {
@@ -21,9 +32,10 @@ body {
 h1,
 h2,
 h3 {
+  font-family: var(--heading-font);
   line-height: 1.15;
   font-weight: 650;
-  letter-spacing: -.045em;
+  letter-spacing: var(--heading-tracking);
   text-wrap: balance;
 }
 

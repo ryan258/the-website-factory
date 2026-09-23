@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import re
 import shutil
-from factory import apply_palette, apply_preset, validate
+from factory import apply_fonts, apply_palette, apply_preset, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts')
@@ -122,7 +122,7 @@ form works. Agree who monitors enquiries, and how often, before launch.
 """)
 
 
-def create(destination, name, preset="agency", palette=None):
+def create(destination, name, preset="agency", palette=None, fonts=None):
     if preset not in available_presets():
         raise ValueError(f"Unknown business preset. Choose one of: {', '.join(available_presets())}.")
     errors = validate(ROOT)
@@ -168,6 +168,8 @@ def create(destination, name, preset="agency", palette=None):
         apply_preset(destination, preset, name)
         if palette:
             apply_palette(destination, palette)
+        if fonts:
+            apply_fonts(destination, fonts)
         readme = destination / 'README.md'
         readme.write_text(f'> Client draft: {name}. Preset: `{preset}`. This copy excludes the master workshop and other presets. The factory reference below documents the shared system; see `docs/factory-guide.md` for editing this copy.\n\n' + readme.read_text())
         # Each new instance starts private and disabled, irrespective of source settings.
@@ -191,9 +193,11 @@ def main():
     parser.add_argument('--preset', choices=available_presets(), default='agency')
     parser.add_argument('--palette', choices=sorted(json.loads((ROOT / 'data/palettes.json').read_text())),
                         help='Color palette from data/palettes.json (contrast-checked); default: the preset accent')
+    parser.add_argument('--fonts', choices=sorted(json.loads((ROOT / 'data/fonts.json').read_text())),
+                        help='Font pairing from data/fonts.json (self-hosted, open-licensed); default: Inter')
     args = parser.parse_args()
     try:
-        destination = create(args.destination, args.name, args.preset, args.palette)
+        destination = create(args.destination, args.name, args.preset, args.palette, args.fonts)
     except (OSError, ValueError) as error:
         parser.exit(1, f'Not created: {error}\n')
     print(f'Created {destination}\nEdit data/site.yaml and content/. Read README.md.\nNo Git repository, tool binaries, reports, or generated site was copied. Forms stay disabled; noindex stays on.\nNo hosting resources were copied: wrangler.toml is unconfigured and /api/contact refuses submissions until this client declares its own. See docs/cloudflare-setup.md.')

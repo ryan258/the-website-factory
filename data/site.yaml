@@ -37,9 +37,18 @@ process:
   title: "From first idea to the finish line."
 work_notice: "Sample projects. All clients are fictional."
 case_notice: "Sample project. This client is fictional. All scores below are illustrative, not measured results."
+# Fonts are self-hosted from static/fonts with their licenses. Pairings live in
+# data/fonts.json; `new_site.py --fonts NAME` fills these in. Empty heading_* uses the body font.
 font:
   family: "Inter"
   file: "fonts/inter-latin-variable.woff2"
+  weights: "100 900"
+  fallback: "sans-serif"
+  heading_family: ""
+  heading_file: ""
+  heading_weights: ""
+  heading_fallback: ""
+  tracking: "-.045em"
 theme:
   ink: "#14181f"
   paper: "#ffffff"

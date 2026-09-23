@@ -30,6 +30,7 @@ sections for a business. The live site is the `258webco` preset (258 Web Co.).
 | Deploy | `.github/workflows/deploy.yml` (manual `workflow_dispatch` only); previews: `preview.yml` |
 | Schemas (generated; run `scripts/schemas.py` after editing modules or tones) | `schemas/` |
 | Palettes (contrast-checked by `scripts/contrast.py`) | `data/palettes.json` |
+| Font pairings (self-hosted; each font needs `static/fonts/OFL-<name>.txt`) | `data/fonts.json` |
 
 ## Agent tools
 

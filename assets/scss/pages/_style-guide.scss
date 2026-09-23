@@ -208,9 +208,9 @@
   .sg-w-64 { width: 64px; }
   .sg-w-96 { width: 96px; }
   .sg-subhead { margin-bottom: 16px; font-size: 1.1rem; }
-  .sg-type-h1 { font-size: clamp(2.6rem, 5.8vw, 4.5rem); margin: 0; line-height: 1.15; font-weight: 650; letter-spacing: -0.045em; }
-  .sg-type-h2 { margin: 0; font-size: clamp(1.8rem, 3.2vw, 2.65rem); line-height: 1.15; font-weight: 650; letter-spacing: -0.045em; }
-  .sg-type-h3 { margin: 0; font-size: 1.4rem; line-height: 1.15; font-weight: 650; letter-spacing: -0.045em; }
+  .sg-type-h1 { font-family: var(--heading-font); font-size: clamp(2.6rem, 5.8vw, 4.5rem); margin: 0; line-height: 1.15; font-weight: 650; letter-spacing: var(--heading-tracking); }
+  .sg-type-h2 { font-family: var(--heading-font); margin: 0; font-size: clamp(1.8rem, 3.2vw, 2.65rem); line-height: 1.15; font-weight: 650; letter-spacing: var(--heading-tracking); }
+  .sg-type-h3 { font-family: var(--heading-font); margin: 0; font-size: 1.4rem; line-height: 1.15; font-weight: 650; letter-spacing: var(--heading-tracking); }
   .sg-type-intro { margin: 0; font-size: 1rem; line-height: 1.6; max-width: 48ch; }
   .sg-type-body { margin: 0; font-size: 1.125rem; line-height: 1.6; max-width: 65ch; }
   .sg-type-eyebrow { margin: 0; font-size: 0.68rem; font-weight: 650; letter-spacing: 0.12em; }

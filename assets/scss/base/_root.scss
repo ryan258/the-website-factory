@@ -1,3 +1,5 @@
+@use 'sass:meta';
+@use 'sass:string';
 @use 'hugo:vars' as brand;
 @use '../abstracts/variables' as v;
 
@@ -10,7 +12,10 @@
   --accent-text: #{brand.$accent_text};
   --link: #{v.$link};
   --muted: #{brand.$muted};
-  --font: #{v.$font};
+  // meta.inspect keeps the quotes, so a name like "Source Serif 4" stays valid inside var().
+  --font: #{meta.inspect(v.$font)};
+  --heading-font: #{meta.inspect(v.$heading-font)};
+  --heading-tracking: #{string.unquote("#{brand.$heading_tracking}")};
   --width: #{v.$width};
   --reading: #{v.$reading};
 

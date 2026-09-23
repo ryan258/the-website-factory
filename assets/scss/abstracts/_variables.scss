@@ -1,3 +1,4 @@
+@use 'sass:string';
 @use 'sass:color';
 @use 'hugo:vars' as brand;
 
@@ -28,7 +29,9 @@ $muted-on-ink: color.mix($ink, $line, 14%);
 // scripts/factory.py validates presets against and copies into a scaffolded data/site.yaml.
 $tones: ("yellow": #ffc400, "clay": #edb08e, "sage": #b9d7bb, "blue": #a6cef7);
 
-$font: brand.$font_family, Arial, sans-serif;
+// Family names are quoted (so "Source Serif 4" stays one name); generic fallbacks are not.
+$font: "#{brand.$font_family}", string.unquote("#{brand.$font_fallback}");
+$heading-font: "#{brand.$heading_family}", string.unquote("#{brand.$heading_fallback}");
 $spaces: (1: 4px, 2: 8px, 3: 16px, 4: 24px, 5: 32px, 6: 48px, 7: 64px, 8: 96px);
 $breakpoints: (small: 600px, medium: 900px, large: 1200px);
 $width: 1120px;

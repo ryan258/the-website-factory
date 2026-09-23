@@ -10,7 +10,7 @@ The master includes eight business compositions (`agency`, `contractor`, `consul
 python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor
 ```
 
-Choose `agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, or `258webco`. Add `--palette` with a name from `data/palettes.json` to start from a contrast-checked color set. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated agency project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
+Choose `agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, or `258webco`. Add `--palette` with a name from `data/palettes.json` to start from a contrast-checked color set, and `--fonts` with a name from `data/fonts.json` for a self-hosted font pairing. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated agency project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
 
 ## Compiling presets from the planning workshop
 

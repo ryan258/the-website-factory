@@ -1,0 +1,72 @@
+{
+  "modern": {
+    "label": "Modern",
+    "use": "Clean and neutral; the current default",
+    "body": {
+      "family": "Inter",
+      "file": "fonts/inter-latin-variable.woff2",
+      "weights": "100 900",
+      "fallback": "sans-serif"
+    },
+    "heading": null,
+    "tracking": "-.045em"
+  },
+  "editorial": {
+    "label": "Editorial",
+    "use": "Serious and trustworthy: consultants, clinics, professional services",
+    "body": {
+      "family": "Inter",
+      "file": "fonts/inter-latin-variable.woff2",
+      "weights": "100 900",
+      "fallback": "sans-serif"
+    },
+    "heading": {
+      "family": "Source Serif 4",
+      "file": "fonts/source-serif-4-latin-variable.woff2",
+      "weights": "200 900",
+      "fallback": "serif"
+    },
+    "tracking": "-.015em"
+  },
+  "warm": {
+    "label": "Warm",
+    "use": "Characterful and welcoming: restaurants, studios, makers",
+    "body": {
+      "family": "Inter",
+      "file": "fonts/inter-latin-variable.woff2",
+      "weights": "100 900",
+      "fallback": "sans-serif"
+    },
+    "heading": {
+      "family": "Fraunces",
+      "file": "fonts/fraunces-latin-variable.woff2",
+      "weights": "100 900",
+      "fallback": "serif"
+    },
+    "tracking": "-.02em"
+  },
+  "friendly": {
+    "label": "Friendly",
+    "use": "Soft and approachable: local services, community groups",
+    "body": {
+      "family": "Nunito",
+      "file": "fonts/nunito-latin-variable.woff2",
+      "weights": "200 900",
+      "fallback": "sans-serif"
+    },
+    "heading": null,
+    "tracking": "-.02em"
+  },
+  "readable": {
+    "label": "Readable",
+    "use": "Designed for low vision and easy reading: non-profits, public services",
+    "body": {
+      "family": "Atkinson Hyperlegible Next",
+      "file": "fonts/atkinson-hyperlegible-next-latin-variable.woff2",
+      "weights": "200 800",
+      "fallback": "sans-serif"
+    },
+    "heading": null,
+    "tracking": "-.01em"
+  }
+}

@@ -52,6 +52,7 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
     # the preset. A mismatch published one business's pages under another's name, so it fails.
     named=re.search(r'(?m)^name:\s*(.+?)\s*$', (root/'data/site.yaml').read_text()) if (root/'data/site.yaml').is_file() else None
     site_name=yaml_scalar(named.group(1)) if named else None
+    errors+=font_errors(root)
     if config.get('preset') in profiles and site_name!=profiles[config['preset']].get('name'):
         errors.append(f"data/site.yaml: name {site_name!r} must match the selected preset's name {profiles[config['preset']].get('name')!r}")
     def check_content(module, content, label, profile=None):
@@ -173,6 +174,54 @@ def apply_palette(destination, palette):
         theme,count=re.subn(r'(?m)^([ \t]+'+key+r':).*$',lambda m:m.group(1)+' '+json.dumps(color),theme)
         if not count: raise ValueError(f'data/site.yaml theme has no {key} to replace.')
     site.write_text(text[:block.start(1)]+theme+text[block.end(1):])
+
+FONT_KEYS=('family','file','weights','fallback','heading_family','heading_file','heading_weights','heading_fallback','tracking')
+
+def font_settings(root):
+    """The flat font block of data/site.yaml as a dict of strings."""
+    block=re.search(r'(?m)^font:\n((?:[ \t]+.*\n)+)',(Path(root)/'data/site.yaml').read_text())
+    return {k:yaml_scalar(v) for k,v in re.findall(r'(?m)^[ \t]+(\w+):[ \t]*(.*)$',block.group(1))} if block else {}
+
+def font_errors(root):
+    """Fonts must be self-hosted files with a license beside them; names and values must be plain."""
+    font=font_settings(root); errors=[]
+    for prefix in ('','heading_'):
+        family,file=font.get(prefix+'family',''),font.get(prefix+'file','')
+        if prefix and not (family or file): continue
+        label=f'data/site.yaml font.{prefix}'
+        if not re.fullmatch(r'[A-Za-z0-9 ]{1,60}',family): errors.append(f'{label}family must be a plain font name')
+        path=Path(root)/'static'/file
+        if not re.fullmatch(r'fonts/[a-z0-9-]+\.woff2',file) or not path.is_file():
+            errors.append(f'{label}file must be an existing static/fonts/*.woff2 file'); continue
+        stem=path.name.replace('-latin-variable.woff2','')
+        if not ((path.parent/f'OFL-{stem}.txt').is_file() or (stem=='inter' and (path.parent/'OFL.txt').is_file())):
+            errors.append(f'{label}file {file} has no license file (static/fonts/OFL-{stem}.txt)')
+        weights=font.get(prefix+'weights') or font.get('weights','100 900')
+        if not re.fullmatch(r'\d{3,4}( \d{3,4})?',weights): errors.append(f'{label}weights must look like "100 900"')
+        if (font.get(prefix+'fallback') or 'sans-serif') not in ('serif','sans-serif'): errors.append(f'{label}fallback must be serif or sans-serif')
+    if not re.fullmatch(r'-?\.?\d*\.?\d+em',font.get('tracking','-.045em')): errors.append('data/site.yaml font.tracking must be an em value such as -.02em')
+    return errors
+
+def apply_fonts(destination, pairing):
+    """Set a copy's fonts from data/fonts.json and drop the font files (and licenses) it no longer uses."""
+    root=Path(destination)
+    pairings=read(root/'data/fonts.json')
+    if pairing not in pairings:
+        raise ValueError(f"Unknown font pairing {pairing!r}. Choose one of: {', '.join(pairings)}.")
+    chosen=pairings[pairing]; body=chosen['body']; heading=chosen.get('heading') or {}
+    values=dict(family=body['family'],file=body['file'],weights=body['weights'],fallback=body['fallback'],
+                heading_family=heading.get('family',''),heading_file=heading.get('file',''),heading_weights=heading.get('weights',''),
+                heading_fallback=heading.get('fallback',''),tracking=chosen['tracking'])
+    site=root/'data/site.yaml'
+    text=site.read_text()
+    block=re.search(r'(?m)^font:\n((?:[ \t]+.*\n)+)',text)
+    site.write_text(text[:block.start(1)]+''.join(f'  {k}: {json.dumps(values[k])}\n' for k in FONT_KEYS)+text[block.end(1):])
+    used={Path(values['file']).name,Path(values['heading_file']).name}
+    for font in (root/'static/fonts').glob('*.woff2'):
+        if font.name not in used:
+            font.unlink()
+            stem=font.name.replace('-latin-variable.woff2','')
+            (root/'static/fonts'/('OFL.txt' if stem=='inter' else f'OFL-{stem}.txt')).unlink(missing_ok=True)
 
 def apply_preset(destination, slug, name):
     """Select pages and remove workshop and unrelated example content in a new copy."""

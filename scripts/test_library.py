@@ -64,6 +64,62 @@ class FormServiceTests(unittest.TestCase):
             dest = new_site.create(Path(tmp) / 'c', 'Form Co', 'consultant')
             self.assertIn("formAction = ''", (dest / 'hugo.toml').read_text())
 
+class FontTests(unittest.TestCase):
+    def test_every_pairing_is_self_hosted_and_licensed(self):
+        import factory
+        self.assertEqual(factory.font_errors(ROOT), [])
+        for name, pairing in json.loads((ROOT / 'data/fonts.json').read_text()).items():
+            for font in (pairing['body'], pairing.get('heading') or pairing['body']):
+                path = ROOT / 'static' / font['file']
+                self.assertTrue(path.is_file(), f'{name}: {font["file"]}')
+                stem = path.name.replace('-latin-variable.woff2', '')
+                license_file = ROOT / 'static/fonts' / ('OFL.txt' if stem == 'inter' else f'OFL-{stem}.txt')
+                self.assertIn('SIL Open Font License', license_file.read_text(), name)
+
+    def test_copy_with_a_pairing_keeps_only_its_fonts(self):
+        import factory
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = new_site.create(Path(tmp) / 'c', 'Font Co', 'consultant', fonts='editorial')
+            self.assertEqual(sorted(p.name for p in (dest / 'static/fonts').iterdir()),
+                             ['OFL-source-serif-4.txt', 'OFL.txt', 'inter-latin-variable.woff2', 'source-serif-4-latin-variable.woff2'])
+            settings = factory.font_settings(dest)
+            self.assertEqual((settings['family'], settings['heading_family']), ('Inter', 'Source Serif 4'))
+            self.assertEqual(factory.validate(dest), [])
+            result = run_build(dest)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            css = ''.join(p.read_text() for p in (dest / 'public/css').glob('*.css'))
+            self.assertIn('--heading-font:"Source Serif 4", serif', css, 'multi-word names keep their quotes')
+            home = (dest / 'public/index.html').read_text()
+            self.assertIn('href=/fonts/source-serif-4-latin-variable.woff2 as=font', home)
+            with self.assertRaises(ValueError):
+                new_site.create(Path(tmp) / 'd', 'Font Co', 'consultant', fonts='no-such-pairing')
+
+    def test_bad_font_settings_are_caught(self):
+        import factory
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = new_site.create(Path(tmp) / 'c', 'Font Co', 'consultant', fonts='warm')
+            site = dest / 'data/site.yaml'
+            original = site.read_text()
+            for old, new, expected in (('"Fraunces"', '"Fraunces; }"', 'plain font name'),
+                                       ('heading_fallback: "serif"', 'heading_fallback: "cursive"', 'serif or sans-serif'),
+                                       ('tracking: "-.02em"', 'tracking: "tight"', 'em value')):
+                site.write_text(original.replace(old, new))
+                self.assertTrue(any(expected in e for e in factory.validate(dest)), expected)
+            site.write_text(original)
+            (dest / 'static/fonts/OFL-fraunces.txt').unlink()
+            self.assertTrue(any('no license file' in e for e in factory.validate(dest)))
+
+    def test_heavy_font_preloads_fail_the_output_check(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            (out / 'fonts').mkdir()
+            (out / 'fonts/big.woff2').write_bytes(b'0' * 95000)
+            (out / 'index.html').write_text('<!doctype html><title>T</title><meta name="description" content="d">'
+                                            '<meta name="robots" content="noindex"><link rel="canonical" href="https://example.invalid/">'
+                                            '<link rel="preload" href="/fonts/big.woff2" as="font"><h1>Hi</h1>')
+            import check_site
+            self.assertTrue(any('preloaded fonts' in e for e in check_site.check(out, noindex=True)))
+
 class LlmsTxtTests(unittest.TestCase):
     def test_llms_txt_lists_selected_pages_in_menu_order(self):
         with tempfile.TemporaryDirectory() as tmp:

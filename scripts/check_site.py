@@ -19,7 +19,7 @@ def noindex_expected():
     return os.environ.get('HUGO_PARAMS_NOINDEX', found.group(1) if found else 'true').lower() not in ('false', '0', 'no')
 class Page(HTMLParser):
     def __init__(self):
-        super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]; self.loads=[]
+        super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]; self.loads=[]; self.fonts=[]
     def handle_starttag(self, tag, attrs):
         a=dict(attrs)
         if tag=='h1': self.h1+=1
@@ -30,6 +30,7 @@ class Page(HTMLParser):
         if tag=='a' and a.get('href'): self.refs.append(a['href'])
         if tag in ('img','script') and a.get('src'): self.refs.append(a['src']); self.loads.append(a['src'])
         if tag=='link' and a.get('rel') in ('stylesheet','preload','icon','apple-touch-icon'): self.refs.append(a.get('href','')); self.loads.append(a.get('href',''))
+        if tag=='link' and a.get('rel')=='preload' and a.get('as')=='font': self.fonts.append(a.get('href',''))
         if tag in ('img','source') and a.get('srcset'): self.loads+=[c.split()[0] for c in a['srcset'].split(',') if c.strip()]
     def handle_endtag(self, tag):
         if tag=='title': self.in_title=False
@@ -70,6 +71,10 @@ def check(output, noindex=None):
         rel=file.relative_to(output).as_posix()
         suffix='/' if rel=='index.html' else '/'+rel.removesuffix('index.html')
         prefix=base.path[:-len(suffix)] if base.path.endswith(suffix) else ''
+        # Fonts load before text renders; keep the preloaded total small (a pairing is about 71 KB).
+        font_files=[output/unquote(urlparse(f).path).removeprefix(prefix).lstrip('/') for f in p.fonts]
+        font_bytes=sum(f.stat().st_size for f in font_files if f.is_file())
+        if font_bytes>90000:errors.append(f'{label}: preloaded fonts total {font_bytes} bytes; keep them under 90000')
         for ref in p.refs:
             # Hugo swaps a URL it considers unsafe for this marker instead of failing the build.
             if 'ZgotmplZ' in ref:errors.append(f'{label}: a link was replaced as unsafe ({ref}); mark it with safeURL only after validating it');continue
