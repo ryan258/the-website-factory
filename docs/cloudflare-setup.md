@@ -102,7 +102,13 @@ npx wrangler kv namespace create ENQUIRY
 **You should see:** a short block of text containing an `id = "..."` with a long
 string of letters and numbers.
 
-Now open `wrangler.toml` in this project. Find these three lines:
+Now open `wrangler.toml` in this project.
+
+In **this master project**, the block is already filled in with the 258webco namespace
+id, so there is nothing to uncomment. Check the `id` matches the one you were just given
+(or skip this step if you did not create a new namespace).
+
+In a **new client copy** made with `scripts/new_site.py`, find these three lines:
 
 ```toml
 # [[kv_namespaces]]
@@ -131,7 +137,11 @@ starts without it — can never write into the namespace above:
 ENQUIRY_ENABLED = "true"
 ```
 
-In `wrangler.toml`, this defaults to `"false"`. Change it to `"true"` (or configure `ENQUIRY_ENABLED = "true"` in the Cloudflare Dashboard under **Workers & Pages → your project → Settings → Variables and Secrets**) when you are ready to accept enquiries. Without it every submission is refused with a 503 and nothing is stored — safe, but silent to you.
+In `wrangler.toml`, this defaults to `"false"`. Change it to `"true"` and deploy again when you are ready to accept enquiries. Without it every submission is refused with a 503 and nothing is stored — safe, but silent to you.
+
+**The dashboard cannot turn this on.** When a Pages project has a `wrangler.toml`, Cloudflare treats that file as the only source of its variables and bindings. A value typed into **Settings → Variables and Secrets** does not override it. Whatever `wrangler.toml` says at deploy time is what the live site uses.
+
+After deploying, check the live endpoint answers: a form submission should return a success page, not "could not confirm delivery". A 503 means intake is still off.
 
 If image assets use Cloudflare R2 (`wrangler.toml` declares `IMAGES_BUCKET = "258webco-images"`), create the bucket:
 

@@ -2,6 +2,7 @@
    The endpoint is called directly with stub bindings; check_contact.sh covers the real ones. */
 import assert from 'node:assert/strict';
 import {onRequestPost} from '../functions/api/contact.js';
+import {onRequest as middleware} from '../functions/_middleware.js';
 
 const VALID = 'name=Test+Person&email=test%40example.com&project-type=Not+sure+yet&budget=Under+10k&message=Hello';
 const post = (env, {json = true, body = VALID, headers = {}} = {}) => onRequestPost({
@@ -162,6 +163,39 @@ check('rate limiting restricts burst submissions from same IP beyond window limi
   const statuses = results.map(r => r.status);
   assert.equal(statuses.slice(0, 5).every(s => s === 200), true);
   assert.equal(statuses.slice(5).every(s => s === 429), true);
+});
+
+check('a delivered webhook is acknowledged even when email then fails', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => new Response('{"ok":true}', {status: 200});
+    const response = await post({...ENABLED, NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify',
+      EMAIL: failingMailer(), ENQUIRY_TO: 'a@b.invalid', ENQUIRY_FROM: 'c@d.invalid'});
+    assert.equal(response.status, 200);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+check('a failed webhook and failed email with no store is refused', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => new Response('down', {status: 503});
+    const response = await post({...ENABLED, NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify',
+      EMAIL: failingMailer(), ENQUIRY_TO: 'a@b.invalid', ENQUIRY_FROM: 'c@d.invalid'});
+    assert.equal(response.status, 502);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+check('middleware hides dotfiles but serves /.well-known/', async () => {
+  const visit = path => middleware({request: new Request('https://example.invalid' + path),
+    next: async () => new Response('served', {status: 200})});
+  assert.equal((await visit('/.factory-build.json')).status, 404);
+  assert.equal((await visit('/.env')).status, 404);
+  assert.equal((await visit('/.well-known/security.txt')).status, 200);
+  assert.equal((await visit('/contact/')).status, 200);
 });
 
 let failures = 0;

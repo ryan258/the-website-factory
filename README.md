@@ -183,21 +183,23 @@ npm ci
 npx playwright install chromium
 ```
 
-Serve **production output**, not the live-reload development server, for performance measurement:
+The browser checks serve the built output themselves on a free local port, with the same security headers as `static/_headers`, so a blocked inline style or script fails the check. Build first (`python3 scripts/build.py`, plus `--workshop` for the last three):
 
 ```sh
-python3 -m http.server 14722 --bind 127.0.0.1 --directory public
-```
-
-In another terminal, run the broader checks when ready:
-
-```sh
-PREVIEW_URL=http://127.0.0.1:14722/ npm run check:browser
-npm run audit -- http://127.0.0.1:14722/
-PREVIEW_URL=http://127.0.0.1:1314/ node scripts/check_workshop.cjs
+npm run check:browser
+node scripts/check_workshop.cjs
 node scripts/check_components.cjs
 node scripts/check_workflow.cjs
 ```
+
+Set `PREVIEW_URL` to check an already-running server instead. Lighthouse needs a server of its own; serve **production output**, not a development server:
+
+```sh
+python3 -m http.server 14722 --bind 127.0.0.1 --directory public
+npm run audit -- http://127.0.0.1:14722/   # in another terminal
+```
+
+CI runs all four browser checks on every push and pull request.
 
 The standard browser and Lighthouse commands discover every generated `index.html`, including renamed/new case studies and the contact receipt page, and return nonzero on failure. Browser checks cover axe WCAG A/AA, one H1, `noindex`, light/dark modes, and widths 320/600/900/1200. Lighthouse checks Performance >=95, Accessibility 100, LCP <1.5 s, CLS <0.05, and Home <150 KB / <=10 requests. `CHECK_PATHS` or `AUDIT_PATHS` can limit a run, e.g. `CHECK_PATHS='["/","/pricing/"]'`. Use `SITE_OUTPUT` for an alternate build directory and `CHROME_PATH` for an existing Chrome binary. Reports are written under this project's ignored `reports/` directory, independent of the caller's working directory.
 

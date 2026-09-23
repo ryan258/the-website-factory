@@ -27,7 +27,7 @@ python3 scripts/build.py        # validate → build in a temp dir → check →
 python3 scripts/check_site.py   # re-check generated output
 python3 scripts/build.py --serve --port 1313
 # http://127.0.0.1:1313/            the selected composition
-# http://127.0.0.1:1313/site-kit/   every module + all four business compositions
+# http://127.0.0.1:1313/site-kit/   every module + all five business compositions
 # http://127.0.0.1:1313/site-kit/style-guide/   tokens, type scale, buttons, states
 ```
 
@@ -140,8 +140,8 @@ What the repository has actually measured (`docs/acceptance.md`, evidence in `re
 What is **not** measured and is yours to prove per project: current Lighthouse scores (the old demo's 100s are historical, not inherited), hosted TTFB, CO₂ figures, screen-reader and physical-device acceptance, and live form receipt. Several plays below are sold on numbers — measure the actual site first:
 
 ```sh
-python3 -m http.server 14722 --bind 127.0.0.1 --directory public   # serve production output
-PREVIEW_URL=http://127.0.0.1:14722/ npm run check:browser          # axe + H1 + overflow
+npm run check:browser                                              # axe + H1 + overflow + CSP (serves public/ itself)
+python3 -m http.server 14722 --bind 127.0.0.1 --directory public   # serve production output for Lighthouse
 npm run audit -- http://127.0.0.1:14722/                           # Lighthouse thresholds
 ```
 
@@ -729,10 +729,10 @@ python3 scripts/check_site.py    # generated output
 python3 scripts/test_factory.py  # reordering, omission, failure paths
 python3 scripts/test_starter.py  # client copy, branding, subpath, broken-link detection
 # optional, Node:
+npm run check:browser                          # serves public/ itself
+python3 scripts/build.py --workshop && node scripts/check_workshop.cjs
 python3 -m http.server 14722 --bind 127.0.0.1 --directory public
-PREVIEW_URL=http://127.0.0.1:14722/ npm run check:browser
 npm run audit -- http://127.0.0.1:14722/
-PREVIEW_URL=http://127.0.0.1:14722/ node scripts/check_workshop.cjs
 ```
 
 Deployment, indexing, form delivery, and publication are owner-controlled and are not performed by any script here. See `docs/factory-guide.md` for the editing reference, `docs/acceptance.md` for measured evidence and its limits, and `roadmap.md` for what is planned but not built.

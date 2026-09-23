@@ -3,16 +3,16 @@ const {chromium}=require('playwright');
 const {AxeBuilder}=require('@axe-core/playwright');
 const fs=require('node:fs');
 const path=require('node:path');
-const ROOT=path.resolve(__dirname,'..');
+const {ROOT,launchOptions,preview,watchCSP}=require('./qa-paths.cjs');
 const expectedVariants=Object.values(JSON.parse(fs.readFileSync(path.join(ROOT,'data/modules.json'),'utf8'))).reduce((n,m)=>n+m.variants.length,0);
-const base=process.env.PREVIEW_URL||'http://127.0.0.1:14722/';
 (async()=>{
- const browser=await chromium.launch({headless:true});
+ const site=await preview('public-workshop');const base=site.base;
+ const browser=await chromium.launch(launchOptions());
  const results=[];const failures=[];
  const out=path.join(ROOT,'reports');fs.mkdirSync(out,{recursive:true});
  try {
   const context=await browser.newContext();const page=await context.newPage();
-  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));watchCSP(page,errors);
   for(const mode of ['light','dark']){
    await page.emulateMedia({colorScheme:mode});await page.setViewportSize({width:1200,height:900});
    await page.goto(base+'site-kit/catalog/');await page.evaluate(()=>document.fonts.ready);
@@ -66,5 +66,5 @@ const base=process.env.PREVIEW_URL||'http://127.0.0.1:14722/';
   fs.writeFileSync(path.join(out,'workshop-checks.json'),JSON.stringify({results,failures,keyboard:'native catalog and FAQ',noJavaScript:'catalog and contact',styleGuide:'zero a11y violations'},null,2));
   console.log(`${expectedVariants} expanded variants, living style guide, two themes, five widths, keyboard, no-JS and preview contact paths: ${failures.length?'FAILED '+failures.join(', '):'passed'}`);
   process.exitCode=failures.length?1:0;
- }finally{await browser.close()}
+ }finally{await browser.close();await site.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

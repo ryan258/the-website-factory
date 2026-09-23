@@ -26,6 +26,17 @@ class StarterTests(unittest.TestCase):
             with self.assertRaises(ValueError):scaffold.create(dest,'Bad\nname')
             self.assertFalse(dest.exists())
         with self.assertRaises(ValueError):scaffold.create(ROOT/'forbidden-copy','Test')
+    def test_compiled_preset_can_start_a_client_copy(self):
+        # A preset written by from_plan.py is not in any fixed list; the scaffold must accept it.
+        compiled=ROOT/'data/presets/zz-compiled-fixture.json'
+        self.assertFalse(compiled.exists())
+        compiled.write_text((ROOT/'data/presets/consultant.json').read_text())
+        self.addCleanup(compiled.unlink)
+        self.assertIn('zz-compiled-fixture',scaffold.available_presets())
+        with tempfile.TemporaryDirectory() as tmp:
+            dest=scaffold.create(Path(tmp)/'client','Compiled Client','zz-compiled-fixture')
+            self.assertEqual([p.name for p in (dest/'data/presets').iterdir()],['zz-compiled-fixture.json'])
+        with self.assertRaises(ValueError):scaffold.create(Path(tempfile.gettempdir())/'never-made','Test','no-such-preset')
     def test_new_instance_build_and_edited_content(self):
         with tempfile.TemporaryDirectory(prefix='starter-fixture-') as tmp:
             dest=scaffold.create(Path(tmp)/'client','Cedar & Stone')

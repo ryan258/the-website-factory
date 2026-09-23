@@ -324,3 +324,7 @@ $preview-pale: #e3eee0;
     grid-template-columns:1.2fr 1fr;
   }
 }
+
+// Style guide links in the catalog header and index (formerly inline styles; see CSP).
+.kit-facts a.kit-facts__guide { color: inherit; text-decoration: underline; }
+.kit-index a.kit-index__guide { border-color: var(--accent); font-weight: 600; }

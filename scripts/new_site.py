@@ -13,6 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts')
 FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json')
 
+def available_presets():
+    """Every preset in data/presets, including ones compiled by scripts/from_plan.py."""
+    return sorted(p.stem for p in (ROOT / 'data/presets').glob('*.json'))
+
 def project_slug(name):
     """A Cloudflare-safe project name derived from the client name."""
     slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')[:54]
@@ -102,8 +106,8 @@ form works. Agree who monitors enquiries, and how often, before launch.
 
 
 def create(destination, name, preset="agency"):
-    if preset not in ("agency", "contractor", "consultant", "local-service", "258webco"):
-        raise ValueError("Unknown business preset.")
+    if preset not in available_presets():
+        raise ValueError(f"Unknown business preset. Choose one of: {', '.join(available_presets())}.")
     errors = validate(ROOT)
     if errors:
         raise ValueError("Invalid master: " + "; ".join(errors))
@@ -161,7 +165,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('destination')
     parser.add_argument('--name', required=True)
-    parser.add_argument('--preset', choices=['agency', 'contractor', 'consultant', 'local-service', '258webco'], default='agency')
+    parser.add_argument('--preset', choices=available_presets(), default='agency')
     args = parser.parse_args()
     try:
         destination = create(args.destination, args.name, args.preset)

@@ -43,7 +43,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Dependencies
@@ -67,6 +67,19 @@ jobs:
 
       - name: Verify Enabled Form & Pages Local KV Integration Gate
         run: sh scripts/check_contact.sh
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Internal Workshop
+        run: python3 scripts/build.py --workshop
+
+      - name: Verify Browser Accessibility, Layout & CSP Gates
+        run: |
+          node scripts/browser-checks.cjs
+          node scripts/check_workshop.cjs
+          node scripts/check_components.cjs
+          node scripts/check_workflow.cjs
 
   deploy:
     name: Publish Production Release (Owner Authorized)
@@ -96,7 +109,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Dependencies
