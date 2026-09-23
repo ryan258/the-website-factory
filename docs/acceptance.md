@@ -11,7 +11,7 @@ Verified locally on the `main` branch with Hugo Extended 0.166.0 and Dart Sass 1
 | --- | --- |
 | Build and generated-output checks (`scripts/build.py`, `scripts/check_site.py`) | Pass |
 | Factory tests (`scripts/test_factory.py`, all 7 sample presets as client copies) | 13 pass |
-| Client-copy tests (`scripts/test_starter.py`) | 6 pass |
+| Client-copy and guided setup tests (`scripts/test_starter.py`) | 8 pass |
 | Plan compiler tests (`scripts/test_from_plan.py`) | 11 pass |
 | Enquiry reader tests (`scripts/test_enquiries.py`, stand-in wrangler) | 4 pass |
 | Schema and `--json` report tests (`scripts/test_schemas.py`) | 8 pass |
@@ -20,13 +20,14 @@ Verified locally on the `main` branch with Hugo Extended 0.166.0 and Dart Sass 1
 | MCP server (`scripts/test_mcp.py`) | 7 pass |
 | Eval grader (`scripts/test_evals.py`); saved bakery draft | 5 pass; score 1.00 |
 | Handover report (`scripts/test_handover.py`) | 2 pass |
-| Palettes, outside form service, llms.txt (`scripts/test_library.py`) | 7 pass |
+| Palettes, fonts, outside form service, llms.txt (`scripts/test_library.py`) | 11 pass |
+| Anchors, deep links, mailto/tel (`scripts/test_links.py`) | 6 pass |
 | Contrast (`scripts/contrast.py`): site theme and 5 palettes, light and dark | Pass (4.5:1 minimum) |
 | Contact endpoint cases (`scripts/test_contact_endpoint.mjs`) | 25 pass |
 | Local Pages integration (`sh scripts/check_contact.sh`) | Pass |
 | Lint (`npm run lint`: ruff pyflakes rules, `node --check`) | Pass |
 | Browser checks, public site: Home, Services, Contact, Privacy, receipt; light/dark; 320–1200 px; axe WCAG A/AA | Pass |
-| Browser checks on clinic, restaurant, and non-profit client copies | Pass |
+| Browser checks on clinic, restaurant, and non-profit client copies, and on editorial, friendly, and readable font pairings | Pass |
 | Workshop (7 compositions), component, and planner browser checks | Pass |
 | Visual regression PNG codec self-test; baseline record and compare on this machine | Pass |
 

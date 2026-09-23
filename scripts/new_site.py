@@ -186,21 +186,88 @@ def create(destination, name, preset="agency", palette=None, fonts=None):
         raise
     return destination
 
+NEXT_STEPS = ('Edit data/site.yaml and content/. Read README.md.\nNo Git repository, tool binaries, reports, or generated site '
+              'was copied. Forms stay disabled; noindex stays on.\nNo hosting resources were copied: wrangler.toml is unconfigured '
+              'and /api/contact refuses submissions until this client declares its own. See docs/cloudflare-setup.md.')
+
+def choose(ask, title, options, default=0):
+    """Ask for one of options [(value, label, description)] by letter (or number, or name). Returns the value."""
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    print(f'\n{title}')
+    for i, (value, label, description) in enumerate(options):
+        mark = ' (default)' if i == default else ''
+        print(f'  {letters[i]}. {label}{mark}' + (f' — {description}' if description else ''))
+    for _ in range(5):
+        answer = ask(f'Type a letter and press Enter [{letters[default]}]: ').strip()
+        if not answer:
+            return options[default][0]
+        for i, (value, label, _) in enumerate(options):
+            if answer.upper() == letters[i] or answer == str(i + 1) or answer.lower() in (str(value).lower(), label.lower()):
+                return value
+        print(f'  "{answer}" is not one of the letters shown. Please try again.')
+    raise ValueError('No choice made.')
+
+def guided(ask=input):
+    """Ask one question at a time; nothing is created until the summary is confirmed."""
+    print('Guided setup: a new client copy, one question at a time. Press Enter to accept a default.')
+    print('\nStep 1 of 5 — Business name')
+    name = ''
+    for _ in range(5):
+        name = ask('Type the business name: ').strip()
+        if name and '\n' not in name:
+            break
+        print('  Please type a name.')
+    if not name:
+        raise ValueError('No business name given.')
+    suggested = ROOT.parent / project_slug(name)
+    print('\nStep 2 of 5 — Where to put the copy (a folder that does not exist yet)')
+    destination = ask(f'Folder [{suggested}]: ').strip() or str(suggested)
+    presets = [(slug, slug, json.loads((ROOT / 'data/presets' / f'{slug}.json').read_text()).get('label', ''))
+               for slug in available_presets()]
+    preset = choose(ask, 'Step 3 of 5 — Starting preset (pages and sections you can change later)', presets,
+                    next((i for i, p in enumerate(presets) if p[0] == 'agency'), 0))
+    palettes = json.loads((ROOT / 'data/palettes.json').read_text())
+    palette = choose(ask, 'Step 4 of 5 — Colors (every palette passes contrast checks)',
+                     [(None, 'Preset accent', 'keep the default theme with the preset\'s accent color')]
+                     + [(key, key, p['use']) for key, p in palettes.items()])
+    fonts = json.loads((ROOT / 'data/fonts.json').read_text())
+    pairing = choose(ask, 'Step 5 of 5 — Fonts (self-hosted, open-licensed)',
+                     [(key, key, f['use']) for key, f in fonts.items()])
+    print(f'\nSummary\n  Name:    {name}\n  Folder:  {destination}\n  Preset:  {preset}\n'
+          f'  Colors:  {palette or "preset accent"}\n  Fonts:   {pairing}')
+    if choose(ask, 'Create this copy?', [(True, 'Yes, create it', ''), (False, 'No, cancel', '')]) is not True:
+        print('Cancelled. Nothing was created.')
+        return None
+    return create(destination, name, preset, palette, None if pairing == 'modern' else pairing)
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('destination')
-    parser.add_argument('--name', required=True)
+    parser.add_argument('destination', nargs='?')
+    parser.add_argument('--name')
     parser.add_argument('--preset', choices=available_presets(), default='agency')
     parser.add_argument('--palette', choices=sorted(json.loads((ROOT / 'data/palettes.json').read_text())),
                         help='Color palette from data/palettes.json (contrast-checked); default: the preset accent')
     parser.add_argument('--fonts', choices=sorted(json.loads((ROOT / 'data/fonts.json').read_text())),
                         help='Font pairing from data/fonts.json (self-hosted, open-licensed); default: Inter')
+    parser.add_argument('--guided', action='store_true', help='Answer a few lettered questions instead of passing options')
     args = parser.parse_args()
+    if args.guided:
+        try:
+            destination = guided()
+        except (EOFError, KeyboardInterrupt):
+            parser.exit(1, '\nCancelled. Nothing was created.\n')
+        except (OSError, ValueError) as error:
+            parser.exit(1, f'Not created: {error}\n')
+        if destination:
+            print(f'\nCreated {destination}\n{NEXT_STEPS}')
+        return
+    if not args.destination or not args.name:
+        parser.error('give a destination and --name, or use --guided')
     try:
         destination = create(args.destination, args.name, args.preset, args.palette, args.fonts)
     except (OSError, ValueError) as error:
         parser.exit(1, f'Not created: {error}\n')
-    print(f'Created {destination}\nEdit data/site.yaml and content/. Read README.md.\nNo Git repository, tool binaries, reports, or generated site was copied. Forms stay disabled; noindex stays on.\nNo hosting resources were copied: wrangler.toml is unconfigured and /api/contact refuses submissions until this client declares its own. See docs/cloudflare-setup.md.')
+    print(f'Created {destination}\n{NEXT_STEPS}')
 
 if __name__ == '__main__':
     main()

@@ -6,6 +6,8 @@ The master includes eight business compositions (`agency`, `contractor`, `consul
 
 ## Start a separate copy
 
+Run `python3 scripts/new_site.py --guided` to answer lettered questions instead of typing options.
+
 ```sh
 python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor
 ```

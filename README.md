@@ -157,8 +157,16 @@ The helper scripts also work when called by absolute path from another directory
 
 ## Create a client copy
 
+The easiest way is guided setup. It asks for the name, the folder, the preset, the colors, and the fonts, one question at a time. Each choice is a lettered list, and nothing is created until you confirm the summary:
+
 ```sh
-python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor
+python3 scripts/new_site.py --guided
+```
+
+Or pass everything at once:
+
+```sh
+python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor --palette terracotta --fonts warm
 cd ../cedar-studio
 python3 scripts/setup.py
 python3 scripts/build.py

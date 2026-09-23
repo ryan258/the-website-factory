@@ -63,6 +63,11 @@
 - Optimized self-hosted variable Inter font to 20.5 KB.
 - Integrated automated verification quality gates and local Pages integration tests (`sh scripts/check_contact.sh`) into `.github/workflows/deploy.yml`, gating production releases on explicit owner confirmation (`workflow_dispatch`).
 
+### Milestone 9: Links, Fonts, and Guided Setup (2026-09-23)
+- Section `anchor` ids with validated deep links; validated `mailto:`/`tel:` links rendered as clickable item text; output checks for invalid and Hugo-sanitized (`#ZgotmplZ`) links.
+- Optional heading font, `data/fonts.json` pairings (Source Serif 4, Fraunces, Nunito, Atkinson Hyperlegible Next, Inter; all OFL-1.1), `--fonts`, font validation, and a 90 KB preload budget.
+- `scripts/new_site.py --guided`: one question at a time with lettered choices for preset, palette, and fonts.
+
 ### Milestone 8: AI-Ready Production Tooling (2026-09-23)
 - JSON Schemas for presets and AI plans, generated from the module registry; `--json` results with stable error codes.
 - Claims check (`scripts/claims.py`) with owner approvals; release builds fail on "To be confirmed" placeholders.
@@ -83,11 +88,14 @@
 ## Active & Planned Priorities
 
 ### Open
-- **Link and resource validation (Phase 4):** validate telephone and email links offline, and in-page anchors across composed sections.
-- **Font pairings:** only the self-hosted Inter font ships today. Add licensed, self-hosted pairings alongside `data/palettes.json`.
-- **Interactive onboarding:** a guided prompt mode for `scripts/new_site.py` (preset, palette, navigation).
 - **First live AI runs:** record real drafts for the plumber and food-bank test briefs (`scripts/eval_plans.py --live --record`) and review the scores.
 - **Planner code structure:** `assets/js/workflow.js` is compact and dense. Split it into modules only with a bundler step and the existing `check_workflow.cjs` coverage kept green.
+- **Guided navigation editing:** guided setup picks a preset, palette, and fonts; choosing and ordering pages is still done in the preset JSON or the planner.
+
+### Done in Milestone 9
+- Link and resource validation (Phase 4): section anchors, validated `/page/#anchor` deep links, and validated clickable `mailto:` and `tel:` links, with output checks for bad or unsafe links.
+- Font pairings: five self-hosted, open-licensed pairings with an optional heading font and a preload budget.
+- Interactive onboarding: `new_site.py --guided` with lettered choices and a confirmation step.
 
 ### Done in Milestone 8
 - Phase 5 (form providers): any `https://` form service through `params.formAction`, with the built CSP extended for that origin only.

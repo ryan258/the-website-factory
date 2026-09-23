@@ -107,6 +107,22 @@ class StarterTests(unittest.TestCase):
                     self.assertTrue((dest/'scripts'/name).is_file(),f'npm script needs missing scripts/{name}')
             for kept in ('.mcp.json','requirements-dev.txt','ruff.toml','scripts/mcp_server.py','scripts/handover.py'):
                 self.assertTrue((dest/kept).is_file(),kept)
+    def test_guided_setup_uses_letters_and_confirms_first(self):
+        import json
+        with tempfile.TemporaryDirectory() as tmp:
+            def answers(*replies):
+                queue=list(replies)
+                return lambda prompt: queue.pop(0)
+            # A wrong letter is asked again; blank keeps the default; nothing exists before "Yes".
+            dest=scaffold.guided(answers('Guided Co',str(Path(tmp)/'g'),'Z','clinic','D','','A'))
+            self.assertEqual(json.loads((dest/'data/factory.json').read_text())['preset'],'clinic')
+            self.assertIn('link: "#0b5cb5"',(dest/'data/site.yaml').read_text(),'harbor palette')
+            self.assertIn('family: "Inter"',(dest/'data/site.yaml').read_text())
+            self.assertIsNone(scaffold.guided(answers('Other Co',str(Path(tmp)/'h'),'','','','B')))
+            self.assertFalse((Path(tmp)/'h').exists(),'cancel creates nothing')
+            result=subprocess.run(['python3',str(ROOT/'scripts/new_site.py'),'--guided'],input='Half Co\n',text=True,capture_output=True)
+            self.assertEqual(result.returncode,1)
+            self.assertIn('Nothing was created',result.stderr)
     def test_empty_output_fails(self):
         with tempfile.TemporaryDirectory() as tmp:self.assertTrue(static.check(Path(tmp)))
 if __name__=='__main__':unittest.main()
