@@ -153,7 +153,7 @@ def create(destination, name, preset="agency"):
         text = re.sub(r'^\s*formEnabled\s*=.*$', '  formEnabled = false', text, flags=re.M)
         text = re.sub(r'^\s*noindex\s*=.*$', '  noindex = true', text, flags=re.M)
         conf.write_text(text)
-        (destination / 'docs/acceptance.md').write_text('# New instance: not yet verified\n\nNo source-project performance or accessibility results apply to this instance. Run the local checks and review all sample content before publication. No deployment or form delivery has been performed.\n')
+        (destination / 'docs/acceptance.md').write_text('# New instance: not yet verified\n\nNo source-project performance or accessibility results apply to this instance. Run the local checks and review all sample content before publication. No deployment or form delivery has been performed.\n\nWhen the site is ready for review, replace this file with a fresh report:\n\n    python3 scripts/handover.py --build --output docs/acceptance.md\n')
     except Exception:
         shutil.rmtree(destination)
         raise

@@ -1,0 +1,77 @@
+name: Preview Deployment
+
+# Manual only. Publishes a checked preview to a Cloudflare Pages preview alias, never to
+# production: https://preview-site.258webco.pages.dev or https://preview-workshop.258webco.pages.dev.
+# Previews always keep noindex on and the contact form off. Anyone with the link can open
+# them; protect *.258webco.pages.dev with Cloudflare Access if the workshop must stay private.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'What to preview'
+        required: true
+        type: choice
+        options:
+          - site
+          - workshop
+        default: site
+
+concurrency:
+  group: preview-${{ inputs.target }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Build, Check, and Publish Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.166.0'
+          extended: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Dart Sass
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/setup.py
+
+      - name: Build Preview (noindex, form off)
+        env:
+          TARGET: ${{ inputs.target }}
+        run: |
+          rm -rf public public-workshop
+          if [ "$TARGET" = "workshop" ]; then
+            HUGO_PARAMS_NOINDEX=true HUGO_PARAMS_FORMENABLED=false python3 scripts/build.py --workshop
+            echo "OUTPUT=public-workshop" >> "$GITHUB_ENV"
+          else
+            HUGO_PARAMS_NOINDEX=true HUGO_PARAMS_FORMENABLED=false python3 scripts/build.py
+            echo "OUTPUT=public" >> "$GITHUB_ENV"
+          fi
+
+      - name: Verify Preview Output
+        run: |
+          HUGO_PARAMS_NOINDEX=true python3 scripts/check_site.py "$OUTPUT"
+          if grep -rq 'action=/api/contact' "$OUTPUT" --include=index.html; then
+            echo "::error::A preview must never be built with the contact form on."
+            exit 1
+          fi
+
+      - name: Publish to Preview Alias
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ${{ env.OUTPUT }} --project-name=258webco --branch=preview-${{ inputs.target }}

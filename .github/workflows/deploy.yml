@@ -81,6 +81,8 @@ jobs:
           python3 scripts/test_ai.py
           python3 scripts/test_mcp.py
           python3 scripts/test_evals.py
+          python3 scripts/test_handover.py
+          node scripts/visual_check.cjs --self-test
           node scripts/test_contact_endpoint.mjs
 
       - name: Lint Python and JavaScript
