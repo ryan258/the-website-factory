@@ -210,31 +210,23 @@ def main():
     if args.name:
         slug = slugify(args.name)
 
-    # Test validation
-    target_preset_path = ROOT / 'data/presets' / f"{slug}.json"
-    temp_target = target_preset_path.with_suffix('.tmp.json')
-    temp_target.write_text(json.dumps(preset, indent=2) + '\n')
-    
-    try:
-        # Validate against factory rules
+    # Validate against factory rules in-memory
+    errors = validate(ROOT, extra_presets={slug: preset})
+    if errors:
+        print("Validation errors in generated preset:", file=sys.stderr)
+        for err in errors:
+            print(f"  - {err}", file=sys.stderr)
+        return 1
+
+    if args.write:
+        target_preset_path = ROOT / 'data/presets' / f"{slug}.json"
+        temp_target = target_preset_path.with_suffix('.tmp.json')
+        temp_target.write_text(json.dumps(preset, indent=2) + '\n')
         temp_target.replace(target_preset_path)
-        errors = validate(ROOT)
-        if errors:
-            print("Validation errors in generated preset:", file=sys.stderr)
-            for err in errors:
-                print(f"  - {err}", file=sys.stderr)
-            if not args.write and target_preset_path.exists():
-                target_preset_path.unlink(missing_ok=True)
-            return 1
-        
-        if args.write:
-            print(f"Preset successfully compiled and verified: {target_preset_path}")
-        else:
-            target_preset_path.unlink(missing_ok=True)
-            print(json.dumps(preset, indent=2))
-        return 0
-    finally:
-        temp_target.unlink(missing_ok=True)
+        print(f"Preset successfully compiled and verified: {target_preset_path}")
+    else:
+        print(json.dumps(preset, indent=2))
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())

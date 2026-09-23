@@ -49,14 +49,9 @@ class FromPlanTests(unittest.TestCase):
         self.assertIn("contact", preset["pages"])
         self.assertTrue(any(s["module"] == "services" for pg in preset["pages"].values() for s in pg["sections"]))
         
-        # Test validation against factory rules
-        target = ROOT / 'data/presets' / f"{slug}.json"
-        try:
-            target.write_text(json.dumps(preset, indent=2) + '\n')
-            errors = validate(ROOT)
-            self.assertEqual(errors, [], f"Validation failed with: {errors}")
-        finally:
-            target.unlink(missing_ok=True)
+        # Test validation against factory rules in-memory
+        errors = validate(ROOT, extra_presets={slug: preset})
+        self.assertEqual(errors, [], f"Validation failed with: {errors}")
 
     def test_convert_plan_with_missing_hero_and_services(self):
         plan = {
@@ -78,13 +73,49 @@ class FromPlanTests(unittest.TestCase):
         home_sections = preset["pages"]["home"]["sections"]
         self.assertEqual(home_sections[0]["module"], "hero", "First section on every page must be hero")
         
-        target = ROOT / 'data/presets' / f"{slug}.json"
-        try:
-            target.write_text(json.dumps(preset, indent=2) + '\n')
-            errors = validate(ROOT)
-            self.assertEqual(errors, [], f"Validation failed with: {errors}")
-        finally:
-            target.unlink(missing_ok=True)
+        # Test validation against factory rules in-memory
+        errors = validate(ROOT, extra_presets={slug: preset})
+        self.assertEqual(errors, [], f"Validation failed with: {errors}")
+
+    def test_preview_colliding_slug_preserves_existing_preset(self):
+        import hashlib
+        import subprocess
+
+        # Target existing preset
+        target = ROOT / 'data/presets/agency.json'
+        original_bytes = target.read_bytes()
+        original_hash = hashlib.sha256(original_bytes).hexdigest()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            # 1. Valid plan preview with colliding slug
+            valid_plan_file = Path(tmp) / 'valid_plan.json'
+            valid_plan_file.write_text(json.dumps({
+                "name": "Agency Collision Test",
+                "pages": [{"name": "Home", "sections": [{"kind": "hero", "title": "Hero", "body": "Body"}]}]
+            }))
+            res = subprocess.run([
+                sys.executable, str(ROOT / 'scripts/from_plan.py'),
+                str(valid_plan_file), '--name', 'agency'
+            ], capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, f"Expected 0, got {res.returncode}: {res.stderr}")
+            self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(), original_hash,
+                             "Existing preset must not be modified or deleted during valid plan preview")
+
+            # 2. Invalid plan preview with colliding slug
+            invalid_plan_file = Path(tmp) / 'invalid_plan.json'
+            # Tone or page structure invalid
+            invalid_plan_file.write_text(json.dumps({
+                "name": "Invalid Plan",
+                "tone": "nonexistent_tone_123",
+                "pages": []
+            }))
+            res_invalid = subprocess.run([
+                sys.executable, str(ROOT / 'scripts/from_plan.py'),
+                str(invalid_plan_file), '--name', 'agency'
+            ], capture_output=True, text=True)
+            self.assertEqual(res_invalid.returncode, 1, "Expected validation failure code 1")
+            self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(), original_hash,
+                             "Existing preset must not be modified or deleted during invalid plan preview")
 
 if __name__ == '__main__':
     unittest.main()

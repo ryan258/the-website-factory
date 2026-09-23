@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def read(path):
     return json.loads(path.read_text())
 
-def validate(root=ROOT, workshop=None):
+def validate(root=ROOT, workshop=None, extra_presets=None):
     errors = []
     try:
         config = read(root / 'data/factory.json')
@@ -18,6 +18,8 @@ def validate(root=ROOT, workshop=None):
             config['workshop'] = workshop
         registry = read(root / 'data/modules.json')
         profiles = {p.stem: read(p) for p in (root / 'data/presets').glob('*.json')}
+        if extra_presets:
+            profiles.update(extra_presets)
         examples = read(root / 'data/examples.json') if config.get('workshop') else {}
     except (OSError, ValueError) as error:
         return [str(error)]
