@@ -50,6 +50,8 @@ jobs:
         run: npm ci
 
       - name: Setup Dart Sass
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/setup.py
 
       - name: Build Safe Verification Baseline
@@ -86,6 +88,10 @@ jobs:
     needs: verify
     if: github.event_name == 'workflow_dispatch' && inputs.confirm_release == true
     runs-on: ubuntu-latest
+    # A newer release waits for the running one instead of racing it to Cloudflare.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
     permissions:
       contents: read
       deployments: write
@@ -116,6 +122,8 @@ jobs:
         run: npm ci
 
       - name: Setup Dart Sass
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/setup.py
 
       - name: Build Production Site (258webco)

@@ -73,7 +73,7 @@
     },
     "contact": {
       "title": "Contact",
-      "description": "Tell us about your project. We reply in one business day. This demonstration sends nothing.",
+      "description": "Tell us about your project. We reply by email.",
       "sections": [
         {
           "module": "hero",
@@ -110,32 +110,6 @@
           "module": "cta",
           "variant": "band",
           "content": "cta"
-        }
-      ]
-    },
-    "pricing": {
-      "title": "Pricing",
-      "description": "Three clear plans with sample prices. No hidden fees. Real fees require a proposal.",
-      "sections": [
-        {
-          "module": "hero",
-          "variant": "compact",
-          "content": "intro-pricing"
-        },
-        {
-          "module": "pricing",
-          "variant": "cards",
-          "content": "pricing"
-        },
-        {
-          "module": "comparison",
-          "variant": "table",
-          "content": "comparison"
-        },
-        {
-          "module": "faq",
-          "variant": "accordion",
-          "content": "faq-pricing"
         }
       ]
     }
@@ -290,11 +264,11 @@
     },
     "faq": {
       "label": "Before we begin",
-      "title": "Six questions we are asked most.",
+      "title": "Six common questions.",
       "items": [
         {
           "title": "How long does a website take?",
-          "text": "A focused landing page typically takes two to three weeks. A five-page site is usually three to five weeks after content and scope are agreed. These are sample timelines, not a delivery guarantee."
+          "text": "A focused landing page usually takes two to three weeks. A five-page site usually takes three to five weeks after content and scope are agreed. These are estimates, not a guarantee."
         },
         {
           "title": "What do you need from us?",
@@ -306,7 +280,7 @@
         },
         {
           "title": "Will we be able to edit the site?",
-          "text": "Content is stored in plain text and structured data files. This sample project has no CMS; an editing workflow would be agreed before a real build."
+          "text": "Content is stored in plain text and structured data files. There is no CMS by default. If you want to edit the site yourself, we agree on an editing workflow before the build starts."
         },
         {
           "title": "What happens after launch?",
@@ -317,45 +291,6 @@
           "text": "No. We build against a small performance budget and test the result. The hosting environment, content, and later changes can affect scores."
         }
       ]
-    },
-    "pricing": {
-      "label": "Ways to work together",
-      "title": "Three plans. No hidden fees.",
-      "intro": "Transparent investment for small businesses. Final scope and deliverables confirmed in writing.",
-      "items": [
-        {
-          "title": "Starter",
-          "value": "$2,400",
-          "text": "One focused page. A strong first impression. Sample timing: 2\u20133 weeks.",
-          "bullets": [
-            "One landing page",
-            "Mobile design",
-            "Contact form"
-          ]
-        },
-        {
-          "title": "Standard",
-          "value": "$6,800",
-          "badge": "Most popular",
-          "text": "A complete site, built around your business. Sample timing: 3\u20135 weeks.",
-          "bullets": [
-            "Up to five pages",
-            "Custom design",
-            "Speed report"
-          ]
-        },
-        {
-          "title": "Custom",
-          "value": "Quote",
-          "text": "More moving parts. One considered plan. Timing agreed in the proposal.",
-          "bullets": [
-            "Larger websites",
-            "Design systems",
-            "Ongoing care"
-          ]
-        }
-      ],
-      "notice": "Fixed-price scopes and monthly care plans with zero lock-in."
     },
     "areas": {
       "label": "Close to home",
@@ -393,22 +328,22 @@
     },
     "stats": {
       "label": "Proof, not adjectives",
-      "title": "Measured on this page.",
+      "title": "Check this page yourself.",
       "items": [
         {
-          "title": "Largest Contentful Paint, mobile",
-          "text": "1.5 s"
+          "title": "Tracking and analytics scripts",
+          "text": "0"
         },
         {
-          "title": "Lighthouse performance, mobile",
-          "text": "100"
+          "title": "Requests to other websites",
+          "text": "0"
         },
         {
-          "title": "From agreed brief to launch",
-          "text": "14 days"
+          "title": "JavaScript on this page",
+          "text": "0 KB"
         }
       ],
-      "notice": "Sample figures. The two speed numbers come from a Lighthouse mobile run of this demonstration build; the timeline is illustrative, not a delivery guarantee."
+      "notice": "Open your browser\u2019s developer tools and look at the Network tab. Every file on this page comes from this site."
     },
     "cta": {
       "label": "Your next chapter",
@@ -422,16 +357,8 @@
     "contact": {
       "label": "Start here",
       "title": "Good projects start with a hello.",
-      "intro": "Tell us what you have in mind, what you need, and any constraints. We reply within one business day. This demonstration does not send messages.",
+      "intro": "Tell us what you have in mind, what you need, and any constraints. We reply by email.",
       "items": [
-        {
-          "title": "Email",
-          "text": "hello@example.invalid"
-        },
-        {
-          "title": "Office hours",
-          "text": "Monday to Friday, 9 am to 5 pm Central. Sample hours."
-        },
         {
           "title": "Based in",
           "text": "Chicago, IL \u00b7 Remote nationwide"
@@ -441,7 +368,7 @@
           "text": "Your goals, the work you need, and any relevant timing."
         }
       ],
-      "notice": "Direct founder communication. Submissions answered within one business day."
+      "notice": "Direct founder communication. You talk with the person who builds your site."
     },
     "resources": {
       "label": "Useful starting points",
@@ -458,31 +385,6 @@
           "url": "/services/"
         }
       ]
-    },
-    "comparison": {
-      "label": "Choose with confidence",
-      "title": "What each plan includes.",
-      "items": [
-        {
-          "title": "Starter",
-          "text": "One page, adapted foundation.",
-          "scope": "One landing page \u00b7 mobile design \u00b7 contact form \u00b7 basic checks",
-          "best": "A new business with one clear offer"
-        },
-        {
-          "title": "Standard",
-          "text": "Up to five pages, custom design.",
-          "scope": "Up to five pages \u00b7 custom design \u00b7 full speed report",
-          "best": "An established business with services to explain"
-        },
-        {
-          "title": "Custom",
-          "text": "Scoped in the proposal.",
-          "scope": "Larger sites \u00b7 design systems \u00b7 ongoing care as scoped",
-          "best": "A business with more moving parts"
-        }
-      ],
-      "notice": "Illustrative scope comparison. A proposal defines the actual deliverables."
     },
     "before-after": {
       "label": "The difference",
@@ -513,12 +415,12 @@
     "intro-contact": {
       "label": "A digital studio",
       "title": "Let\u2019s start a conversation.",
-      "intro": "Tell us about your project. We reply in one business day. This demonstration sends nothing.",
+      "intro": "Tell us about your project. We reply by email.",
       "action": {
         "label": "Get in touch",
         "url": "/contact/"
       },
-      "note": "Direct collaboration \u00b7 Fast turnaround",
+      "note": "Direct collaboration",
       "art": "factory"
     },
     "intro-work": {
@@ -530,17 +432,6 @@
         "url": "/contact/"
       },
       "note": "Production projects \u00b7 Measured results",
-      "art": "factory"
-    },
-    "intro-pricing": {
-      "label": "A digital studio",
-      "title": "What a website costs here.",
-      "intro": "Three clear plans with sample prices. No hidden fees. Real fees require a proposal.",
-      "action": {
-        "label": "Get in touch",
-        "url": "/contact/"
-      },
-      "note": "Clear deliverables \u00b7 Predictable investment",
       "art": "factory"
     },
     "services-preview": {
@@ -602,24 +493,6 @@
         {
           "title": "Launch",
           "text": "After your approval we verify the forms and the speed scores on the real host, then hand over the source and a short guide."
-        }
-      ]
-    },
-    "faq-pricing": {
-      "label": "Payment and timing",
-      "title": "How the money and the calendar work.",
-      "items": [
-        {
-          "title": "When would payment be due?",
-          "text": "A sample arrangement is 50% to begin and 50% at handover. Any real payment terms would be confirmed in a written proposal."
-        },
-        {
-          "title": "When does the timeline start?",
-          "text": "After scope, content, and the initial payment are agreed. Feedback delays or additional pages can change the schedule."
-        },
-        {
-          "title": "What costs are separate?",
-          "text": "Domain registration, hosting, ongoing care, and new work outside the agreed scope. We would list each separately before you proceed."
         }
       ]
     }

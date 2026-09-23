@@ -17,7 +17,7 @@ def noindex_expected():
     return os.environ.get('HUGO_PARAMS_NOINDEX', found.group(1) if found else 'true').lower() not in ('false', '0', 'no')
 class Page(HTMLParser):
     def __init__(self):
-        super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]
+        super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]; self.loads=[]
     def handle_starttag(self, tag, attrs):
         a=dict(attrs)
         if tag=='h1': self.h1+=1
@@ -26,8 +26,9 @@ class Page(HTMLParser):
         if tag=='meta': self.meta[a.get('name','')]=a.get('content','')
         if tag=='link' and a.get('rel')=='canonical': self.canonical=a.get('href','')
         if tag=='a' and a.get('href'): self.refs.append(a['href'])
-        if tag in ('img','script') and a.get('src'): self.refs.append(a['src'])
-        if tag=='link' and a.get('rel') in ('stylesheet','preload','icon','apple-touch-icon'): self.refs.append(a.get('href',''))
+        if tag in ('img','script') and a.get('src'): self.refs.append(a['src']); self.loads.append(a['src'])
+        if tag=='link' and a.get('rel') in ('stylesheet','preload','icon','apple-touch-icon'): self.refs.append(a.get('href','')); self.loads.append(a.get('href',''))
+        if tag in ('img','source') and a.get('srcset'): self.loads+=[c.split()[0] for c in a['srcset'].split(',') if c.strip()]
     def handle_endtag(self, tag):
         if tag=='title': self.in_title=False
     def handle_data(self, value):
@@ -53,6 +54,10 @@ def check(output, noindex=None):
         if not noindex and p.meta.get('robots')=='noindex':errors.append(f'{label}: noindex present in an indexable build')
         if len(set(p.ids))!=len(p.ids):errors.append(f'{label}: duplicate IDs')
         base=urlparse(p.canonical)
+        # The CSP in static/_headers allows only this site's own files; catch any other origin here.
+        for ref in p.loads:
+            u=urlparse(ref)
+            if (u.scheme or u.netloc) and u.netloc!=base.netloc:errors.append(f'{label}: loads a file from another site: {ref}')
         rel=file.relative_to(output).as_posix()
         suffix='/' if rel=='index.html' else '/'+rel.removesuffix('index.html')
         prefix=base.path[:-len(suffix)] if base.path.endswith(suffix) else ''

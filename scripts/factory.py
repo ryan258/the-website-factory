@@ -27,6 +27,12 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         errors.append('data/factory.json: unknown selected preset')
     if type(config.get('workshop')) is not bool:
         errors.append('data/factory.json: workshop must be true or false')
+    # The header, footer, titles, and structured data read data/site.yaml, while the pages read
+    # the preset. A mismatch published one business's pages under another's name, so it fails.
+    named=re.search(r'(?m)^name:\s*(.+?)\s*$', (root/'data/site.yaml').read_text()) if (root/'data/site.yaml').is_file() else None
+    site_name=json.loads(named.group(1)) if named and named.group(1).startswith('"') else (named.group(1) if named else None)
+    if config.get('preset') in profiles and site_name!=profiles[config['preset']].get('name'):
+        errors.append(f"data/site.yaml: name {site_name!r} must match the selected preset's name {profiles[config['preset']].get('name')!r}")
     def check_content(module, content, label, profile=None):
         if not isinstance(content, dict):
             errors.append(f'{label}: content must be an object'); return
@@ -88,9 +94,11 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
             errors.append(f'{slug}: a services module is required somewhere; the contact form offers its items as project types')
         for key,page in profile['pages'].items():
             if not re.fullmatch(r'[a-z][a-z0-9-]*',key): errors.append(f'{slug}: invalid page key {key}')
+            if not isinstance(page,dict):
+                errors.append(f'{slug}/{key}: page must be an object'); continue
             sections=page.get('sections')
-            if not isinstance(sections,list) or not sections:
-                errors.append(f'{slug}/{key}: sections must be a nonempty list'); continue
+            if not isinstance(sections,list) or not sections or not all(isinstance(s,dict) for s in sections):
+                errors.append(f'{slug}/{key}: sections must be a nonempty list of objects'); continue
             if not all(page.get(k) for k in ('title','description')): errors.append(f'{slug}/{key}: title and description required')
             if sections[0].get('module')!='hero' or sum(s.get('module')=='hero' for s in sections)!=1:
                 errors.append(f'{slug}/{key}: exactly one hero must be first')
@@ -140,7 +148,7 @@ def apply_preset(destination, slug, name):
     site=root/'data/site.yaml';text=site.read_text()
     navigation=[dict(label=p['title'],url='/' if k=='home' else '/'+k+'/') for k,p in profile['pages'].items()]
     text=re.sub(r'^navigation:\n(?:[ \t].*\n)*', lambda _: 'navigation: '+json.dumps(navigation)+'\n',text,flags=re.M)
-    values=dict(description=f'{name}: sample business website. Content awaits review.',tagline=profile['label'],address='Example business · Details awaiting confirmation',email='hello@example.invalid',hours='Hours to be confirmed',location='Service location to be confirmed')
+    values=dict(notice='Preview · Content awaiting review',description=f'{name}: sample business website. Content awaits review.',tagline=profile['label'],address='Example business · Details awaiting confirmation',email='hello@example.invalid',hours='Hours to be confirmed',location='Service location to be confirmed')
     for key,value in values.items(): text=re.sub(r'^'+key+r':.*$',lambda _:key+': '+json.dumps(value),text,flags=re.M)
     # Remove agency-specific footer/legacy copy from the client source.
     text=re.sub(r'^cta:\n(?:[ \t].*\n)*',lambda _: 'cta: '+json.dumps(dict(label='Your next step',heading='Let’s talk about what you need.'))+'\n',text,flags=re.M)

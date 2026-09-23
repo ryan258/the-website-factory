@@ -63,6 +63,7 @@ export async function onRequestPost({request, env}) {
     try {
       const res = await fetch(env.NOTIFICATION_WEBHOOK, {
         method: 'POST',
+        signal: AbortSignal.timeout(10000),
         headers: {'content-type': 'application/json'},
         body: JSON.stringify({
           text: `New website enquiry from ${enquiry.name} (${enquiry.email}):\n${enquiry.message}`,

@@ -189,6 +189,19 @@ check('a failed webhook and failed email with no store is refused', async () => 
   }
 });
 
+check('a stored enquiry is still acknowledged when the webhook fails', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => new Response('down', {status: 500});
+    const ENQUIRY = store();
+    const response = await post({...ENABLED, ENQUIRY, NOTIFICATION_WEBHOOK: 'https://webhook.invalid/notify'});
+    assert.equal(response.status, 200);
+    assert.equal(ENQUIRY.written.filter(([key]) => key.startsWith('enquiry:')).length, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 check('middleware hides dotfiles but serves /.well-known/', async () => {
   const visit = path => middleware({request: new Request('https://example.invalid' + path),
     next: async () => new Response('served', {status: 200})});
@@ -204,5 +217,5 @@ for (const [name, fn] of cases) {
 }
 console.log(failures
   ? `Contact endpoint checks FAILED: ${failures} of ${cases.length}`
-  : `Contact endpoint checks passed: ${cases.length} cases, including storage failure, notification failure, and unopened intake.`);
+  : `Contact endpoint checks passed: ${cases.length} cases, including storage failure, notification failure, webhook errors, unopened intake, and dotfile protection.`);
 process.exitCode = failures ? 1 : 0;

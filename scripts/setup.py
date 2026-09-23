@@ -3,6 +3,7 @@
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import platform
 import tarfile
@@ -14,7 +15,11 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 def fetch(url):
-    request = urllib.request.Request(url, headers={'User-Agent': 'website-starter-setup'})
+    headers = {'User-Agent': 'website-starter-setup'}
+    # Unauthenticated GitHub API calls are rate-limited per IP, which shared CI runners hit.
+    if os.environ.get('GITHUB_TOKEN') and url.startswith('https://api.github.com/'):
+        headers['Authorization'] = f"Bearer {os.environ['GITHUB_TOKEN']}"
+    request = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(request, timeout=60) as response:
         return response.read()
 

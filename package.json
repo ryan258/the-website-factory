@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Optional local website quality tools; not required for Hugo builds",
+  "type": "module",
   "scripts": {
     "check:browser": "node scripts/browser-checks.cjs",
     "audit": "node scripts/audit.mjs",

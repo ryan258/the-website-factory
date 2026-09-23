@@ -13,6 +13,8 @@ import build
 import check_site
 
 ROOT=Path(__file__).resolve().parents[1]
+MASTER_NAME=json.loads((ROOT/'data/presets'/(json.loads((ROOT/'data/factory.json').read_text())['preset']+'.json')).read_text())['name']
+
 class FactoryTests(unittest.TestCase):
     def command(self, root, *args, ok=True):
         result=subprocess.run(['python3',str(root/'scripts/build.py'),*args],env=build.environment(),capture_output=True,text=True)
@@ -33,7 +35,7 @@ class FactoryTests(unittest.TestCase):
                         self.assertFalse((output/'site-kit/index.html').exists())
                         home=(output/'index.html').read_text()
                         self.assertNotIn('site-kit/',home)
-                        self.assertNotIn('TheWebsiteFactory',home)
+                        self.assertNotIn(MASTER_NAME,home)
                         original_name=json.loads((ROOT/'data/presets'/f'{slug}.json').read_text())['name']
                         for page in output.rglob('*.html'):
                             self.assertNotIn(original_name,page.read_text(),str(page))
@@ -186,4 +188,15 @@ class FactoryTests(unittest.TestCase):
             # A clean destination still publishes, and an unchanged rebuild is accepted.
             dest=Path(tmp)/'clean';build.publish_output(source,dest);build.publish_output(source,dest)
             self.assertEqual((dest/'index.html').read_text(),'new')
+    def test_site_name_must_match_selected_preset(self):
+        with tempfile.TemporaryDirectory(prefix='factory-identity-') as tmp:
+            dest=new_site.create(Path(tmp)/'client','Review Studio','contractor')
+            site=dest/'data/site.yaml';site.write_text(site.read_text().replace('name: "Review Studio"','name: "Some Other Studio"',1))
+            self.assertTrue(any('must match the selected preset' in e for e in factory.validate(dest)))
+    def test_checker_rejects_files_from_other_sites(self):
+        with tempfile.TemporaryDirectory(prefix='factory-origin-') as tmp:
+            page=Path(tmp)/'index.html'
+            page.write_text('<title>T</title><meta name="description" content="D"><link rel="canonical" href="https://example.invalid/">'
+                            '<h1>H</h1><script src="https://tracker.example.com/t.js"></script>')
+            self.assertTrue(any('another site' in e for e in check_site.check(Path(tmp),noindex=False)))
 if __name__=='__main__': unittest.main()
