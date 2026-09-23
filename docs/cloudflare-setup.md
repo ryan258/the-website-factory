@@ -35,8 +35,9 @@ That folder is generated output. Nothing you wrote by hand lives in it.
 
 ## Step 1 — Let Claude talk to Cloudflare
 
-The Cloudflare MCP server is already added to your Claude Code config. It is not
-logged in yet. In Claude Code, type:
+This step is optional. It only applies if the Cloudflare MCP server is in your own
+Claude Code config (it is not in this project's `.mcp.json`). If it is, log it in. In
+Claude Code, type:
 
 ```
 /mcp
@@ -240,8 +241,10 @@ Open that address in a browser. The site should be there. Go to the contact page
 send yourself a real test enquiry. Then check it arrived:
 
 ```sh
-npx wrangler kv key list --binding ENQUIRY --remote
+npx wrangler kv key list --binding ENQUIRY --remote --prefix enquiry:
 ```
+
+The `--prefix` hides the rate-limit counters that share this store.
 
 **You should see:** one entry, starting with `enquiry:` and today's date. To view the
 submitted message content:

@@ -45,9 +45,9 @@ The section editor separates missing, draft, and approved copy. Editing a sectio
 
 Projects are saved in browser local storage on the current origin (including the port). The status line reports success or failure. Export a JSON backup to move work between browsers or addresses. Import creates a separate project, validates its structure, and clears review confirmations. A Markdown design brief contains the page plan, copy, content states, and open questions. These are planning artifacts, not generated Hugo client sites.
 
-The AI copy control prepares a prompt from the brief and selected section. No model or external service is connected. Paste a proposed response, review it, and apply it as draft; proposals are saved separately until applied. Business facts and approval remain under operator control.
+The AI copy control prepares a prompt from the brief and selected section. The planner itself connects to no model or external service. Paste a proposed response, review it, and apply it as draft; proposals are saved separately until applied. Business facts and approval remain under operator control.
 
-The component catalog moved to `/site-kit/catalog/`; the style guide and preset references remain available from it. Exported JSON project plans can now be compiled directly into validated factory presets using `scripts/from_plan.py` (`python3 scripts/from_plan.py export.json --name client-preset --write`). Direct AI integration, shared remote storage, and full automated launch workflows remain subsequent work.
+The component catalog moved to `/site-kit/catalog/`; the style guide and preset references remain available from it. Exported JSON project plans can now be compiled directly into validated factory presets using `scripts/from_plan.py` (`python3 scripts/from_plan.py export.json --name client-preset --write`). Outside the planner, `scripts/draft_plan.py` drafts a plan from a written brief with the Claude API (a paid call), and `scripts/factory_run.py` goes from a brief or plan to a checked client copy. See the README's **AI and agent tools**. Shared remote storage for the planner and automated launches are not planned; see `roadmap.md`.
 
 ### Focused verification
 

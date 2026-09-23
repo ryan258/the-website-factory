@@ -10,11 +10,11 @@ The operating cycle is **brief → scope → assemble → client review → veri
 
 This adopts the master-and-sculpt approach used in the sibling `jones-construction` project. Shared patterns can inform this implementation; contractor-specific content, business claims, approvals, and integrations must remain specific to their client.
 
-**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, eight business presets, five contrast-checked palettes, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact; the live `258webco` preset has Home, Services, Contact, and Privacy.
+**Available now:** 30 module families with 61 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, eight business presets, five contrast-checked palettes, five self-hosted font pairings, guided client setup, AI and agent tools, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. The other presets start with Home, Services, About, and Contact; the live `258webco` preset has Home, Services, Contact, and Privacy.
 
 **Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/` to create or resume a client project. Work through its brief, page plan, wireframe copy, review, and design handoff. Exported project plans can be compiled directly into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, consultant, local-service, clinic, restaurant, and non-profit compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
-See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical client plays, vertical presets, and monetization ideas. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
+See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical, paid uses: monthly care plans, local-business builds, rescue work, and AI-assisted production. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
 
 ## The kitchen-sink master
 
@@ -24,7 +24,7 @@ The library includes these section families:
 
 | Family | Intended options |
 | --- | --- |
-| Hero and introduction | Text-led, split image, project-led, and compact introductions |
+| Hero and introduction | Split with artwork, centered, and compact introductions |
 | Services | Cards, detailed service sections, comparisons, and related services |
 | Features and capabilities | 3-column feature cards with bullets and alternating split graphic rows |
 | Work and proof | Project galleries, case studies, before/after comparisons, testimonials, and supported results |
@@ -113,6 +113,9 @@ Client copies must start without inherited approvals, historical performance gua
 | Handover report | `scripts/handover.py` |
 | Visual regression screenshots (local) | `scripts/visual_check.cjs` |
 | Color palettes and contrast check | `data/palettes.json`, `scripts/contrast.py` |
+| Font pairings (self-hosted, with licenses) | `data/fonts.json`, `static/fonts/` |
+| Client copies, including guided setup | `scripts/new_site.py` |
+| Link, anchor, and mailto/tel tests | `scripts/test_links.py` |
 | Manual preview deploys | `.github/workflows/preview.yml` |
 
 ## AI and agent tools
@@ -215,7 +218,8 @@ python3 scripts/test_ai.py         # AI drafting against a local stand-in API
 python3 scripts/test_mcp.py
 python3 scripts/test_evals.py
 python3 scripts/test_handover.py
-python3 scripts/test_library.py    # palettes, outside form services, llms.txt
+python3 scripts/test_library.py    # palettes, fonts, outside form services, llms.txt
+python3 scripts/test_links.py      # anchors, deep links, mailto/tel links
 python3 scripts/contrast.py
 node scripts/test_contact_endpoint.mjs
 sh scripts/check_contact.sh

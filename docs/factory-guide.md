@@ -37,8 +37,9 @@ Running without `--write` previews the validated preset JSON to stdout and valid
 
 `data/factory.json` selects the preset. Its `workshop` flag controls whether the review catalog is included by the build helper. The selected `data/presets/<preset>.json` contains:
 
-- `name`, `label`, and `tone`: the composition identity. Tone is `yellow`, `clay`, `sage`, or `blue`.
-- `pages`: page title, description, and ordered section declarations. `home` and `contact` are required.
+- `name`, `label`, and `tone`: the composition identity. Tone is `yellow`, `clay`, `sage`, or `blue`. `name` must match `name` in `data/site.yaml`.
+- `approved_claims` (optional): claims the business has confirmed. See `scripts/claims.py`.
+- `pages`: page title, description, and ordered section declarations. `home` and `contact` are required, and some page must include a `services` section (the contact form offers its items).
 - `sections`: the editorial content referenced by those declarations.
 
 For example, an About section can be inserted after services:
@@ -73,12 +74,12 @@ Client contact pages retain the existing accessible form. Its service choices co
 python3 scripts/factory.py
 python3 scripts/build.py
 python3 scripts/check_site.py
-python3 scripts/test_factory.py
-python3 scripts/test_from_plan.py
-node scripts/test_contact_endpoint.mjs
+python3 scripts/claims.py
+npm test            # all unit and contract tests
+npm run lint
 sh scripts/check_contact.sh
-node scripts/check_components.cjs
-node scripts/check_workflow.cjs
+python3 scripts/build.py --workshop
+node scripts/check_workshop.cjs && node scripts/check_components.cjs && node scripts/check_workflow.cjs
 ```
 
 Use the targeted browser checks documented in the README for changed routes. Check narrow screens, keyboard use, both color modes, and a no-JavaScript visit. Performance reports and automated accessibility results apply only to the measured output, never every future composition.

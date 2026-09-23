@@ -10,7 +10,7 @@ Choose a family to see its purpose and required content before adding a blank se
 | Included and outside scope | Columns, stacked | Understand what is included and what needs separate agreement |
 | Preparation checklist | Checklist, ordered | Know what to gather before a conversation or appointment |
 | Opening hours | Table, list | Find the regular schedule and exceptions |
-| Plan your visit | Definitions, cards | Understand directions, arrival, and access arrangements |
+| Plan your visit | Details, cards | Understand directions, arrival, and access arrangements |
 | Menu or service list | Table, cards | Read item details and confirmed price or scope information |
 | Events and sessions | Agenda, cards | Find the date, location, and participation conditions |
 | Practical policies | Accordion, open | Read relevant approved conditions before committing |
