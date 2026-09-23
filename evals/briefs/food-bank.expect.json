@@ -1,0 +1,8 @@
+{
+  "min_pages": 3,
+  "max_pages": 6,
+  "required_modules": ["hero", "services", "contact"],
+  "must_mention": ["volunteer", "no paperwork"],
+  "must_not_mention": ["$", "people each week", "families each week", "donate money"],
+  "must_mark_unknown": ["collection"]
+}

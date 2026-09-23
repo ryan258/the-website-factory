@@ -1,0 +1,8 @@
+{
+  "min_pages": 3,
+  "max_pages": 6,
+  "required_modules": ["hero", "services", "contact", "process"],
+  "must_mention": ["water heater", "drain"],
+  "must_not_mention": ["certified", "licensed", "$", "best", "years"],
+  "must_mark_unknown": ["emergency", "neighborhood"]
+}
