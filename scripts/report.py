@@ -10,6 +10,9 @@ import sys
 
 # First match wins. Keep patterns in step with the messages the checkers print.
 CODES = [
+    (r'replaced as unsafe', 'OUTPUT_UNSAFE_URL'),
+    (r'link to missing anchor|anchor .* must be|share an anchor', 'CONTENT_ANCHOR_INVALID'),
+    (r'mailto link|tel link', 'CONTENT_CONTACT_LINK_INVALID'),
     (r'unknown selected preset', 'PRESET_UNKNOWN'),
     (r'workshop must be true or false', 'CONFIG_WORKSHOP_INVALID'),
     (r"data/site\.yaml: name .* must match", 'SITE_NAME_MISMATCH'),

@@ -31,9 +31,11 @@ def preset_schema(registry, tones):
     action = {'$ref': '#/$defs/action'}
     shared = {'text': {'type': 'string', 'minLength': 1},
               'action': {'type': 'object', 'required': ['label', 'url'],
-                         'properties': {'label': text, 'url': {'type': 'string', 'pattern': '^/'}}}}
+                         'properties': {'label': text, 'url': {'$ref': '#/$defs/link'}}},
+              'link': {'type': 'string', 'pattern': '^(/|mailto:|tel:)',
+                       'description': 'A local page path (optionally /page/#anchor), mailto:, or tel: link'}}
     item = {'type': 'object', 'required': ['title', 'text'],
-            'properties': {'title': text, 'text': text, 'url': {'type': 'string', 'pattern': '^/'},
+            'properties': {'title': text, 'text': text, 'url': {'$ref': '#/$defs/link'},
                            'image': {'type': 'string'}}}
     content = {}
     for key, module in registry.items():
@@ -52,7 +54,9 @@ def preset_schema(registry, tones):
     section = {
         'type': 'object', 'required': ['module', 'variant', 'content'], 'additionalProperties': False,
         'properties': {'module': {'enum': list(registry)}, 'variant': {'type': 'string'},
-                       'content': {'type': 'string', 'description': 'Key in this preset\'s "sections" object'}},
+                       'content': {'type': 'string', 'description': 'Key in this preset\'s "sections" object'},
+                       'anchor': {'type': 'string', 'pattern': '^[a-z][a-z0-9-]*$',
+                                  'description': 'Stable id for this section, so links can use /page/#anchor'}},
         'allOf': [{'if': {'properties': {'module': {'const': key}}},
                    'then': {'properties': {'variant': {'enum': module['variants']}}}} for key, module in registry.items()],
     }

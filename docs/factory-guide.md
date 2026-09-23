@@ -49,7 +49,13 @@ The first section must be the page's only `hero`. Reorder subsequent entries to 
 
 Page front matter controls browser metadata. Composition content controls the visible page sections. Update both when changing a page's purpose. `data/site.yaml` controls the real client identity, font, base light/dark palettes, contact details, and navigation labels. Preset tones style workshop previews and initialize the client's accent color when scaffolding. Edit `theme.accent` in the client copy for its final brand color.
 
-`data/modules.json` documents each module's variants, required fields, and page dependencies. The work module requires the work page. Image references must resolve to local assets. Module links currently support local page paths only; external links and arbitrary fragments are intentionally rejected until they have a defined validation contract.
+`data/modules.json` documents each module's variants, required fields, and page dependencies. The work module requires the work page. Image references must resolve to local assets. Module links (`url` fields) accept three kinds of address, and validation checks each one:
+
+- **A local page:** `/services/`. The page must be in the preset.
+- **A spot on a page:** `/services/#questions`. A section on that page must declare the anchor, like this: `{"module": "faq", "variant": "accordion", "content": "faq", "anchor": "questions"}`. Anchors are lowercase words joined by hyphens. They must not end in a number, and each one is used once per page. A section without an anchor keeps its automatic id.
+- **Email or phone:** `mailto:hello@example.com` or `tel:+1 312 555 0100`. The address must be valid, and a phone number needs 7 to 15 digits. On an item, the item's text becomes the clickable link.
+
+Other addresses are rejected, including outside websites and `javascript:`. The output check also fails on any invalid email or phone link. It fails, too, if Hugo replaced a link it judged unsafe (`#ZgotmplZ`).
 
 The helper validates configuration before building and renders into an isolated temporary destination. Successful builds reconcile only files recorded in the previous build manifest. Existing untracked assets (`.html`, `.js`, `.css`, `.map`) that would otherwise remain in the destination block the build; choose an empty output directory rather than leaving unknown assets in place. Never use a source directory as the output destination.
 

@@ -102,6 +102,11 @@
                   "content": {
                     "type": "string",
                     "description": "Key in this preset's \"sections\" object"
+                  },
+                  "anchor": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]*$",
+                    "description": "Stable id for this section, so links can use /page/#anchor"
                   }
                 },
                 "allOf": [
@@ -714,10 +719,14 @@
           "$ref": "#/$defs/text"
         },
         "url": {
-          "type": "string",
-          "pattern": "^/"
+          "$ref": "#/$defs/link"
         }
       }
+    },
+    "link": {
+      "type": "string",
+      "pattern": "^(/|mailto:|tel:)",
+      "description": "A local page path (optionally /page/#anchor), mailto:, or tel: link"
     },
     "content-hero": {
       "type": "object",
@@ -809,8 +818,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -872,8 +880,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -935,8 +942,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1036,8 +1042,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1099,8 +1104,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1163,8 +1167,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1227,8 +1230,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1291,8 +1293,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1355,8 +1356,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1458,8 +1458,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1521,8 +1520,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1585,8 +1583,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1649,8 +1646,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1712,8 +1708,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1776,8 +1771,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1839,8 +1833,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1902,8 +1895,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -1968,8 +1960,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2040,8 +2031,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2111,8 +2101,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2176,8 +2165,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2241,8 +2229,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2307,8 +2294,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2377,8 +2363,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2448,8 +2433,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2513,8 +2497,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"
@@ -2580,8 +2563,7 @@
                 "$ref": "#/$defs/text"
               },
               "url": {
-                "type": "string",
-                "pattern": "^/"
+                "$ref": "#/$defs/link"
               },
               "image": {
                 "type": "string"

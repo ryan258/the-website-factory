@@ -14,7 +14,8 @@ FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md
 # These test the master itself (every preset, the scaffold, the eval fixtures), so they cannot
 # pass in a one-preset client copy. The copy's npm test runs checks that fit a client site.
 MASTER_ONLY_TESTS = ('test_factory.py', 'test_starter.py', 'test_from_plan.py', 'test_schemas.py', 'test_claims.py',
-                     'test_ai.py', 'test_mcp.py', 'test_evals.py', 'test_handover.py', 'test_library.py', 'test_enquiries.py')
+                     'test_ai.py', 'test_mcp.py', 'test_evals.py', 'test_handover.py', 'test_library.py', 'test_enquiries.py',
+                     'test_links.py')
 CLIENT_TEST = ('python3 scripts/factory.py && python3 scripts/check_site.py && python3 scripts/claims.py '
                '&& python3 scripts/contrast.py && node scripts/test_contact_endpoint.mjs')
 

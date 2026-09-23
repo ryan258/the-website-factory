@@ -41,10 +41,10 @@
 {{ if in (slice "services" "process" "resources" "features" "timeline") $m }}<span class="fm-index" aria-hidden="true">{{ with .phase }}{{ . }}{{ else }}{{ printf "%02d" (add $i 1) }}{{ end }}</span>{{ end }}
 {{ if eq $m "testimonials" }}<blockquote><p>{{ .text }}</p><footer>{{ .title }}</footer></blockquote>
 {{ else if eq $m "stats" }}<p class="fm-stat">{{ .text }}</p><h3>{{ .title }}</h3>
-{{ else }}{{ with .badge }}<span class="fm-badge">{{ . }}</span>{{ end }}<h3>{{ .title }}</h3>{{ with .value }}<p class="fm-value">{{ . }}</p>{{ end }}<p>{{ .text }}</p>{{ with .scope }}<p>{{ . }}</p>{{ end }}{{ with .best }}<p class="caption">For: {{ . }}</p>{{ end }}
+{{ else }}{{ with .badge }}<span class="fm-badge">{{ . }}</span>{{ end }}<h3>{{ .title }}</h3>{{ with .value }}<p class="fm-value">{{ . }}</p>{{ end }}<p>{{ if and .url (or (hasPrefix .url "mailto:") (hasPrefix .url "tel:")) }}<a class="text-link" href="{{ partial "url.html" .url }}">{{ .text }}</a>{{ else }}{{ .text }}{{ end }}</p>{{ with .scope }}<p>{{ . }}</p>{{ end }}{{ with .best }}<p class="caption">For: {{ . }}</p>{{ end }}
 {{ with .bullets }}<ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
 {{/* Workshop samples can point at pages the selected preset does not build; those stay unlinked. Presets themselves are link-checked by scripts/factory.py. */}}
-{{ with .url }}{{ if or (and $.preview (index $.targets .)) (site.GetPage .) }}<a class="text-link" href="{{ if and $.preview (index $.targets .) }}{{ index $.targets . }}{{ else }}{{ partial "url.html" . }}{{ end }}">{{ if eq $m "work" }}View {{ $item.title }}{{ else }}Explore {{ $item.title }}{{ end }} <span aria-hidden="true">↗</span></a>{{ end }}{{ end }}{{ end }}
+{{ with .url }}{{ if and (not (hasPrefix . "mailto:")) (not (hasPrefix . "tel:")) (or (and $.preview (index $.targets .)) (site.GetPage (urls.Parse .).Path)) }}<a class="text-link" href="{{ if and $.preview (index $.targets .) }}{{ index $.targets . }}{{ else }}{{ partial "url.html" . }}{{ end }}">{{ if eq $m "work" }}View {{ $item.title }}{{ else }}Explore {{ $item.title }}{{ end }} <span aria-hidden="true">↗</span></a>{{ end }}{{ end }}{{ end }}
 {{ if or (eq $m "process") (eq $m "timeline") }}</li>{{ else }}</article>{{ end }}
 {{ end }}
 {{ if or (eq $m "process") (eq $m "timeline") }}</ol>{{ else }}</div>{{ end }}

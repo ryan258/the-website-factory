@@ -1,1 +1,3 @@
+{{/* Local paths follow the base URL. mailto: and tel: pass through; scripts/factory.py has validated them. */}}
+{{ if or (hasPrefix . "mailto:") (hasPrefix . "tel:") }}{{ return (. | safeURL) }}{{ end }}
 {{ return (strings.TrimPrefix "/" . | relURL) }}

@@ -83,6 +83,7 @@ jobs:
           python3 scripts/test_evals.py
           python3 scripts/test_handover.py
           python3 scripts/test_library.py
+          python3 scripts/test_links.py
           python3 scripts/contrast.py
           node scripts/visual_check.cjs --self-test
           node scripts/test_contact_endpoint.mjs

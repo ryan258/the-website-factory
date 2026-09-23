@@ -10,6 +10,8 @@ import sys
 from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from factory import contact_link_error  # noqa: E402
 
 def noindex_expected():
     """Search-engine visibility is a deliberate release setting, not a template edit."""
@@ -69,6 +71,12 @@ def check(output, noindex=None):
         suffix='/' if rel=='index.html' else '/'+rel.removesuffix('index.html')
         prefix=base.path[:-len(suffix)] if base.path.endswith(suffix) else ''
         for ref in p.refs:
+            # Hugo swaps a URL it considers unsafe for this marker instead of failing the build.
+            if 'ZgotmplZ' in ref:errors.append(f'{label}: a link was replaced as unsafe ({ref}); mark it with safeURL only after validating it');continue
+            if ref.startswith(('mailto:','tel:')):
+                problem=contact_link_error(unquote(ref))
+                if problem:errors.append(f'{label}: {problem}')
+                continue
             u=urlparse(ref)
             if u.scheme or u.netloc:continue
             path=unquote(u.path)

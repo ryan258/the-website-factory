@@ -6,6 +6,17 @@ import re
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
+# mailto: and tel: links must hold something a visitor can actually use.
+EMAIL = re.compile(r'[^@\s/?#:]+@[^@\s/?#:]+\.[a-zA-Z]{2,}')
+TEL = re.compile(r'\+?[(0-9][0-9 ().-]{5,}')
+ANCHOR = re.compile(r'[a-z][a-z0-9-]*')
+
+def contact_link_error(url):
+    """None if url is a usable mailto: or tel: link, else the reason it is not."""
+    if url.startswith('mailto:'):
+        return None if EMAIL.fullmatch(url[7:]) else f'mailto link needs one valid email address: {url}'
+    digits = re.sub(r'\D', '', url[4:])
+    return None if TEL.fullmatch(url[4:]) and 7 <= len(digits) <= 15 else f'tel link needs a phone number of 7-15 digits: {url}'
 
 def read(path):
     return json.loads(path.read_text())
@@ -76,13 +87,22 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
                 for key, val in value.items():
                     if key=='url':
                         if not isinstance(val,str): errors.append(f'{label}: URL must be text'); continue
+                        if val.startswith(('mailto:','tel:')):
+                            problem=contact_link_error(val)
+                            if problem: errors.append(f'{label}: {problem}')
+                            continue
                         parsed=urlsplit(val)
-                        if parsed.scheme or parsed.netloc or not val.startswith('/') or '..' in parsed.path.split('/') or parsed.query or parsed.fragment:
-                            errors.append(f'{label}: module links must be local page paths: {val}'); continue
+                        if parsed.scheme or parsed.netloc or not val.startswith('/') or '..' in parsed.path.split('/') or parsed.query or (parsed.fragment and not ANCHOR.fullmatch(parsed.fragment)):
+                            errors.append(f'{label}: module links must be local page paths, mailto:, or tel: {val}'); continue
                         parts=parsed.path.strip('/').split('/')
                         page=parts[0] or 'home'
                         if profile and page not in profile['pages']:
                             errors.append(f'{label}: link to omitted page {val}')
+                        elif profile and parsed.fragment and isinstance(profile['pages'][page],dict):
+                            # A deep link must land on a section that declares that anchor.
+                            declared={s.get('anchor') for s in profile['pages'][page].get('sections',[]) if isinstance(s,dict)}
+                            if parsed.fragment not in declared:
+                                errors.append(f'{label}: link to missing anchor {val}; add "anchor": "{parsed.fragment}" to a section on that page')
                         path=root/'content'/parsed.path.strip('/')
                         if page!='home' and not any(p.is_file() for p in [path/'_index.md',path/'index.md',path.with_suffix('.md')]):
                             errors.append(f'{label}: link has no content page: {val}')
@@ -115,6 +135,12 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
             if not all(page.get(k) for k in ('title','description')): errors.append(f'{slug}/{key}: title and description required')
             if sections[0].get('module')!='hero' or sum(s.get('module')=='hero' for s in sections)!=1:
                 errors.append(f'{slug}/{key}: exactly one hero must be first')
+            anchors=[s['anchor'] for s in sections if 'anchor' in s]
+            for anchor in anchors:
+                if not isinstance(anchor,str) or not ANCHOR.fullmatch(anchor) or re.fullmatch(r'.*-\d+',anchor):
+                    errors.append(f'{slug}/{key}: anchor {anchor!r} must be lowercase words joined by hyphens, not ending in a number')
+            if len(set(map(str,anchors)))!=len(anchors):
+                errors.append(f'{slug}/{key}: two sections share an anchor')
             for section in sections:
                 module=section.get('module');label=f'{slug}/{key}/{module}'
                 if module not in registry:
