@@ -13,12 +13,13 @@
     "test:factory": "python3 scripts/test_factory.py",
     "test:integration": "sh scripts/check_contact.sh",
     "from-plan": "python3 scripts/from_plan.py",
-    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py && python3 scripts/test_enquiries.py && python3 scripts/test_schemas.py && python3 scripts/test_claims.py && python3 scripts/test_ai.py",
+    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py && python3 scripts/test_enquiries.py && python3 scripts/test_schemas.py && python3 scripts/test_claims.py && python3 scripts/test_ai.py && python3 scripts/test_mcp.py",
     "test:enquiries": "python3 scripts/test_enquiries.py",
     "lint": "ruff check scripts && for f in assets/js/*.js functions/*.js functions/api/*.js scripts/*.cjs scripts/*.mjs; do node --check \"$f\" || exit 1; done",
     "schemas": "python3 scripts/schemas.py",
     "claims": "python3 scripts/claims.py",
-    "draft": "python3 scripts/draft_plan.py"
+    "draft": "python3 scripts/draft_plan.py",
+    "mcp": "python3 scripts/mcp_server.py"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

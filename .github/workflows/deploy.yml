@@ -79,6 +79,7 @@ jobs:
           python3 scripts/schemas.py --check
           python3 scripts/claims.py --strict
           python3 scripts/test_ai.py
+          python3 scripts/test_mcp.py
           node scripts/test_contact_endpoint.mjs
 
       - name: Lint Python and JavaScript

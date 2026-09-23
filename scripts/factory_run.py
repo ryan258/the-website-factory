@@ -70,7 +70,9 @@ def run(plan, destination, name=None, plan_file='plan.json'):
     text, gaps, found = review(preset, plan_file)
     (dest / 'docs/plan-review.md').write_text(text)
     # The copy has no .tools of its own yet; build with the master's pinned Hugo and Sass.
-    built = subprocess.run([sys.executable, str(dest / 'scripts/build.py')], cwd=dest, env=build.environment())
+    # Build progress goes to stderr, so a caller that owns stdout (the MCP server) stays clean.
+    built = subprocess.run([sys.executable, str(dest / 'scripts/build.py')], cwd=dest, env=build.environment(),
+                           stdout=sys.stderr)
     print(f'{dest}: {len(preset["pages"])} pages, {gaps} placeholder(s), {found} claim(s) to confirm. '
           'See docs/plan-review.md in the copy.', file=sys.stderr)
     return dest, built.returncode
