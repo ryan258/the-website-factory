@@ -92,6 +92,9 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         links(content)
     for slug, profile in profiles.items():
         if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', slug): errors.append(f'Invalid preset identifier {slug}')
+        approved=profile.get('approved_claims',[])
+        if not isinstance(approved,list) or not all(isinstance(a,str) and a.strip() for a in approved):
+            errors.append(f'{slug}: approved_claims must be a list of text')
         if profile.get('tone') not in tones: errors.append(f"{slug}: unknown tone; choose one of {', '.join(tones)}")
         if not isinstance(profile.get('pages'),dict) or not isinstance(profile.get('sections'),dict):
             errors.append(f'{slug}: pages and sections must be objects'); continue
@@ -139,6 +142,8 @@ def apply_preset(destination, slug, name):
         return value
     profile=rename(profile)
     profile['name']=name
+    # Approvals belong to the business that confirmed them; a copy starts with none.
+    profile.pop('approved_claims',None)
     for preset in (root/'data/presets').glob('*.json'):
         if preset!=source: preset.unlink()
     selected={s['content'] for page in profile['pages'].values() for s in page['sections']}

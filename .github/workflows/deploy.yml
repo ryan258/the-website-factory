@@ -73,6 +73,9 @@ jobs:
           python3 scripts/test_from_plan.py
           python3 scripts/test_enquiries.py
           python3 scripts/test_schemas.py
+          python3 scripts/test_claims.py
+          python3 scripts/schemas.py --check
+          python3 scripts/claims.py --strict
           node scripts/test_contact_endpoint.mjs
 
       - name: Lint Python and JavaScript

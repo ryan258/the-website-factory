@@ -72,6 +72,8 @@ def preset_schema(registry, tones):
             'pages': {'type': 'object', 'required': ['home', 'contact'],
                       'patternProperties': {'^[a-z][a-z0-9-]*$': page}, 'additionalProperties': False},
             'sections': {'type': 'object', 'additionalProperties': {'type': 'object'}},
+            'approved_claims': {'type': 'array', 'items': text,
+                                'description': 'Claims the business has confirmed; see scripts/claims.py'},
         },
         '$defs': {**shared, **content},
     }

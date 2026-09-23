@@ -689,6 +689,13 @@
       "additionalProperties": {
         "type": "object"
       }
+    },
+    "approved_claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text"
+      },
+      "description": "Claims the business has confirmed; see scripts/claims.py"
     }
   },
   "$defs": {
