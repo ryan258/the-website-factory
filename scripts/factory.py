@@ -133,6 +133,21 @@ def replace_block(text, key, value):
     one line (a copy can be re-sculpted with another preset, which runs this twice)."""
     return re.sub(r'^'+key+r':(?:[ \t]*\n(?:[ \t]+.*\n)*|[ \t]+\S.*\n)', lambda _: key+': '+json.dumps(value)+'\n', text, flags=re.M)
 
+def apply_palette(destination, palette):
+    """Replace the theme colors in a copy's data/site.yaml with a named palette from data/palettes.json."""
+    root=Path(destination)
+    palettes=read(root/'data/palettes.json')
+    if palette not in palettes:
+        raise ValueError(f"Unknown palette {palette!r}. Choose one of: {', '.join(palettes)}.")
+    site=root/'data/site.yaml'
+    text=site.read_text()
+    block=re.search(r'(?m)^theme:\n((?:[ \t]+.*\n)+)',text)
+    theme=block.group(1)
+    for key,color in palettes[palette]['colors'].items():
+        theme,count=re.subn(r'(?m)^([ \t]+'+key+r':).*$',lambda m:m.group(1)+' '+json.dumps(color),theme)
+        if not count: raise ValueError(f'data/site.yaml theme has no {key} to replace.')
+    site.write_text(text[:block.start(1)]+theme+text[block.end(1):])
+
 def apply_preset(destination, slug, name):
     """Select pages and remove workshop and unrelated example content in a new copy."""
     import shutil

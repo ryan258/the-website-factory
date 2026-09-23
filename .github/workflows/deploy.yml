@@ -82,6 +82,8 @@ jobs:
           python3 scripts/test_mcp.py
           python3 scripts/test_evals.py
           python3 scripts/test_handover.py
+          python3 scripts/test_library.py
+          python3 scripts/contrast.py
           node scripts/visual_check.cjs --self-test
           node scripts/test_contact_endpoint.mjs
 
@@ -177,7 +179,7 @@ jobs:
       - name: Verify Production Output
         run: |
           HUGO_PARAMS_NOINDEX=false python3 scripts/check_site.py public
-          if grep -q 'action=/api/contact' public/contact/index.html; then built=true; else built=false; fi
+          if grep -q 'data-enabled=true' public/contact/index.html; then built=true; else built=false; fi
           if [ "$built" != "$HUGO_PARAMS_FORMENABLED" ]; then
             echo "::error::The contact form was built with delivery '$built', expected '$HUGO_PARAMS_FORMENABLED'."
             exit 1

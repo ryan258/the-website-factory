@@ -64,7 +64,7 @@ jobs:
       - name: Verify Preview Output
         run: |
           HUGO_PARAMS_NOINDEX=true python3 scripts/check_site.py "$OUTPUT"
-          if grep -rq 'action=/api/contact' "$OUTPUT" --include=index.html; then
+          if grep -rq 'data-enabled=true' "$OUTPUT" --include=index.html; then
             echo "::error::A preview must never be built with the contact form on."
             exit 1
           fi

@@ -4,8 +4,20 @@ enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term', 'RSS']
 [params]
   formEnabled = false
+  # Optional outside form service (https only), e.g. 'https://formspree.io/f/abc123'. Empty uses
+  # the Cloudflare Pages Function at /api/contact. The build allows this origin in the CSP.
+  formAction = ''
   # Set false only for a real public domain: it lets search engines index the site.
   noindex = true
+# llms.txt: a plain-text map of the site for AI tools (layouts/index.llms.txt).
+[outputFormats.llms]
+  mediaType = 'text/plain'
+  baseName = 'llms'
+  isPlainText = true
+  notAlternative = true
+[outputs]
+  home = ['html', 'llms']
+
 [security.exec]
   osEnv = ['(?i)^(PATH|PATHEXT|APPDATA|TMP|TEMP|TERM|GO\w+|HOME|USERPROFILE|SYSTEMROOT|LOCALAPPDATA)$']
 

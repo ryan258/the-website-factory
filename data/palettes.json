@@ -1,0 +1,102 @@
+{
+  "studio": {
+    "label": "Studio yellow",
+    "use": "Bold and friendly; the 258 Web Co. default",
+    "colors": {
+      "ink": "#14181f",
+      "paper": "#ffffff",
+      "mist": "#f3f5f7",
+      "line": "#d8dde3",
+      "accent": "#ffc400",
+      "accent_text": "#14181f",
+      "link": "#0a5cd6",
+      "muted": "#555d68",
+      "dark_ink": "#f4f5f7",
+      "dark_paper": "#14181f",
+      "dark_mist": "#1e242d",
+      "dark_line": "#434c59",
+      "dark_muted": "#b7c0ca",
+      "dark_link": "#8abaff"
+    }
+  },
+  "forest": {
+    "label": "Forest",
+    "use": "Calm and natural: clinics, wellness, outdoor services",
+    "colors": {
+      "ink": "#16201b",
+      "paper": "#ffffff",
+      "mist": "#eff4f0",
+      "line": "#d3ddd6",
+      "accent": "#b9d7bb",
+      "accent_text": "#16201b",
+      "link": "#1d6b43",
+      "muted": "#4f5d55",
+      "dark_ink": "#eef3ef",
+      "dark_paper": "#121a16",
+      "dark_mist": "#1b2520",
+      "dark_line": "#3b4a42",
+      "dark_muted": "#b3c2b8",
+      "dark_link": "#8fd3ad"
+    }
+  },
+  "harbor": {
+    "label": "Harbor",
+    "use": "Clear and trustworthy: professional services, non-profits",
+    "colors": {
+      "ink": "#121a24",
+      "paper": "#ffffff",
+      "mist": "#f0f4f9",
+      "line": "#d4dce6",
+      "accent": "#a6cef7",
+      "accent_text": "#121a24",
+      "link": "#0b5cb5",
+      "muted": "#4d5a69",
+      "dark_ink": "#eef2f7",
+      "dark_paper": "#0f1621",
+      "dark_mist": "#18212e",
+      "dark_line": "#3a4757",
+      "dark_muted": "#b2bfcd",
+      "dark_link": "#8cc2ff"
+    }
+  },
+  "terracotta": {
+    "label": "Terracotta",
+    "use": "Warm and welcoming: restaurants, trades, local shops",
+    "colors": {
+      "ink": "#221812",
+      "paper": "#fffdfb",
+      "mist": "#f7f0ea",
+      "line": "#e3d6cb",
+      "accent": "#edb08e",
+      "accent_text": "#221812",
+      "link": "#a4461b",
+      "muted": "#5f5047",
+      "dark_ink": "#f6efe9",
+      "dark_paper": "#1a1310",
+      "dark_mist": "#241b16",
+      "dark_line": "#4a3b32",
+      "dark_muted": "#c9b9ad",
+      "dark_link": "#f2a77f"
+    }
+  },
+  "plum": {
+    "label": "Plum",
+    "use": "Distinctive and refined: studios, consultants, events",
+    "colors": {
+      "ink": "#1c1522",
+      "paper": "#ffffff",
+      "mist": "#f5f1f7",
+      "line": "#ddd4e2",
+      "accent": "#d9b8e8",
+      "accent_text": "#1c1522",
+      "link": "#7a2f9e",
+      "muted": "#5a5063",
+      "dark_ink": "#f3eef6",
+      "dark_paper": "#17111c",
+      "dark_mist": "#211a27",
+      "dark_line": "#453a4f",
+      "dark_muted": "#c3b6cc",
+      "dark_link": "#d4a3f0"
+    }
+  }
+}

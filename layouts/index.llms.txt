@@ -1,0 +1,23 @@
+{{- $profile := index hugo.Data.presets hugo.Data.factory.preset -}}
+{{- $listed := slice -}}
+# {{ hugo.Data.site.name }}
+
+> {{ hugo.Data.site.description }}
+{{ with hugo.Data.site.tagline }}
+{{ . }}
+{{ end }}
+## Pages
+{{- /* Menu order first, then selected pages the menu leaves out (such as privacy). */}}
+{{ range hugo.Data.site.navigation }}{{ $key := strings.TrimSuffix "/" (strings.TrimPrefix "/" .url) | default "home" }}{{ with index $profile.pages $key }}{{ $listed = $listed | append $key }}{{ $page := . }}{{ with site.GetPage (cond (eq $key "home") "/" (printf "/%s" $key)) }}
+- [{{ $page.title }}]({{ .Permalink }}): {{ $page.description }}{{ end }}{{ end }}{{ end }}
+{{- range $key, $page := $profile.pages }}{{ if not (in $listed $key) }}{{ with site.GetPage (cond (eq $key "home") "/" (printf "/%s" $key)) }}
+- [{{ $page.title }}]({{ .Permalink }}): {{ $page.description }}{{ end }}{{ end }}{{ end }}
+{{ with site.GetPage "/work" }}{{ with .RegularPages }}
+## Case studies
+{{ range . }}
+- [{{ .Title }}]({{ .Permalink }}): {{ .Description }}{{ end }}
+{{ end }}{{ end }}
+## Notes
+
+- Contact: {{ with site.GetPage "/contact" }}{{ .Permalink }}{{ end }}{{ if site.Params.noindex }}
+- This is a preview. Search engines are asked not to index it, and its content awaits review.{{ end }}

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import re
 import shutil
-from factory import apply_preset, validate
+from factory import apply_palette, apply_preset, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts')
@@ -103,7 +103,7 @@ form works. Agree who monitors enquiries, and how often, before launch.
 """)
 
 
-def create(destination, name, preset="agency"):
+def create(destination, name, preset="agency", palette=None):
     if preset not in available_presets():
         raise ValueError(f"Unknown business preset. Choose one of: {', '.join(available_presets())}.")
     errors = validate(ROOT)
@@ -144,6 +144,8 @@ def create(destination, name, preset="agency"):
                 raise ValueError(f'Expected exactly one top-level {key} in data/site.yaml.')
         config.write_text(text)
         apply_preset(destination, preset, name)
+        if palette:
+            apply_palette(destination, palette)
         readme = destination / 'README.md'
         readme.write_text(f'> Client draft: {name}. Preset: `{preset}`. This copy excludes the master workshop and other presets. The factory reference below documents the shared system; see `docs/factory-guide.md` for editing this copy.\n\n' + readme.read_text())
         # Each new instance starts private and disabled, irrespective of source settings.
@@ -152,6 +154,7 @@ def create(destination, name, preset="agency"):
         text = re.sub(r'^baseURL\s*=.*$', "baseURL = 'https://example.invalid/'", text, flags=re.M)
         text = re.sub(r'^\s*formEnabled\s*=.*$', '  formEnabled = false', text, flags=re.M)
         text = re.sub(r'^\s*noindex\s*=.*$', '  noindex = true', text, flags=re.M)
+        text = re.sub(r"^\s*formAction\s*=.*$", "  formAction = ''", text, flags=re.M)
         conf.write_text(text)
         (destination / 'docs/acceptance.md').write_text('# New instance: not yet verified\n\nNo source-project performance or accessibility results apply to this instance. Run the local checks and review all sample content before publication. No deployment or form delivery has been performed.\n\nWhen the site is ready for review, replace this file with a fresh report:\n\n    python3 scripts/handover.py --build --output docs/acceptance.md\n')
     except Exception:
@@ -164,9 +167,11 @@ def main():
     parser.add_argument('destination')
     parser.add_argument('--name', required=True)
     parser.add_argument('--preset', choices=available_presets(), default='agency')
+    parser.add_argument('--palette', choices=sorted(json.loads((ROOT / 'data/palettes.json').read_text())),
+                        help='Color palette from data/palettes.json (contrast-checked); default: the preset accent')
     args = parser.parse_args()
     try:
-        destination = create(args.destination, args.name, args.preset)
+        destination = create(args.destination, args.name, args.preset, args.palette)
     except (OSError, ValueError) as error:
         parser.exit(1, f'Not created: {error}\n')
     print(f'Created {destination}\nEdit data/site.yaml and content/. Read README.md.\nNo Git repository, tool binaries, reports, or generated site was copied. Forms stay disabled; noindex stays on.\nNo hosting resources were copied: wrangler.toml is unconfigured and /api/contact refuses submissions until this client declares its own. See docs/cloudflare-setup.md.')

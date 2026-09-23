@@ -95,6 +95,28 @@ def publish_output(source, destination):
         raise
     store()
 
+def form_origin():
+    """The outside form service origin (hugo.toml params.formAction or HUGO_PARAMS_FORMACTION), or None."""
+    from urllib.parse import urlsplit
+    found = re.search(r"(?m)^\s*formAction\s*=\s*'([^']*)'", (ROOT/'hugo.toml').read_text())
+    action = os.environ.get('HUGO_PARAMS_FORMACTION', found.group(1) if found else '').strip()
+    if not action:
+        return None
+    parts = urlsplit(action)
+    if parts.scheme != 'https' or not parts.hostname or parts.username or parts.password or parts.query or parts.fragment:
+        raise ValueError(f'formAction must be a plain https:// URL with no credentials, query, or fragment: {action}')
+    return f'https://{parts.netloc}'
+
+def allow_form_origin(output, origin):
+    """Let the CSP in the built _headers send the form (and its JSON fetch) to one outside origin."""
+    headers = output/'_headers'
+    text = headers.read_text()
+    for directive in ('form-action', 'connect-src'):
+        text, count = re.subn(directive + r" 'self'", f"{directive} 'self' {origin}", text)
+        if count != 1:
+            raise ValueError(f"static/_headers must have exactly one \"{directive} 'self'\" to extend.")
+    headers.write_text(text)
+
 def content_selection(destination, workshop=None):
     config = json.loads((ROOT/'data/factory.json').read_text())
     if workshop is not None:
@@ -173,6 +195,9 @@ def main():
                     return emit([l for l in result.stdout.splitlines() if re.match(r'(ERROR|WARN)\b', l)] or ['hugo build failed'])
                 print(result.stdout, file=sys.stderr)
                 return result.returncode or 1
+            origin = form_origin()
+            if origin:
+                allow_form_origin(output, origin)
             from check_site import check
             errors = check(output.resolve())
             if errors:
