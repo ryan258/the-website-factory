@@ -22,6 +22,11 @@ python3 scripts/from_plan.py path/to/plan.json --name "my-preset" --write
 
 This compiles the planner JSON into `data/presets/<name>.json`, normalizes the page hierarchy (ensuring `home` first and `contact` last), injects mandatory hero headers and services, maps sections to schema contracts in `data/modules.json`, and validates the output against `scripts/factory.py`.
 
+- Sections may use the planner's names ("Introduction", "Services", "FAQ", …) or module keys (`hero`, `services`, `faq`). An unknown section type, or two pages that would share one address, stops the compile with an error instead of being dropped.
+- The compiler never invents business facts. Any required field the plan leaves empty (prices, times, places, services) is filled with **"To be confirmed"**, and the command prints how many there are. Replace each one before publishing.
+- `--write` refuses to replace an existing preset. Choose another `--name`, or add `--force` to replace it on purpose.
+- The written preset can start a client copy straight away: `python3 scripts/new_site.py ../client --name "Client" --preset <name>`.
+
 Running without `--write` previews the validated preset JSON to stdout and validates completely in-memory, leaving existing preset files on disk untouched even if the plan shares a slug.
 
 ## Edit the composition

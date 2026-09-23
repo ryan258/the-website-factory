@@ -10,17 +10,31 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from factory import validate
 
+# Missing facts are marked, never invented: every generated placeholder carries this text so
+# it is easy to find and replace before anything is published.
+TBC = 'To be confirmed'
+
+# The planner (assets/js/workflow.js) labels eight core modules with these names and every
+# other module with its registry name. Keep this map identical to `legacy` in workflow.js;
+# scripts/test_from_plan.py checks that it is.
+PLANNER_LABELS = {'hero': 'Introduction', 'services': 'Services', 'about': 'About', 'work': 'Proof',
+                  'process': 'Process', 'faq': 'FAQ', 'contact': 'Contact', 'cta': 'Call to action'}
+
+def module_names(registry):
+    """Map every name a plan may use for a section (planner label or registry key) to its module."""
+    names = {key: key for key in registry}
+    names.update({PLANNER_LABELS.get(key, value['name']): key for key, value in registry.items()})
+    return names
+
 def slugify(text):
     slug = re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
     return slug or 'page'
 
 def parse_items(text, default_title="Detail"):
-    lines = [line.strip().lstrip('-*•0123456789. ') for line in (text or '').splitlines() if line.strip()]
+    # Strip list markers ("- ", "* ", "• ", "1. ", "2) ") only, so "24/7 support" keeps its digits.
+    lines = [re.sub(r'^(?:[-*•]|\d+[.)])\s+', '', line.strip()) for line in (text or '').splitlines() if line.strip()]
     if not lines:
-        return [
-            {"title": f"{default_title} 1", "text": "Essential feature and practical benefit."},
-            {"title": f"{default_title} 2", "text": "Clear expectations and verified delivery."}
-        ]
+        return [{"title": f"{default_title} {TBC.lower()}", "text": f"{TBC}: add confirmed details before publishing."}]
     items = []
     for i, line in enumerate(lines[:8]):
         if ' - ' in line:
@@ -39,6 +53,12 @@ def parse_items(text, default_title="Detail"):
 def convert_plan_to_preset(project_data, registry):
     # Support both full backup export {"version":1,"projects":[...]} and direct project object
     project = project_data['projects'][0] if 'projects' in project_data else project_data
+    names = module_names(registry)
+    unknown = sorted({str(s.get('kind') or '(missing)') for p in project.get('pages', []) for s in p.get('sections', [])
+                      if s.get('kind') not in names})
+    if unknown:
+        raise ValueError('Unknown section types: ' + ', '.join(unknown)
+                         + '. Use a planner section name or a module key from data/modules.json.')
     
     preset_name = project.get('name', 'Untitled Website').strip()
     slug = slugify(preset_name)
@@ -58,7 +78,9 @@ def convert_plan_to_preset(project_data, registry):
     for p in raw_pages:
         p_name = p.get('name', 'Page').strip()
         p_slug = 'home' if p_name.lower() in ('home', 'index', 'welcome') else slugify(p_name)
-        page_map[p_slug] = p
+        if p_slug in page_map:
+            raise ValueError(f'Two pages would share the address /{p_slug}/. Rename one of them.')
+        page_map[p_slug] = dict(p, sections=[dict(s, kind=names[s['kind']]) for s in p.get('sections', [])])
 
     # Ensure required pages: home and contact
     if 'home' not in page_map:
@@ -73,7 +95,7 @@ def convert_plan_to_preset(project_data, registry):
             'purpose': 'Direct enquiry path for new client projects.',
             'sections': [
                 {'kind': 'hero', 'variant': 'compact', 'title': 'Get in touch', 'body': 'Start a project conversation.'},
-                {'kind': 'contact', 'title': 'Contact details', 'body': 'Available Monday to Friday.'}
+                {'kind': 'contact', 'title': 'Contact details', 'body': f'{TBC}: contact hours and details.'}
             ]
         }
 
@@ -87,8 +109,8 @@ def convert_plan_to_preset(project_data, registry):
         page_map['home'].setdefault('sections', []).append({
             'kind': 'services',
             'variant': 'cards',
-            'title': 'Core services',
-            'body': 'Consulting: Strategic advice.\nImplementation: High-speed delivery.\nSupport: Reliable care.'
+            'title': 'Services',
+            'body': f'Services {TBC.lower()}: list the services this business actually offers.'
         })
 
     # Order pages with home first, contact last
@@ -103,7 +125,6 @@ def convert_plan_to_preset(project_data, registry):
         page_sections = []
 
         # Rule: exactly one hero first
-        has_hero = any(s.get('kind') == 'hero' for s in raw_sections)
         if not raw_sections or raw_sections[0].get('kind') != 'hero':
             raw_sections.insert(0, {
                 'kind': 'hero',
@@ -113,9 +134,7 @@ def convert_plan_to_preset(project_data, registry):
             })
 
         for idx, s in enumerate(raw_sections):
-            kind = s.get('kind', 'hero')
-            if kind not in registry:
-                continue
+            kind = s['kind']
 
             # Exactly one hero per page
             if kind == 'hero' and idx > 0:
@@ -157,30 +176,35 @@ def convert_plan_to_preset(project_data, registry):
 
             if 'items' in req_fields:
                 if isinstance(s.get('items'), list) and s['items']:
-                    items = [{"title": str(it.get('title','Feature')), "text": str(it.get('text','Detail'))} for it in s['items']]
+                    items = [{"title": str(it.get('title') or f'Item {TBC.lower()}'), "text": str(it.get('text') or TBC),
+                              **{k: str(it[k]) for k in item_req if it.get(k)}} for it in s['items']]
                 else:
                     items = parse_items(s.get('body'), default_title=kind.capitalize())
                 
                 # Fill special item requirements
                 for it in items:
-                    if 'group' in item_req:
-                        it.setdefault('group', 'Core')
+                    for field, choices in mod_meta.get('item_choices', {}).items():
+                        # A classification such as included/excluded is a business decision,
+                        # so it is never guessed.
+                        if it.get(field) not in choices:
+                            raise ValueError(f'{p_title} / {kind}: item "{it["title"]}" needs {field} set to one of: '
+                                             + ', '.join(choices) + '. Give the section an "items" list that sets it.')
                     if 'value' in item_req:
-                        it.setdefault('value', '$100')
+                        it.setdefault('value', TBC)
                     if 'when' in item_req:
-                        it.setdefault('when', 'Every Monday')
+                        it.setdefault('when', TBC)
                     if 'place' in item_req:
-                        it.setdefault('place', 'Main Studio')
+                        it.setdefault('place', TBC)
                     if 'url' in item_req:
                         it.setdefault('url', '/contact/')
                         it.setdefault('link_label', 'Enquire')
                     if kind == 'comparison':
-                        it.setdefault('scope', 'Standard')
-                        it.setdefault('best', 'Tailored')
+                        it.setdefault('scope', TBC)
+                        it.setdefault('best', TBC)
                 content_block['items'] = items
 
             if 'notice' in req_fields:
-                content_block['notice'] = (s.get('notice') or s.get('a11y') or "Details confirmed upon project brief.").strip()
+                content_block['notice'] = (s.get('notice') or s.get('a11y') or f"{TBC}: details agreed in the project brief.").strip()
 
             preset['sections'][content_key] = content_block
 
@@ -197,6 +221,7 @@ def main():
     parser.add_argument('plan', help='Path to planner JSON export file')
     parser.add_argument('--name', help='Override preset identifier/slug')
     parser.add_argument('--write', action='store_true', help='Save preset directly to data/presets/<slug>.json')
+    parser.add_argument('--force', action='store_true', help='With --write, replace an existing preset of the same name')
     args = parser.parse_args()
 
     plan_path = Path(args.plan)
@@ -206,7 +231,10 @@ def main():
     registry = json.loads((ROOT / 'data/modules.json').read_text())
     plan_data = json.loads(plan_path.read_text())
 
-    slug, preset = convert_plan_to_preset(plan_data, registry)
+    try:
+        slug, preset = convert_plan_to_preset(plan_data, registry)
+    except ValueError as error:
+        parser.error(str(error))
     if args.name:
         slug = slugify(args.name)
 
@@ -220,12 +248,19 @@ def main():
 
     if args.write:
         target_preset_path = ROOT / 'data/presets' / f"{slug}.json"
+        if target_preset_path.exists() and not args.force:
+            parser.error(f'{target_preset_path.relative_to(ROOT)} already exists. Choose another --name, '
+                         'or add --force to replace it.')
         temp_target = target_preset_path.with_suffix('.tmp.json')
         temp_target.write_text(json.dumps(preset, indent=2) + '\n')
         temp_target.replace(target_preset_path)
         print(f"Preset successfully compiled and verified: {target_preset_path}")
     else:
         print(json.dumps(preset, indent=2))
+    placeholders = json.dumps(preset).count(TBC)
+    if placeholders:
+        print(f'Note: {placeholders} field(s) say "{TBC}". Replace them with real business facts before publishing.',
+              file=sys.stderr)
     return 0
 
 if __name__ == '__main__':
