@@ -1,0 +1,4 @@
+# Optional Python tools. Not needed to build the site.
+# anthropic: scripts/draft_plan.py and its tests. ruff: npm run lint.
+anthropic==1.8.0
+ruff==0.15.8

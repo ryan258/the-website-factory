@@ -128,6 +128,11 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         else: check_content(module,content,f'catalog/{module}')
     return errors
 
+def replace_block(text, key, value):
+    """Set a top-level site.yaml key to one-line JSON, whether it is currently a block or already
+    one line (a copy can be re-sculpted with another preset, which runs this twice)."""
+    return re.sub(r'^'+key+r':(?:[ \t]*\n(?:[ \t]+.*\n)*|[ \t]+\S.*\n)', lambda _: key+': '+json.dumps(value)+'\n', text, flags=re.M)
+
 def apply_preset(destination, slug, name):
     """Select pages and remove workshop and unrelated example content in a new copy."""
     import shutil
@@ -162,14 +167,14 @@ def apply_preset(destination, slug, name):
     (root/'data/contact.yaml').write_text(json.dumps(dict(budgets=['To be discussed','I have a scope in mind'],budget_help='No sample budget is a quote.'),indent=2)+'\n')
     site=root/'data/site.yaml';text=site.read_text()
     navigation=[dict(label=p['title'],url='/' if k=='home' else '/'+k+'/') for k,p in profile['pages'].items()]
-    text=re.sub(r'^navigation:\n(?:[ \t].*\n)*', lambda _: 'navigation: '+json.dumps(navigation)+'\n',text,flags=re.M)
+    text=replace_block(text,'navigation',navigation)
     values=dict(notice='Preview · Content awaiting review',description=f'{name}: sample business website. Content awaits review.',tagline=profile['label'],address='Example business · Details awaiting confirmation',email='hello@example.invalid',hours='Hours to be confirmed',location='Service location to be confirmed')
     for key,value in values.items(): text=re.sub(r'^'+key+r':.*$',lambda _:key+': '+json.dumps(value),text,flags=re.M)
     # Remove agency-specific footer/legacy copy from the client source.
-    text=re.sub(r'^cta:\n(?:[ \t].*\n)*',lambda _: 'cta: '+json.dumps(dict(label='Your next step',heading='Let’s talk about what you need.'))+'\n',text,flags=re.M)
+    text=replace_block(text,'cta',dict(label='Your next step',heading='Let’s talk about what you need.'))
     # The master's search-engine business details (type, city) belong to the master's business.
-    text=re.sub(r'^organization:\n(?:[ \t].*\n)*',lambda _: 'organization: '+json.dumps(dict(type='Organization'))+'\n',text,flags=re.M)
-    text=re.sub(r'^social:\n(?:[ \t].*\n)*',lambda _: 'social: '+json.dumps(dict(heading=name,caption='Fictional preview · Content awaiting review'))+'\n',text,flags=re.M)
+    text=replace_block(text,'organization',dict(type='Organization'))
+    text=replace_block(text,'social',dict(heading=name,caption='Fictional preview · Content awaiting review'))
     accent = read(root/'data/tones.json')[profile['tone']]
     text=re.sub(r'^  accent:.*$', '  accent: '+json.dumps(accent),text,flags=re.M)
     site.write_text(text)

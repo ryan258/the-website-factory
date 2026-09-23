@@ -1,0 +1,8 @@
+{
+  "min_pages": 3,
+  "max_pages": 6,
+  "required_modules": ["hero", "services", "contact"],
+  "must_mention": ["sourdough", "3 days"],
+  "must_not_mention": ["$", "award", "best"],
+  "must_mark_unknown": ["hours"]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "Rise & Crumb Bakery",
+  "business": "Neighborhood bakery",
+  "audience": "People who live nearby and visit on foot",
+  "goal": "Show what the bakery sells, explain how to order a cake, and make it easy to get in touch.",
+  "facts": [
+    "Small neighborhood bakery run by two owners",
+    "Bakes sourdough bread, pastries, and celebration cakes",
+    "Cakes must be ordered at least 3 days ahead",
+    "No prices on the website"
+  ],
+  "unknowns": [
+    "Opening hours for the new season",
+    "Photos of the bakery and its bread",
+    "Address and how customers should place a cake order"
+  ],
+  "pages": [
+    {
+      "name": "Home",
+      "purpose": "Say what the bakery makes and point people to cakes and contact.",
+      "action": "Order a cake",
+      "sections": [
+        {"kind": "hero", "variant": "split", "title": "Fresh bread and cakes, baked in the neighborhood.", "body": "Sourdough bread, pastries, and celebration cakes from a small bakery run by two owners.", "cta": "Order a cake"},
+        {"kind": "services", "variant": "cards", "title": "What we bake", "body": "Sourdough bread - Baked in our neighborhood bakery.\nPastries - A daily selection from the counter.\nCelebration cakes - Made to order, at least 3 days ahead.", "cta": ""},
+        {"kind": "cta", "variant": "band", "title": "Planning a celebration?", "body": "Cakes need at least 3 days' notice.", "cta": "Order a cake"}
+      ]
+    },
+    {
+      "name": "Cakes",
+      "purpose": "Explain how ordering a celebration cake works.",
+      "action": "Get in touch to order",
+      "sections": [
+        {"kind": "hero", "variant": "compact", "title": "Celebration cakes", "body": "Made to order for your occasion.", "cta": "Get in touch"},
+        {"kind": "process", "variant": "steps", "title": "How to order", "body": "Get in touch - Tell us the date and what you have in mind.\nOrder ahead - Cakes need at least 3 days' notice.\nCollect - To be confirmed: how and where orders are collected.", "cta": ""}
+      ]
+    },
+    {
+      "name": "Contact",
+      "purpose": "Help nearby customers visit or get in touch.",
+      "action": "Send a message",
+      "sections": [
+        {"kind": "hero", "variant": "compact", "title": "Visit or get in touch", "body": "We are a small neighborhood bakery.", "cta": "Send a message"},
+        {"kind": "contact", "variant": "panel", "title": "Find us", "body": "Opening hours - To be confirmed: opening hours for the new season.\nAddress - To be confirmed: bakery address.", "cta": ""}
+      ]
+    }
+  ]
+}
