@@ -28,7 +28,7 @@ id = "ea6f0db631da4aaeb78c786a4581214c"
 # project starts without it, so an inherited namespace can never receive its enquiries.
 # Confirm this variable is present on the Pages project after deploying.
 [vars]
-ENQUIRY_ENABLED = "true"
+ENQUIRY_ENABLED = "false"
 # ENQUIRY_TO = "ryanleejwebdev@gmail.com"
 # ENQUIRY_FROM = "forms@258webco.com"
 
