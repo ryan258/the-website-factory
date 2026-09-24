@@ -42,6 +42,8 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
             profiles.update(extra_presets)
         examples = read(root / 'data/examples.json') if config.get('workshop') else {}
         tones = read(root / 'data/tones.json')
+        palettes = read(root / 'data/palettes.json')
+        font_pairings = read(root / 'data/fonts.json')
     except (OSError, ValueError) as error:
         return [str(error)]
     if config.get('preset') not in profiles:
@@ -60,8 +62,30 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
             errors.append(f'{label}: content must be an object'); return
         for field in registry[module]['required']:
             if not content.get(field): errors.append(f'{label}: missing required field {field}')
-        for field in ('title','intro','body','notice','label','aside','note'):
+        for field in ('title','intro','body','notice','label','aside','note','image','imageAlt'):
             if field in content and not isinstance(content[field], str): errors.append(f'{label}: {field} must be text')
+        if content.get('image'):
+            image = Path(content['image'])
+            if image.is_absolute() or '..' in image.parts or not (root/'assets'/image).is_file():
+                errors.append(f'{label}: missing or unsafe image {image}')
+            if not isinstance(content.get('imageAlt'), str) or not content['imageAlt'].strip():
+                errors.append(f'{label}: image needs descriptive imageAlt text')
+        if module == 'project-brief':
+            options = content.get('services')
+            if not isinstance(options, list) or not options or not all(isinstance(option, str) and option.strip() for option in options):
+                errors.append(f'{label}: services must be a nonempty list of service names')
+            elif len(set(options)) != len(options):
+                errors.append(f'{label}: services must not contain duplicates')
+            elif profile:
+                offered = set()
+                for page in profile.get('pages', {}).values():
+                    for section in page.get('sections', []) if isinstance(page, dict) else []:
+                        if section.get('module') == 'services':
+                            data = profile.get('sections', {}).get(section.get('content'), {})
+                            offered.update(item.get('title') for item in data.get('items', []) if isinstance(item, dict))
+                missing = set(options) - offered
+                if missing:
+                    errors.append(f'{label}: project brief includes services absent from the site catalog: {", ".join(sorted(missing))}')
         if 'items' in registry[module]['required']:
             if not isinstance(content.get('items'), list) or not content['items']:
                 errors.append(f'{label}: items must be a nonempty list'); return
@@ -80,6 +104,8 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
                     image = Path(item['image'])
                     if image.is_absolute() or '..' in image.parts or not (root/'assets'/image).is_file():
                         errors.append(f'{label}: missing or unsafe image {image}')
+                    if 'imageAlt' in item and not isinstance(item['imageAlt'], str):
+                        errors.append(f'{label}: item {i+1} imageAlt must be text')
         for field in ('action','secondary'):
             if field in content and (not isinstance(content[field],dict) or not content[field].get('label') or not content[field].get('url')):
                 errors.append(f'{label}: {field} needs label and url')
@@ -117,6 +143,10 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         if not isinstance(approved,list) or not all(isinstance(a,str) and a.strip() for a in approved):
             errors.append(f'{slug}: approved_claims must be a list of text')
         if profile.get('tone') not in tones: errors.append(f"{slug}: unknown tone; choose one of {', '.join(tones)}")
+        if profile.get('palette') and profile['palette'] not in palettes:
+            errors.append(f"{slug}: unknown palette; choose one of {', '.join(palettes)}")
+        if profile.get('font_pairing') and profile['font_pairing'] not in font_pairings:
+            errors.append(f"{slug}: unknown font pairing; choose one of {', '.join(font_pairings)}")
         if not isinstance(profile.get('pages'),dict) or not isinstance(profile.get('sections'),dict):
             errors.append(f'{slug}: pages and sections must be objects'); continue
         if not all(k in profile['pages'] for k in ('home','contact')): errors.append(f'{slug}: home and contact are required')
@@ -159,6 +189,21 @@ def replace_block(text, key, value):
     """Set a top-level site.yaml key to one-line JSON, whether it is currently a block or already
     one line (a copy can be re-sculpted with another preset, which runs this twice)."""
     return re.sub(r'^'+key+r':(?:[ \t]*\n(?:[ \t]+.*\n)*|[ \t]+\S.*\n)', lambda _: key+': '+json.dumps(value)+'\n', text, flags=re.M)
+
+def prune_unlinked_details(content_root, profile):
+    """Keep detail pages only when a selected composition links to them."""
+    linked = {
+        item.get('url')
+        for section in profile.get('sections', {}).values() if isinstance(section, dict)
+        for item in section.get('items', []) if isinstance(item, dict) and isinstance(item.get('url'), str)
+    }
+    for section in ('services', 'work'):
+        directory = Path(content_root) / section
+        if not directory.is_dir():
+            continue
+        for page in directory.glob('*.md'):
+            if page.name != '_index.md' and f'/{section}/{page.stem}/' not in linked:
+                page.unlink()
 
 def apply_palette(destination, palette):
     """Replace the theme colors in a copy's data/site.yaml with a named palette from data/palettes.json."""
@@ -252,6 +297,7 @@ def apply_preset(destination, slug, name):
         path=root/'content'/('_index.md' if key=='home' else f'{key}/_index.md')
         path.parent.mkdir(parents=True,exist_ok=True)
         path.write_text(json.dumps(dict(title=page['title'],description=f"{name}: {page['title'].lower()} and sample information. Content awaits business review."),indent=2)+'\n')
+    prune_unlinked_details(root/'content', profile)
     # Structured contact choices follow the selected business instead of the agency demo.
     # Project types come from the preset's services section at render time, so only budgets are written here.
     (root/'data/contact.yaml').write_text(json.dumps(dict(budgets=['To be discussed','I have a scope in mind'],budget_help='No sample budget is a quote.'),indent=2)+'\n')
@@ -267,10 +313,27 @@ def apply_preset(destination, slug, name):
     text=replace_block(text,'social',dict(heading=name,caption='Fictional preview · Content awaiting review'))
     accent = read(root/'data/tones.json')[profile['tone']]
     text=re.sub(r'^  accent:.*$', '  accent: '+json.dumps(accent),text,flags=re.M)
+    if 'estimate' in profile['pages']:
+        text=replace_block(text,'primary_cta',dict(label='Build a project brief',url='/estimate/'))
     site.write_text(text)
-    if 'work' not in profile['pages']:
-        for stem in ('fieldwork','forma','common-ground','northline'):
+    referenced_images = set()
+    for content in profile['sections'].values():
+        if isinstance(content, dict):
+            if isinstance(content.get('image'), str): referenced_images.add(content['image'])
+            for item in content.get('items', []):
+                if isinstance(item, dict) and isinstance(item.get('image'), str):
+                    referenced_images.add(item['image'])
+    for stem in ('fieldwork','forma','common-ground','northline'):
+        name=f'images/{stem}.png'
+        if name not in referenced_images:
             (root/'assets/images'/f'{stem}.png').unlink(missing_ok=True)
+    construction_images = root/'assets/images/construction'
+    if construction_images.is_dir():
+        for image in construction_images.rglob('*'):
+            if image.is_file() and image.relative_to(root/'assets').as_posix() not in referenced_images:
+                image.unlink()
+        if not any(construction_images.rglob('*')):
+            shutil.rmtree(construction_images, ignore_errors=True)
 
 if __name__=='__main__':
     import sys

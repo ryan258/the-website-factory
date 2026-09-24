@@ -20,5 +20,57 @@
 <meta name="twitter:image" content="{{ $social.Permalink }}">
 <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | relURL }}">
-{{ $font := hugo.Data.site.font }}<link rel="preload" href="{{ $font.file | relURL }}" as="font" type="font/woff2" crossorigin>{{ with $font.heading_file }}<link rel="preload" href="{{ . | relURL }}" as="font" type="font/woff2" crossorigin>{{ end }}{{ $vars := merge hugo.Data.site.theme (dict "font_family" $font.family "font_url" ($font.file | relURL) "font_weights" ($font.weights | default "100 900") "font_fallback" ($font.fallback | default "sans-serif") "heading_family" ($font.heading_family | default $font.family) "heading_url" (($font.heading_file | default $font.file) | relURL) "heading_weights" ($font.heading_weights | default ($font.weights | default "100 900")) "heading_fallback" ($font.heading_fallback | default ($font.fallback | default "sans-serif")) "heading_tracking" ($font.tracking | default "-.045em")) }}{{ $css := resources.Get "scss/main.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/main.css" "vars" $vars) | minify | fingerprint "sha384" }}<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">{{ if eq .Section "site-kit" }}{{ $kitCSS := resources.Get "scss/workshop.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/workshop.css" "vars" $vars) | minify | fingerprint "sha384" }}<link rel="stylesheet" href="{{ $kitCSS.RelPermalink }}" integrity="{{ $kitCSS.Data.Integrity }}">{{ end }}{{ if eq .Section "contact" }}{{ $js := resources.Get "js/contact.js" | minify | fingerprint "sha384" }}<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer>
-</script>{{ end }}{{ if .IsHome }}{{ $info := hugo.Data.site.organization | default dict }}{{ $org := dict "@context" "https://schema.org" "@type" ($info.type | default "Organization") "name" hugo.Data.site.name "url" site.BaseURL "description" hugo.Data.site.description }}{{ with $info.area_served }}{{ $org = merge $org (dict "areaServed" .) }}{{ end }}{{ with $info.locality }}{{ $org = merge $org (dict "address" (dict "@type" "PostalAddress" "addressLocality" . "addressRegion" ($info.region | default "") "addressCountry" ($info.country | default ""))) }}{{ end }}{{ if and hugo.Data.site.email (ne hugo.Data.site.email "hello@example.invalid") }}{{ $org = merge $org (dict "email" hugo.Data.site.email) }}{{ end }}<script type="application/ld+json">{{ $org | jsonify | safeJS }}</script>{{ end }}
+{{ $font := hugo.Data.site.font }}
+<link rel="preload" href="{{ $font.file | relURL }}" as="font" type="font/woff2" crossorigin>
+{{ with $font.heading_file }}<link rel="preload" href="{{ . | relURL }}" as="font" type="font/woff2" crossorigin>{{ end }}
+{{ $vars := merge hugo.Data.site.theme (dict
+  "font_family" $font.family
+  "font_url" ($font.file | relURL)
+  "font_weights" ($font.weights | default "100 900")
+  "font_fallback" ($font.fallback | default "sans-serif")
+  "heading_family" ($font.heading_family | default $font.family)
+  "heading_url" (($font.heading_file | default $font.file) | relURL)
+  "heading_weights" ($font.heading_weights | default ($font.weights | default "100 900"))
+  "heading_fallback" ($font.heading_fallback | default ($font.fallback | default "sans-serif"))
+  "heading_tracking" ($font.tracking | default "-.045em")) }}
+{{ $css := resources.Get "scss/main.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/main.css" "vars" $vars) | minify | fingerprint "sha384" }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{ if eq .Section "site-kit" }}
+  {{ $kitCSS := resources.Get "scss/workshop.scss" | css.Sass (dict "transpiler" "dartsass" "targetPath" "css/workshop.css" "vars" $vars) | minify | fingerprint "sha384" }}
+  <link rel="stylesheet" href="{{ $kitCSS.RelPermalink }}" integrity="{{ $kitCSS.Data.Integrity }}">
+  {{ $themeSource := partial "factory/preset-theme-css.html" . }}
+  {{ if $themeSource }}
+    {{ $themeCSS := resources.FromString "css/preset-themes.css" $themeSource | minify | fingerprint "sha384" }}
+    <link rel="stylesheet" href="{{ $themeCSS.RelPermalink }}" integrity="{{ $themeCSS.Data.Integrity }}">
+  {{ end }}
+{{ end }}
+{{ if eq .Section "contact" }}
+  {{ $js := resources.Get "js/contact.js" | minify | fingerprint "sha384" }}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{ end }}
+{{ $presetSlug := .Params.preset | default hugo.Data.factory.preset }}
+{{ $profile := index hugo.Data.presets $presetSlug }}
+{{ $pageKey := cond .IsHome "home" .Section }}
+{{ $composition := index $profile.pages $pageKey }}
+{{ $hasProjectBrief := false }}
+{{ with $composition }}
+  {{ range .sections }}{{ if eq .module "project-brief" }}{{ $hasProjectBrief = true }}{{ end }}{{ end }}
+{{ end }}
+{{ if and (not $hasProjectBrief) (eq .Section "site-kit") (eq .Layout "composition") }}
+  {{ with index $profile.pages "estimate" }}{{ range .sections }}{{ if eq .module "project-brief" }}{{ $hasProjectBrief = true }}{{ end }}{{ end }}{{ end }}
+{{ end }}
+{{ if and (not $hasProjectBrief) (eq .Layout "catalog") (index hugo.Data.examples "project-brief") }}
+  {{ $hasProjectBrief = true }}
+{{ end }}
+{{ if $hasProjectBrief }}
+  {{ $briefJS := resources.Get "js/project-brief.js" | minify | fingerprint "sha384" }}
+  <script src="{{ $briefJS.RelPermalink }}" integrity="{{ $briefJS.Data.Integrity }}" defer></script>
+{{ end }}
+{{ if .IsHome }}
+  {{ $info := hugo.Data.site.organization | default dict }}
+  {{ $org := dict "@context" "https://schema.org" "@type" ($info.type | default "Organization") "name" hugo.Data.site.name "url" site.BaseURL "description" hugo.Data.site.description }}
+  {{ with $info.area_served }}{{ $org = merge $org (dict "areaServed" .) }}{{ end }}
+  {{ with $info.locality }}{{ $org = merge $org (dict "address" (dict "@type" "PostalAddress" "addressLocality" . "addressRegion" ($info.region | default "") "addressCountry" ($info.country | default ""))) }}{{ end }}
+  {{ if and hugo.Data.site.email (ne hugo.Data.site.email "hello@example.invalid") }}{{ $org = merge $org (dict "email" hugo.Data.site.email) }}{{ end }}
+  <script type="application/ld+json">{{ $org | jsonify | safeJS }}</script>
+{{ end }}

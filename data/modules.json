@@ -482,5 +482,22 @@
       "url",
       "link_label"
     ]
+  },
+  "project-brief": {
+    "name": "Project brief builder",
+    "category": "Offers and contact",
+    "purpose": "Help visitors organize project details locally and choose an explicit handoff.",
+    "variants": [
+      "wizard"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "services",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Ask only for details useful to an initial conversation. Explain whether answers stay local and what happens after each handoff.",
+    "a11y_guidance": "Use labelled fields, visible progress, keyboard-operable steps, validation, and a clear completion state. Keep a no-JavaScript explanation."
   }
 }

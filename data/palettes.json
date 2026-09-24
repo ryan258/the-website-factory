@@ -98,5 +98,25 @@
       "dark_muted": "#c3b6cc",
       "dark_link": "#d4a3f0"
     }
+  },
+  "earthworks": {
+    "label": "Earthworks",
+    "use": "Grounded and practical: construction, trades, and outdoor services",
+    "colors": {
+      "ink": "#17211f",
+      "paper": "#f3efe7",
+      "mist": "#e7e0d5",
+      "line": "#cbc4b8",
+      "accent": "#efaa37",
+      "accent_text": "#17211f",
+      "link": "#853b22",
+      "muted": "#53605a",
+      "dark_ink": "#f6f0e6",
+      "dark_paper": "#17211f",
+      "dark_mist": "#232d29",
+      "dark_line": "#53605a",
+      "dark_muted": "#c2c8c0",
+      "dark_link": "#f6c266"
+    }
   }
 }

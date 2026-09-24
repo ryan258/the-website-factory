@@ -38,6 +38,7 @@ class Page(HTMLParser):
         if self.in_title:self.title+=value
 
 def check(output, noindex=None):
+    output = Path(output).resolve()
     noindex = noindex_expected() if noindex is None else noindex
     errors=[]; pages={}
     for file in output.rglob('*.html'):

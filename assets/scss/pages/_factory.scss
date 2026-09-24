@@ -1,5 +1,6 @@
 @use 'sass:color';
 @use '../abstracts/variables' as v;
+@use '../abstracts/mixins' as m;
 
 // Preset tones. A workshop preview wraps a composition in .tone-<name> to show the
 // same modules in another business's accent.
@@ -743,5 +744,239 @@
   .fm-practical-columns,
   .fm-practical-definitions > div {
     grid-template-columns: 1fr;
+  }
+}
+
+// Optional local project brief. The form has no endpoint or browser persistence;
+// visitors choose whether to copy, download, or open a mail draft after review.
+.fm-hero-image {
+  width: 100%;
+  height: clamp(300px, 38vw, 560px);
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 24px 60px rgba(23, 33, 31, .16);
+}
+
+.project-brief {
+  max-width: 800px;
+  padding: clamp(20px, 4vw, 48px);
+  border: 1px solid var(--line);
+  background: var(--mist);
+}
+
+.project-brief__progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 36px;
+  padding: 0;
+  list-style: none;
+}
+
+.project-brief__progress li {
+  padding-top: 12px;
+  border-top: 2px solid var(--line);
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 650;
+}
+
+.project-brief__progress li[aria-current="step"] {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.project-brief__progress li span,
+.project-brief legend span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.project-brief fieldset {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.project-brief legend {
+  width: 100%;
+  margin-bottom: 24px;
+  font-family: var(--heading-font);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: var(--heading-tracking);
+}
+
+.project-brief label {
+  margin-top: 10px;
+  font-weight: 650;
+}
+
+.project-brief input,
+.project-brief select,
+.project-brief textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.project-brief textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+.project-brief :is(input, select, textarea):focus-visible,
+.project-brief button:focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: 3px;
+}
+
+.project-brief__optional {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 400;
+}
+
+.project-brief__privacy,
+.project-brief__local-note,
+.project-brief__status {
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.project-brief__step-actions,
+.project-brief__handoffs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.project-brief__step-actions [data-brief-next] {
+  margin-left: auto;
+}
+
+.project-brief__result > p {
+  max-width: 60ch;
+}
+
+.project-brief__result pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.project-brief__copy-buffer {
+  position: fixed;
+  inset: auto auto 0 -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.project-brief__status {
+  min-height: 1.5em;
+  margin-block: 16px 0;
+}
+
+.project-brief__local-note {
+  margin: 20px 0 0;
+}
+
+.service-detail__grid,
+.project-story__facts {
+  display: grid;
+  gap: 18px;
+}
+
+.service-detail__image picture,
+.service-detail__image img {
+  display: block;
+  width: 100%;
+}
+
+.service-detail__image img,
+.project-story > picture img {
+  border-radius: 4px;
+}
+
+.service-detail__considerations article,
+.project-story__facts article {
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.service-detail__considerations h2,
+.project-story__facts h2 {
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+.service-detail__considerations article + article {
+  border-top: 0;
+}
+
+.service-detail__body {
+  margin-inline: 0;
+}
+
+.service-detail__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.project-story__facts {
+  margin-top: 28px;
+}
+
+.project-story__facts .eyebrow {
+  margin-bottom: 8px;
+}
+
+@include m.breakpoint(medium) {
+  .service-detail__grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+    align-items: start;
+  }
+
+  .project-story__facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .project-brief__progress {
+    gap: 8px;
+  }
+  .project-brief__progress li {
+    font-size: .68rem;
+  }
+  .project-brief__handoffs > * {
+    width: 100%;
+    justify-content: center;
   }
 }

@@ -29,6 +29,25 @@
         "blue"
       ]
     },
+    "palette": {
+      "enum": [
+        "studio",
+        "forest",
+        "harbor",
+        "terracotta",
+        "plum",
+        "earthworks"
+      ]
+    },
+    "font_pairing": {
+      "enum": [
+        "modern",
+        "editorial",
+        "warm",
+        "friendly",
+        "readable"
+      ]
+    },
     "pages": {
       "type": "object",
       "required": [
@@ -93,7 +112,8 @@
                       "events",
                       "policies",
                       "glossary",
-                      "support"
+                      "support",
+                      "project-brief"
                     ]
                   },
                   "variant": {
@@ -680,6 +700,24 @@
                         }
                       }
                     }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "project-brief"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "wizard"
+                          ]
+                        }
+                      }
+                    }
                   }
                 ]
               }
@@ -763,6 +801,12 @@
         },
         "secondary": {
           "$ref": "#/$defs/action"
+        },
+        "image": {
+          "type": "string"
+        },
+        "imageAlt": {
+          "$ref": "#/$defs/text"
         }
       }
     },
@@ -821,6 +865,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -884,6 +931,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -945,6 +995,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -1046,6 +1099,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1107,6 +1163,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -1171,6 +1230,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1233,6 +1295,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -1297,6 +1362,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1359,6 +1427,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -1462,6 +1533,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1523,6 +1597,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -1587,6 +1664,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1650,6 +1730,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1711,6 +1794,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -1775,6 +1861,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1837,6 +1926,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -1898,6 +1990,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -1963,6 +2058,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               },
               "group": {
@@ -2036,6 +2134,9 @@
               "image": {
                 "type": "string"
               },
+              "imageAlt": {
+                "type": "string"
+              },
               "group": {
                 "enum": [
                   "included",
@@ -2105,6 +2206,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -2168,6 +2272,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -2233,6 +2340,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -2297,6 +2407,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               },
               "value": {
@@ -2368,6 +2481,9 @@
               "image": {
                 "type": "string"
               },
+              "imageAlt": {
+                "type": "string"
+              },
               "when": {
                 "$ref": "#/$defs/text"
               },
@@ -2437,6 +2553,9 @@
               },
               "image": {
                 "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
               }
             }
           }
@@ -2500,6 +2619,9 @@
                 "$ref": "#/$defs/link"
               },
               "image": {
+                "type": "string"
+              },
+              "imageAlt": {
                 "type": "string"
               }
             }
@@ -2568,10 +2690,59 @@
               "image": {
                 "type": "string"
               },
+              "imageAlt": {
+                "type": "string"
+              },
               "link_label": {
                 "$ref": "#/$defs/text"
               }
             }
+          }
+        }
+      }
+    },
+    "content-project-brief": {
+      "type": "object",
+      "description": "Project brief builder: Help visitors organize project details locally and choose an explicit handoff.",
+      "required": [
+        "title",
+        "intro",
+        "services",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "services": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/text"
           }
         }
       }

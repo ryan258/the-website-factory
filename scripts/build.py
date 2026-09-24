@@ -10,7 +10,7 @@ import sys
 import tempfile
 import json
 import hashlib
-from factory import validate
+from factory import prune_unlinked_details, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -127,6 +127,7 @@ def content_selection(destination, workshop=None):
         if path.is_dir() and path.name not in profile['pages']:
             if path.name != 'site-kit' or not config['workshop']:
                 shutil.rmtree(path)
+    prune_unlinked_details(destination, profile)
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)

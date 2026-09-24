@@ -41,7 +41,7 @@ const expectedVariants=Object.values(JSON.parse(fs.readFileSync(path.join(ROOT,'
   const question=page.locator('#example-faq-accordion summary').first();await question.focus();await page.keyboard.press('Enter');
   if(!await question.evaluate(e=>e.parentElement.open))failures.push('keyboard FAQ');
   await page.setViewportSize({width:390,height:844});await page.goto(base+'site-kit/catalog/');await page.screenshot({path:path.join(out,'workshop-mobile.png'),fullPage:true});
-  for(const slug of ['agency','contractor','consultant','local-service','clinic','restaurant','nonprofit']){
+  for(const slug of ['agency','contractor','construction','consultant','local-service','clinic','restaurant','nonprofit']){
    await page.setViewportSize({width:1440,height:1000});await page.goto(base+'site-kit/'+slug+'/');
    await page.screenshot({path:path.join(out,slug+'-desktop.png'),fullPage:true});
    // Hero button labels and targets come from the preset, not from this script.
@@ -49,10 +49,11 @@ const expectedVariants=Object.values(JSON.parse(fs.readFileSync(path.join(ROOT,'
    const lead=hero.sections[hero.pages.home.sections[0].content];
    const hero_buttons=page.locator('.fm--lead');
    await hero_buttons.getByRole('link',{name:lead.action.label,exact:false}).click();
-   if(!page.url().endsWith('#preview-contact'))failures.push(slug+' contact preview');
+   const actionTarget=lead.action.url.startsWith('/estimate/')?'#preview-brief':'#preview-contact';
+   if(!page.url().endsWith(actionTarget))failures.push(slug+' '+actionTarget+' preview');
    await hero_buttons.getByRole('link',{name:lead.secondary.label,exact:false}).click();
    const target=lead.secondary.url.replaceAll('/','');
-   if(!page.url().includes('/site-kit/'+slug+'/#'+target+'-'))failures.push(slug+' '+target+' preview');
+   if(!page.url().includes('/site-kit/'+slug+'/#'+target+'-') && !page.url().endsWith('/site-kit/'+slug+'/#'+target))failures.push(slug+' '+target+' preview');
   }
   const nojs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
   const p=await nojs.newPage();await p.goto(base+'site-kit/catalog/');

@@ -11,13 +11,15 @@
 <p class="fm-intro">{{ $d.intro }}</p>
 {{ if ne $v "compact" }}<div class="button-group">{{ partial "factory/action.html" (dict "action" $d.action "preview" .preview "targets" .targets) }}{{ with $d.secondary }}{{ partial "factory/action.html" (dict "action" . "secondary" true "preview" $.preview "targets" $.targets) }}{{ end }}</div>{{ end }}
 {{ with $d.note }}<p class="caption">{{ . }}</p>{{ end }}</div>
-{{ if eq $v "split" }}<div class="fm-art">{{ if eq $d.art "factory" }}{{ partial "hero-art.html" .page }}{{ else }}<div class="abstract-art abstract-art--{{ $d.art }}" aria-hidden="true"><div class="abstract-art__grid"></div><span class="abstract-art__shape"></span><span class="abstract-art__shape second"></span><span class="abstract-art__line"></span><span class="abstract-art__caption">FORM / FUNCTION<br>BUILT WITH INTENTION</span><span class="abstract-art__number">01—04</span></div>{{ end }}</div>{{ end }}</div>
+{{ if eq $v "split" }}<div class="fm-art">{{ if eq $d.art "factory" }}{{ partial "hero-art.html" .page }}{{ else if eq $d.art "image" }}{{ $img := resources.Get $d.image }}{{ if not $img }}{{ errorf "Missing hero image: %s" $d.image }}{{ else }}{{ $small := $img.Resize "880x webp q82" }}{{ $large := $img.Resize "1440x webp q82" }}<img class="fm-hero-image" src="{{ $small.RelPermalink }}" srcset="{{ $small.RelPermalink }} 880w, {{ $large.RelPermalink }} 1440w" sizes="(min-width: 900px) 48vw, 100vw" width="{{ $small.Width }}" height="{{ $small.Height }}" alt="{{ $d.imageAlt }}" {{ if .hero }}fetchpriority="high"{{ else }}loading="lazy"{{ end }} decoding="async">{{ end }}{{ else }}<div class="abstract-art abstract-art--{{ $d.art }}" aria-hidden="true"><div class="abstract-art__grid"></div><span class="abstract-art__shape"></span><span class="abstract-art__shape second"></span><span class="abstract-art__line"></span><span class="abstract-art__caption">FORM / FUNCTION<br>BUILT WITH INTENTION</span><span class="abstract-art__number">01—04</span></div>{{ end }}</div>{{ end }}</div>
 {{ else if eq $m "cta" }}
 <div class="fm-cta"><div><p class="eyebrow">{{ $d.label }}</p><h2>{{ $d.title }}</h2><p>{{ $d.intro }}</p></div>{{ partial "factory/action.html" (dict "action" $d.action "preview" .preview "targets" .targets) }}</div>
 {{ else }}
 <div class="fm-heading"><p class="eyebrow">{{ $d.label }}</p><h2>{{ $d.title }}</h2>{{ with $d.intro }}<p>{{ . }}</p>{{ end }}</div>
 {{ if in (slice "fit" "inclusions" "preparation" "hours" "visit" "menu" "events" "policies" "glossary" "support") $m }}
 {{ partial "factory/practical.html" . }}
+{{ else if eq $m "project-brief" }}
+{{ partial "factory/project-brief.html" . }}
 {{ else if eq $m "about" }}
 <div class="fm-about"><p class="fm-body">{{ $d.body }}</p><aside><span aria-hidden="true">↗</span><p>{{ $d.aside }}</p></aside></div>
 {{ else if eq $m "faq" }}
@@ -36,7 +38,7 @@
 {{ if eq $m "process" }}<ol class="fm-grid fm-list">{{ else if eq $m "timeline" }}<ol class="fm-grid fm-list fm-timeline-cards">{{ else }}<div class="fm-grid">{{ end }}
 {{ range $i, $item := $d.items }}
 {{ if or (eq $m "process") (eq $m "timeline") }}<li class="fm-card">{{ else }}<article class="fm-card{{ with $item.badge }} fm-card--featured{{ end }}">{{ end }}
-{{ if eq $m "work" }}{{ with .image }}{{ $img := resources.Get . }}{{ if not $img }}{{ errorf "Missing module image: %s" . }}{{ else }}{{ $small := $img.Resize "560x webp q80" }}{{ $large := $img.Resize "1120x webp q80" }}<img src="{{ $small.RelPermalink }}" srcset="{{ $small.RelPermalink }} 560w, {{ $large.RelPermalink }} 1120w" sizes="(min-width: 900px) 540px, 100vw" width="{{ $small.Width }}" height="{{ $small.Height }}" alt="{{ $item.title }} — fictional project design" loading="lazy" decoding="async">{{ end }}{{ end }}{{ end }}
+{{ if eq $m "work" }}{{ with .image }}{{ $img := resources.Get . }}{{ if not $img }}{{ errorf "Missing module image: %s" . }}{{ else }}{{ $small := $img.Resize "560x webp q80" }}{{ $large := $img.Resize "1120x webp q80" }}<img src="{{ $small.RelPermalink }}" srcset="{{ $small.RelPermalink }} 560w, {{ $large.RelPermalink }} 1120w" sizes="(min-width: 900px) 540px, 100vw" width="{{ $small.Width }}" height="{{ $small.Height }}" alt="{{ $item.imageAlt | default (printf "Illustrative sample image for %s" $item.title) }}" loading="lazy" decoding="async">{{ end }}{{ end }}{{ end }}
 {{ if eq $m "team" }}<div class="fm-avatar" aria-hidden="true">{{ .initials }}</div>{{ end }}
 {{ if in (slice "services" "process" "resources" "features" "timeline") $m }}<span class="fm-index" aria-hidden="true">{{ with .phase }}{{ . }}{{ else }}{{ printf "%02d" (add $i 1) }}{{ end }}</span>{{ end }}
 {{ if eq $m "testimonials" }}<blockquote><p>{{ .text }}</p><footer>{{ .title }}</footer></blockquote>

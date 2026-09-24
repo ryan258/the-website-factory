@@ -1,0 +1,21 @@
+{{ define "main" }}
+{{ if .Params.service_detail }}
+{{ partial "page-intro.html" . }}
+<section class="service-detail container section">
+  <div class="service-detail__grid">
+    <div class="service-detail__image">{{ partial "picture.html" . }}</div>
+    <aside class="service-detail__considerations">
+      <p class="eyebrow">Useful details to confirm</p>
+      {{ range .Params.considerations }}<article><h2>{{ .title }}</h2><p>{{ .text }}</p></article>{{ end }}
+      <p class="notice">{{ .Params.notice }}</p>
+    </aside>
+  </div>
+  <div class="service-detail__body prose section">{{ .Content }}</div>
+  <div class="service-detail__actions">
+    <a class="button" href="{{ "estimate/" | relURL }}">Build a project brief <span aria-hidden="true">↗</span></a>
+    <a class="text-link" href="{{ "services/" | relURL }}">View all services</a>
+  </div>
+</section>
+{{ partial "cta.html" . }}
+{{ else }}{{ partial "page-intro.html" . }}<div class="container prose section">{{ .Content }}</div>{{ end }}
+{{ end }}

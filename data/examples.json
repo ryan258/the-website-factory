@@ -606,5 +606,16 @@
       }
     ],
     "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "project-brief": {
+    "label": "Start a project",
+    "title": "Organize the details before you get in touch.",
+    "intro": "Three short steps create a readable project summary. Nothing is saved or sent automatically; choose whether to copy it, download it, or open an email draft.",
+    "services": [
+      "Site preparation",
+      "Land clearing",
+      "Utility work"
+    ],
+    "notice": "This browser-only draft is not a quote or booking. Do not include private information you do not want in an email."
   }
 }

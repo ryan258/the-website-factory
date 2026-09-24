@@ -165,11 +165,14 @@ def create(destination, name, preset="agency", palette=None, fonts=None):
             if count != 1:
                 raise ValueError(f'Expected exactly one top-level {key} in data/site.yaml.')
         config.write_text(text)
+        profile_defaults = json.loads((ROOT / 'data/presets' / f'{preset}.json').read_text())
         apply_preset(destination, preset, name)
-        if palette:
-            apply_palette(destination, palette)
-        if fonts:
-            apply_fonts(destination, fonts)
+        selected_palette = palette or profile_defaults.get('palette')
+        selected_fonts = fonts or profile_defaults.get('font_pairing')
+        if selected_palette:
+            apply_palette(destination, selected_palette)
+        if selected_fonts:
+            apply_fonts(destination, selected_fonts)
         readme = destination / 'README.md'
         readme.write_text(f'> Client draft: {name}. Preset: `{preset}`. This copy excludes the master workshop and other presets. The factory reference below documents the shared system; see `docs/factory-guide.md` for editing this copy.\n\n' + readme.read_text())
         # Each new instance starts private and disabled, irrespective of source settings.
@@ -226,19 +229,22 @@ def guided(ask=input):
                for slug in available_presets()]
     preset = choose(ask, 'Step 3 of 5 — Starting preset (pages and sections you can change later)', presets,
                     next((i for i, p in enumerate(presets) if p[0] == 'agency'), 0))
+    profile_defaults = json.loads((ROOT / 'data/presets' / f'{preset}.json').read_text())
     palettes = json.loads((ROOT / 'data/palettes.json').read_text())
     palette = choose(ask, 'Step 4 of 5 — Colors (every palette passes contrast checks)',
-                     [(None, 'Preset accent', 'keep the default theme with the preset\'s accent color')]
+                     [(None, 'Preset colors', f'use {profile_defaults.get("palette")}' if profile_defaults.get('palette') else 'keep the preset accent color')]
                      + [(key, key, p['use']) for key, p in palettes.items()])
     fonts = json.loads((ROOT / 'data/fonts.json').read_text())
     pairing = choose(ask, 'Step 5 of 5 — Fonts (self-hosted, open-licensed)',
-                     [(key, key, f['use']) for key, f in fonts.items()])
+                     [(None, 'Preset font pairing', f'use {profile_defaults.get("font_pairing", "modern")}')]
+                     + [(key, key, f['use']) for key, f in fonts.items()])
     print(f'\nSummary\n  Name:    {name}\n  Folder:  {destination}\n  Preset:  {preset}\n'
-          f'  Colors:  {palette or "preset accent"}\n  Fonts:   {pairing}')
+          f'  Colors:  {palette or profile_defaults.get("palette", "preset accent")}\n'
+          f'  Fonts:   {pairing or profile_defaults.get("font_pairing", "modern")}')
     if choose(ask, 'Create this copy?', [(True, 'Yes, create it', ''), (False, 'No, cancel', '')]) is not True:
         print('Cancelled. Nothing was created.')
         return None
-    return create(destination, name, preset, palette, None if pairing == 'modern' else pairing)
+    return create(destination, name, preset, palette, pairing)
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)

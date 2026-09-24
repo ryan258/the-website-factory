@@ -1,0 +1,611 @@
+{
+  "name": "Red Clay Earthworks",
+  "label": "Construction and earthworks · fictional example",
+  "description": "A Jones Construction-inspired example composition. All business identity, project stories, contacts, and locations here are fictional placeholders.",
+  "tone": "clay",
+  "palette": "earthworks",
+  "font_pairing": "editorial",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Fictional construction and earthworks homepage.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "split",
+          "content": "hero"
+        },
+        {
+          "module": "features",
+          "variant": "grid",
+          "content": "features"
+        },
+        {
+          "module": "services",
+          "variant": "cards",
+          "content": "services",
+          "anchor": "services"
+        },
+        {
+          "module": "process",
+          "variant": "steps",
+          "content": "process",
+          "anchor": "approach"
+        },
+        {
+          "module": "work",
+          "variant": "gallery",
+          "content": "work",
+          "anchor": "work"
+        },
+        {
+          "module": "areas",
+          "variant": "cards",
+          "content": "areas",
+          "anchor": "coverage"
+        },
+        {
+          "module": "faq",
+          "variant": "accordion",
+          "content": "faq",
+          "anchor": "questions"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "services": {
+      "title": "Services",
+      "description": "Illustrative earthworks and construction services.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-services"
+        },
+        {
+          "module": "services",
+          "variant": "rows",
+          "content": "services"
+        },
+        {
+          "module": "fit",
+          "variant": "split",
+          "content": "fit"
+        },
+        {
+          "module": "preparation",
+          "variant": "checklist",
+          "content": "preparation"
+        },
+        {
+          "module": "faq",
+          "variant": "accordion",
+          "content": "faq",
+          "anchor": "questions"
+        }
+      ]
+    },
+    "work": {
+      "title": "Sample work",
+      "description": "Sample earthworks images and project story prompts.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-work"
+        },
+        {
+          "module": "work",
+          "variant": "gallery",
+          "content": "work"
+        },
+        {
+          "module": "before-after",
+          "variant": "panels",
+          "content": "before-after"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "about": {
+      "title": "About",
+      "description": "A fictional contractor profile and project process.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-about"
+        },
+        {
+          "module": "about",
+          "variant": "split",
+          "content": "about"
+        },
+        {
+          "module": "timeline",
+          "variant": "vertical",
+          "content": "timeline"
+        },
+        {
+          "module": "cta",
+          "variant": "band",
+          "content": "cta"
+        }
+      ]
+    },
+    "estimate": {
+      "title": "Project brief",
+      "description": "Prepare a project brief on this device and choose an explicit email handoff.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-estimate"
+        },
+        {
+          "module": "project-brief",
+          "variant": "wizard",
+          "content": "brief",
+          "anchor": "project-brief"
+        },
+        {
+          "module": "support",
+          "variant": "routes",
+          "content": "support-estimate"
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Fictional contact options and review notes.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-contact"
+        },
+        {
+          "module": "contact",
+          "variant": "panel",
+          "content": "contact"
+        },
+        {
+          "module": "faq",
+          "variant": "open",
+          "content": "faq-contact"
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "Example privacy information awaiting owner review.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "compact",
+          "content": "intro-contact"
+        },
+        {
+          "module": "policies",
+          "variant": "open",
+          "content": "privacy"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "hero": {
+      "label": "Fictional earthworks example",
+      "title": "Good ground work starts with a clear plan.",
+      "intro": "Site preparation, land clearing, septic systems, and utility work, explained in plain language. This sample shows how a local contractor site can help visitors understand the work and prepare a useful first conversation.",
+      "action": {
+        "label": "Build a project brief",
+        "url": "/estimate/"
+      },
+      "secondary": {
+        "label": "Explore services",
+        "url": "/services/"
+      },
+      "note": "Illustrative business and imagery · Replace with owner-approved details before publication.",
+      "art": "image",
+      "image": "images/construction/hero-excavator.webp",
+      "imageAlt": "Illustrative excavator at a cleared work site; not a verified customer project"
+    },
+    "features": {
+      "label": "A useful first conversation",
+      "title": "The details that shape a job.",
+      "items": [
+        {
+          "title": "Scope",
+          "text": "Describe the result you need and what is already on site."
+        },
+        {
+          "title": "Access",
+          "text": "Share how equipment and people can reach the work area."
+        },
+        {
+          "title": "Timing",
+          "text": "Explain your preferred sequence or any known deadline."
+        },
+        {
+          "title": "Next step",
+          "text": "Use a project brief to organize the questions before you contact a contractor."
+        }
+      ],
+      "notice": "These prompts help frame a conversation; they are not a quote or a promise of availability."
+    },
+    "services": {
+      "label": "What we do",
+      "title": "Start with the work your property needs.",
+      "intro": "A sample construction service catalog. A real business should keep only the work it currently offers and can confirm.",
+      "items": [
+        {
+          "title": "Septic systems",
+          "text": "Plan a septic project around property conditions, system scope, and the approvals that need to be confirmed.",
+          "url": "/services/septic-systems/"
+        },
+        {
+          "title": "Dirt work and site preparation",
+          "text": "Shape a site for the next phase with grading, access, and drainage discussed up front.",
+          "url": "/services/site-preparation/"
+        },
+        {
+          "title": "Land clearing and demolition",
+          "text": "Review the area, material, access, and disposal needs before work is defined.",
+          "url": "/services/land-clearing/"
+        },
+        {
+          "title": "Water lines and utility work",
+          "text": "Discuss the route, connection points, utility coordination, and site access before scheduling.",
+          "url": "/services/water-and-utilities/"
+        },
+        {
+          "title": "Custom construction",
+          "text": "Bring a project with several moving parts into one conversation about scope and sequence.",
+          "url": "/services/custom-construction/"
+        }
+      ]
+    },
+    "process": {
+      "label": "A clear sequence",
+      "title": "From site questions to a defined next step.",
+      "items": [
+        {
+          "title": "Describe the site",
+          "text": "Share the property context, access, and result you are looking for."
+        },
+        {
+          "title": "Review the scope",
+          "text": "Confirm which service fits and what site details still need a closer look."
+        },
+        {
+          "title": "Plan the work",
+          "text": "Discuss dependencies, approvals, timing, and the agreed finish before scheduling."
+        },
+        {
+          "title": "Close the loop",
+          "text": "Confirm what was completed and what follow-up, if any, remains."
+        }
+      ]
+    },
+    "work": {
+      "label": "Sample work stories",
+      "title": "Show the site, the scope, and the result.",
+      "intro": "Project stories are strongest when they explain the property conditions and work performed alongside permissioned photos.",
+      "items": [
+        {
+          "title": "Site preparation example",
+          "text": "Illustrative image for a site-preparation story. Replace with an approved project, location, scope, and outcome.",
+          "image": "images/construction/site-preparation-example.webp",
+          "imageAlt": "Illustrative site excavation image used as sample artwork",
+          "url": "/work/site-preparation/"
+        },
+        {
+          "title": "Land clearing example",
+          "text": "Illustrative image for a land-clearing story. Add verified details about access, material, and the agreed result.",
+          "image": "images/construction/clearing-example.webp",
+          "imageAlt": "Illustrative land-clearing image used as sample artwork",
+          "url": "/work/land-clearing/"
+        },
+        {
+          "title": "Septic installation example",
+          "text": "Illustrative image for a septic-system story. Use only authorized images and confirmed job details.",
+          "image": "images/construction/septic-example.webp",
+          "imageAlt": "Illustrative septic-system work image used as sample artwork",
+          "url": "/work/septic-installation/"
+        }
+      ],
+      "notice": "The business, project stories, and images in this preset are fictional examples, not completed jobs or customer evidence."
+    },
+    "before-after": {
+      "label": "Explain the change",
+      "title": "Pair the starting conditions with the finished work.",
+      "items": [
+        {
+          "title": "Before",
+          "text": "Describe the original site conditions and the customer's goal using approved project details."
+        },
+        {
+          "title": "After",
+          "text": "Explain the completed scope and any limits that matter to understanding the result."
+        }
+      ],
+      "notice": "Use matched images from the same job, with permission and accurate captions."
+    },
+    "areas": {
+      "label": "Coverage to confirm",
+      "title": "Make the service area specific and accurate.",
+      "items": [
+        {
+          "title": "Primary area",
+          "text": "List confirmed towns, counties, or a clear distance from the business base."
+        },
+        {
+          "title": "Travel limits",
+          "text": "Explain where travel needs a separate conversation or site review."
+        },
+        {
+          "title": "Property fit",
+          "text": "Give visitors a direct way to ask about a location not listed here."
+        }
+      ],
+      "notice": "No real location or coverage claim is included in this fictional example."
+    },
+    "faq": {
+      "label": "Before scheduling",
+      "title": "Questions worth answering early.",
+      "items": [
+        {
+          "title": "What should I share first?",
+          "text": "Describe the result you need, the property location, and what you know about access or existing utilities."
+        },
+        {
+          "title": "Can you estimate a project from photos?",
+          "text": "Photos can help start a conversation, but the business must explain what can be assessed remotely and what needs a site visit."
+        },
+        {
+          "title": "Who confirms permits and utilities?",
+          "text": "State the actual coordination process and who is responsible for each approval before work begins."
+        },
+        {
+          "title": "Does a project brief book the work?",
+          "text": "No. It organizes information for a conversation. Scope, price, availability, and scheduling require direct confirmation."
+        }
+      ]
+    },
+    "cta": {
+      "label": "Ready to talk through a site?",
+      "title": "Start with the property and the work you have in mind.",
+      "intro": "The local project brief helps organize details in your browser before you choose an email handoff.",
+      "action": {
+        "label": "Build a project brief",
+        "url": "/estimate/"
+      }
+    },
+    "intro-services": {
+      "label": "Fictional earthworks example",
+      "title": "Construction work, described with useful detail.",
+      "intro": "The service list below is an illustrative catalog based on the shape of the Jones Construction project. Select only verified services for a real business.",
+      "action": {
+        "label": "Build a project brief",
+        "url": "/estimate/"
+      },
+      "note": "Fictional demonstration · No prices, coverage, credentials, or availability are claimed.",
+      "art": "factory"
+    },
+    "fit": {
+      "label": "Choosing the right starting point",
+      "title": "Match the first conversation to the job.",
+      "intro": "Help visitors explain the site and identify details that may need an on-site review.",
+      "items": [
+        {
+          "title": "The result you need",
+          "text": "Describe what you want the property or work area to support.",
+          "group": "fit"
+        },
+        {
+          "title": "Known site conditions",
+          "text": "Share access, slope, soil, utility, or drainage information you already have.",
+          "group": "fit"
+        },
+        {
+          "title": "Unknowns to check",
+          "text": "Call out permits, boundaries, utility marks, or conditions that need confirmation.",
+          "group": "alternative"
+        }
+      ],
+      "notice": "This guide does not establish engineering, permitting, utility, or property requirements."
+    },
+    "preparation": {
+      "label": "Before you reach out",
+      "title": "A few details can make the first call more useful.",
+      "intro": "Only share information you are comfortable including in an email draft.",
+      "items": [
+        {
+          "title": "Location",
+          "text": "A town, county, or general property location; avoid posting a private address publicly."
+        },
+        {
+          "title": "Access",
+          "text": "Gate width, terrain, overhead clearance, or other known equipment constraints."
+        },
+        {
+          "title": "Timing",
+          "text": "Your preferred sequence, seasonal constraints, or known deadline."
+        },
+        {
+          "title": "Photos or plans",
+          "text": "Identify relevant documents and ask how to share them through an owner-approved channel."
+        }
+      ],
+      "notice": "The project brief does not upload or store files."
+    },
+    "intro-work": {
+      "label": "Fictional earthworks example",
+      "title": "Project stories with room for the real details.",
+      "intro": "A useful case study tells visitors what the site needed, what work was agreed, and how the finish was reviewed.",
+      "action": {
+        "label": "Build a project brief",
+        "url": "/estimate/"
+      },
+      "note": "All imagery and story prompts are illustrative.",
+      "art": "factory"
+    },
+    "brief": {
+      "label": "Project brief · Local-only demo",
+      "title": "Organize the details before you get in touch.",
+      "intro": "Three short steps create a readable project summary. Nothing is saved or sent automatically; you choose whether to copy it, download it, or open an email draft.",
+      "services": [
+        "Septic systems",
+        "Dirt work and site preparation",
+        "Land clearing and demolition",
+        "Water lines and utility work",
+        "Custom construction"
+      ],
+      "notice": "This browser-only draft is not a request, quote, reservation, or confirmation of availability. Do not include private information you do not want in an email."
+    },
+    "contact": {
+      "label": "Demonstration contact details",
+      "title": "Choose a real contact path before publication.",
+      "intro": "The contact information and delivery settings in a new copy must belong to its owner.",
+      "items": [
+        {
+          "title": "Email",
+          "text": "hello@example.invalid"
+        },
+        {
+          "title": "Project context",
+          "text": "Share the service, site location, access needs, and desired timing."
+        },
+        {
+          "title": "Response expectations",
+          "text": "Set accurate response expectations only after the business confirms its process."
+        }
+      ],
+      "notice": "Fictional contact information. Contact delivery is disabled in new client copies."
+    },
+    "faq-contact": {
+      "label": "Contact and next steps",
+      "title": "Know what happens after a message.",
+      "items": [
+        {
+          "title": "Does this sample form send messages?",
+          "text": "No. It demonstrates layout only, and new client copies start with delivery disabled."
+        },
+        {
+          "title": "What should a real estimate request explain?",
+          "text": "Use the questions that match the contractor's actual work, and keep unsupported promises out of the form."
+        },
+        {
+          "title": "Where do I check service coverage?",
+          "text": "Replace the example coverage section with owner-confirmed service locations and boundaries."
+        }
+      ]
+    },
+    "intro-about": {
+      "label": "Fictional earthworks example",
+      "title": "A clear approach to site work.",
+      "intro": "A real About page should introduce the people responsible for the work and explain their verified experience and process.",
+      "action": {
+        "label": "Build a project brief",
+        "url": "/estimate/"
+      },
+      "note": "Replace this copy with an owner-reviewed business story.",
+      "art": "factory"
+    },
+    "about": {
+      "label": "About this example",
+      "title": "Work starts with understanding the property.",
+      "intro": "A practical construction site can show visitors what questions matter before equipment arrives.",
+      "body": "This fictional example demonstrates a local contractor website. Replace it with the accountable people, verified experience, safety practices, and working approach of the real business. Do not publish these sample statements as company history.",
+      "aside": "Understand the site. Agree on the scope. Confirm the next step."
+    },
+    "timeline": {
+      "label": "A sample project path",
+      "title": "Make each decision visible.",
+      "items": [
+        {
+          "title": "Initial discussion",
+          "text": "Understand the requested outcome and note the questions that remain."
+        },
+        {
+          "title": "Site review",
+          "text": "Confirm which site details require direct inspection or outside coordination."
+        },
+        {
+          "title": "Scope and schedule",
+          "text": "Document agreed work, dependencies, exclusions, and a confirmed schedule."
+        },
+        {
+          "title": "Closeout",
+          "text": "Review the agreed finish and record any follow-up responsibilities."
+        }
+      ],
+      "notice": "The sequence is illustrative and does not imply service commitments."
+    },
+    "intro-estimate": {
+      "label": "Project estimate",
+      "title": "Build a useful first brief.",
+      "intro": "Share a few project details, then choose a handoff from your own device.",
+      "action": {
+        "label": "Start your brief",
+        "url": "/estimate/#project-brief"
+      },
+      "note": "Nothing is saved or submitted by this page.",
+      "art": "factory"
+    },
+    "support-estimate": {
+      "label": "Prefer another path?",
+      "title": "Use the owner's confirmed contact options.",
+      "intro": "Call, email, or text availability belongs to the business and must be configured by its owner.",
+      "notice": "This example does not provide real contact details or response-time promises.",
+      "items": [
+        {
+          "title": "Email",
+          "text": "Use the business's verified public email address.",
+          "url": "/contact/",
+          "link_label": "View contact options"
+        }
+      ]
+    },
+    "intro-contact": {
+      "label": "Fictional earthworks example",
+      "title": "A practical next step for your property.",
+      "intro": "Review sample contact options and decide what information to share.",
+      "action": {
+        "label": "Build a project brief",
+        "url": "/estimate/"
+      },
+      "note": "Example details · Replace before publication.",
+      "art": "factory"
+    },
+    "privacy": {
+      "label": "Privacy needs review",
+      "title": "Describe the data this site actually handles.",
+      "intro": "The local project brief stays in the current browser tab until a visitor chooses a handoff.",
+      "items": [
+        {
+          "title": "Local draft",
+          "text": "This sample brief uses page memory only. It does not submit, upload, or persist answers."
+        },
+        {
+          "title": "Email handoff",
+          "text": "Choosing an email action opens the visitor's email app. The visitor reviews and sends the message themselves."
+        },
+        {
+          "title": "Owner review",
+          "text": "Update this policy for actual hosting, contact services, and any future storage or integrations."
+        }
+      ],
+      "notice": "Sample privacy wording. Review the actual site and applicable requirements before publication."
+    }
+  }
+}

@@ -98,6 +98,17 @@ $preview-pale: #e3eee0;
   color: $preview-pale;
 }
 
+.art-construction {
+  background: linear-gradient(145deg, #17211f 0 52%, #35423d 52% 100%);
+  color: #f3efe7;
+}
+
+.art-construction i {
+  border-color: #efaa37;
+  background: color.change(#efaa37, $alpha: .18);
+  transform: rotate(-8deg);
+}
+
 .art-consultant i {
   border-radius: 50%;
   background: transparent;

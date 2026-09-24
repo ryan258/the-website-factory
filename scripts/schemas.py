@@ -21,12 +21,12 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'schemas'
 # Classifying scope as included/excluded or fit/not-fit is a business decision, so an AI
 # draft may not choose these modules; a person adds them in the planner.
-HUMAN_ONLY = {'fit', 'inclusions'}
+HUMAN_ONLY = {'fit', 'inclusions', 'project-brief'}
 
 def load():
     return json.loads((ROOT/'data/modules.json').read_text()), json.loads((ROOT/'data/tones.json').read_text())
 
-def preset_schema(registry, tones):
+def preset_schema(registry, tones, palettes, font_pairings):
     text = {'$ref': '#/$defs/text'}
     action = {'$ref': '#/$defs/action'}
     shared = {'text': {'type': 'string', 'minLength': 1},
@@ -36,11 +36,15 @@ def preset_schema(registry, tones):
                        'description': 'A local page path (optionally /page/#anchor), mailto:, or tel: link'}}
     item = {'type': 'object', 'required': ['title', 'text'],
             'properties': {'title': text, 'text': text, 'url': {'$ref': '#/$defs/link'},
-                           'image': {'type': 'string'}}}
+                           'image': {'type': 'string'}, 'imageAlt': {'type': 'string'}}}
     content = {}
     for key, module in registry.items():
         props = {f: text for f in ('title', 'intro', 'body', 'notice', 'label', 'aside', 'note')}
         props.update(action=action, secondary=action)
+        if 'services' in module['required']:
+            props['services'] = {'type': 'array', 'minItems': 1, 'items': text}
+        if key == 'hero':
+            props.update(image={'type': 'string'}, imageAlt=text)
         if 'items' in module['required']:
             entry = json.loads(json.dumps(item))
             entry['required'] = ['title', 'text', *module.get('item_required', [])]
@@ -73,6 +77,8 @@ def preset_schema(registry, tones):
         'properties': {
             'name': text, 'label': text, 'description': {'type': 'string'},
             'tone': {'enum': list(tones)},
+            'palette': {'enum': list(palettes)},
+            'font_pairing': {'enum': list(font_pairings)},
             'pages': {'type': 'object', 'required': ['home', 'contact'],
                       'patternProperties': {'^[a-z][a-z0-9-]*$': page}, 'additionalProperties': False},
             'sections': {'type': 'object', 'additionalProperties': {'type': 'object'}},
@@ -103,7 +109,9 @@ def plan_schema(registry):
 
 def generated():
     registry, tones = load()
-    return {'preset.schema.json': preset_schema(registry, tones), 'plan.schema.json': plan_schema(registry)}
+    palettes = json.loads((ROOT/'data/palettes.json').read_text())
+    font_pairings = json.loads((ROOT/'data/fonts.json').read_text())
+    return {'preset.schema.json': preset_schema(registry, tones, palettes, font_pairings), 'plan.schema.json': plan_schema(registry)}
 
 def validate(instance, schema, root=None, path='$'):
     """Return a list of 'path: problem' strings for the JSON Schema keywords these files use."""

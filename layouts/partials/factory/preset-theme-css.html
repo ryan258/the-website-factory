@@ -1,0 +1,37 @@
+{{ $rules := "" }}
+{{ range $slug, $profile := hugo.Data.presets }}
+  {{ with $profile.palette }}
+    {{ $palette := index hugo.Data.palettes . }}
+    {{ if $palette }}
+      {{ $light := "color-scheme: light dark;" }}
+      {{ range $key, $value := $palette.colors }}
+        {{ if not (hasPrefix $key "dark_") }}
+          {{ $light = printf "%s--%s: %s;" $light (replace $key "_" "-") $value }}
+        {{ end }}
+      {{ end }}
+      {{ with $profile.font_pairing }}
+        {{ $pairing := index hugo.Data.fonts . }}
+        {{ if $pairing }}
+          {{ $body := $pairing.body }}
+          {{ $heading := $pairing.heading | default $body }}
+          {{ $light = printf "%s--font: \"%s\", %s;" $light $body.family $body.fallback }}
+          {{ $light = printf "%s--heading-font: \"%s\", %s;" $light $heading.family $heading.fallback }}
+          {{ $light = printf "%s--heading-tracking: %s;" $light $pairing.tracking }}
+        {{ end }}
+      {{ end }}
+      {{ $selector := printf ".composition[data-preset=\"%s\"]" $slug }}
+      {{ $rules = printf "%s%s{%s}\n" $rules $selector $light }}
+      {{ $dark := "" }}
+      {{ range $key, $value := $palette.colors }}
+        {{ if hasPrefix $key "dark_" }}
+          {{ $token := replaceRE "^dark_" "" $key }}
+          {{ $dark = printf "%s--%s: %s;" $dark (replace $token "_" "-") $value }}
+        {{ end }}
+      {{ end }}
+      {{ with $dark }}
+        {{ $rules = printf "%s@media (prefers-color-scheme: dark){%s{%s}}\n" $rules $selector . }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ return $rules }}

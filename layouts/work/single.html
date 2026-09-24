@@ -1,4 +1,19 @@
 {{ define "main" }}
+{{ if .Params.project_story }}
+{{ partial "page-intro.html" . }}
+<article class="container case-study project-story">
+  <p class="notice">{{ .Params.notice }}</p>
+  {{ partial "picture.html" . }}
+  <div class="project-story__facts">
+    <article><p class="eyebrow">Service</p><h2>{{ .Params.service }}</h2></article>
+    <article><p class="eyebrow">Site context</p><p>{{ .Params.site_condition }}</p></article>
+    <article><p class="eyebrow">Planning focus</p><p>{{ .Params.planning_focus }}</p></article>
+  </div>
+  <div class="prose section">{{ .Content }}</div>
+  <a class="text-link" href="{{ "work/" | relURL }}">← Back to sample work</a>
+</article>
+{{ partial "cta.html" . }}
+{{ else }}
 {{ $page := . }}{{ range slice "before_score" "after_score" "before_lcp" "after_lcp" "before_weight" "after_weight" }}{{ if not (isset $page.Params.metrics .) }}{{ errorf "%s: metrics.%s is required" $page.File.Path . }}{{ end }}{{ end }}{{ partial "page-intro.html" . }}<article class="container case-study">
 <p class="notice">{{ hugo.Data.site.case_notice }}</p>{{ partial "picture.html" . }}<div class="prose section">{{ .Content }}<h2>Speed, by design.</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Illustrative speed comparison">
@@ -32,4 +47,4 @@
 </div>
 <a class="text-link" href="{{ "work/" | relURL }}">← Back to all work</a>
 </div>
-</article>{{ partial "cta.html" . }}{{ end }}
+</article>{{ partial "cta.html" . }}{{ end }}{{ end }}

@@ -28,7 +28,7 @@ class FactoryTests(unittest.TestCase):
         self.assertEqual(sass_map,tones,'$tones in _variables.scss must match data/tones.json')
     def test_presets_build_at_root_and_subpath(self):
         with tempfile.TemporaryDirectory(prefix='factory-presets-') as tmp:
-            for slug in ('agency','contractor','consultant','local-service','clinic','restaurant','nonprofit'):
+            for slug in ('agency','contractor','construction','consultant','local-service','clinic','restaurant','nonprofit'):
                 with self.subTest(preset=slug):
                     dest=new_site.create(Path(tmp)/slug,'Review Studio',slug)
                     self.assertEqual(factory.validate(dest),[])
@@ -49,10 +49,11 @@ class FactoryTests(unittest.TestCase):
                         contact=(output/'contact/index.html').read_text()
                         self.assertIn('disabled',contact)
                         self.assertIn('hello@example.invalid',contact)
-                        if slug!='agency':
+                        if slug not in ('agency', 'construction'):
                             self.assertFalse((output/'work/index.html').exists())
-                            self.assertFalse((output/'pricing/index.html').exists())
                             self.assertNotIn('/work/',home)
+                        if slug!='agency':
+                            self.assertFalse((output/'pricing/index.html').exists())
                             self.assertNotIn('/pricing/',(output/'sitemap.xml').read_text())
                             self.assertNotIn('Website design',contact)
     def test_removed_page_and_module_disappear_on_rebuild(self):

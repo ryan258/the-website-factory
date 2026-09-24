@@ -1,0 +1,61 @@
+{{ $d := .data }}
+<div class="project-brief" data-project-brief data-recipient="{{ hugo.Data.site.email }}">
+  <ol class="project-brief__progress" aria-label="Project brief steps">
+    <li data-brief-indicator="0" aria-current="step"><span>01</span> The work</li>
+    <li data-brief-indicator="1"><span>02</span> The site</li>
+    <li data-brief-indicator="2"><span>03</span> Reaching you</li>
+  </ol>
+  <form class="project-brief__form" data-brief-form autocomplete="on">
+    <fieldset data-brief-step>
+      <legend><span>Step 1 of 3</span> What work do you have in mind?</legend>
+      <label for="brief-service">Service area <span aria-hidden="true">*</span></label>
+      <select id="brief-service" name="service" required>
+        <option value="">Choose a service</option>
+        {{ range $d.services }}<option value="{{ . }}">{{ . }}</option>{{ end }}
+      </select>
+      <label for="brief-project">What would you like done? <span aria-hidden="true">*</span></label>
+      <textarea id="brief-project" name="project" rows="5" maxlength="1200" required placeholder="Describe the result you need and what you already know about the work."></textarea>
+    </fieldset>
+    <fieldset data-brief-step hidden>
+      <legend><span>Step 2 of 3</span> What should we know about the site?</legend>
+      <label for="brief-location">Town or general location <span aria-hidden="true">*</span></label>
+      <input id="brief-location" name="location" type="text" maxlength="120" required autocomplete="address-level2" placeholder="Avoid entering a full private address">
+      <label for="brief-timing">Preferred timing <span aria-hidden="true">*</span></label>
+      <select id="brief-timing" name="timing" required>
+        <option value="">Choose a timing preference</option>
+        <option>As soon as practical</option>
+        <option>Within the next few months</option>
+        <option>Planning for later</option>
+        <option>Flexible or unsure</option>
+      </select>
+      <label for="brief-access">Access or site details <span class="project-brief__optional">Optional</span></label>
+      <textarea id="brief-access" name="access" rows="3" maxlength="800" placeholder="Known access limits, slope, utilities, or other conditions."></textarea>
+    </fieldset>
+    <fieldset data-brief-step hidden>
+      <legend><span>Step 3 of 3</span> How can the business reply?</legend>
+      <label for="brief-name">Your name <span aria-hidden="true">*</span></label>
+      <input id="brief-name" name="name" type="text" maxlength="120" required autocomplete="name">
+      <label for="brief-reply-email">Email address <span aria-hidden="true">*</span></label>
+      <input id="brief-reply-email" name="replyEmail" type="email" maxlength="254" required autocomplete="email">
+      <p class="project-brief__privacy">These details are included only if you choose an email handoff. The site does not save or submit this draft.</p>
+    </fieldset>
+    <div class="project-brief__step-actions">
+      <button class="button button--outline" type="button" data-brief-back hidden>Back</button>
+      <button class="button" type="button" data-brief-next>Next step</button>
+    </div>
+  </form>
+  <section class="project-brief__result" data-brief-result hidden aria-labelledby="brief-result-title">
+    <h3 id="brief-result-title">Your project brief</h3>
+    <p>Review the summary, then choose a handoff. No action happens until you choose one.</p>
+    <pre data-brief-summary tabindex="0"></pre>
+    <div class="project-brief__handoffs">
+      <button class="button" type="button" data-brief-email>Open email draft</button>
+      <button class="button button--outline" type="button" data-brief-copy>Copy brief</button>
+      <button class="button button--outline" type="button" data-brief-download>Download text file</button>
+      <button class="text-link" type="button" data-brief-reset>Start over</button>
+    </div>
+  </section>
+  <p class="project-brief__status" data-brief-status role="status" aria-live="polite"></p>
+  <noscript><p>JavaScript is required to prepare a project brief here. Use the <a href="{{ "contact/" | relURL }}">contact page</a> for other options.</p></noscript>
+  <p class="project-brief__local-note">This draft stays in the current browser tab. Closing or reloading the page clears it.</p>
+</div>
