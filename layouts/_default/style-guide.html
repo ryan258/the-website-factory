@@ -247,19 +247,22 @@
         <div class="form-grid sg-form-stack">
           <div class="form-field">
             <label class="sg-form-label" for="demo-name">Your name</label>
-            <input class="sg-form-control" id="demo-name" type="text" placeholder="e.g. Alex Morgan">
+            <input class="sg-form-control" id="demo-name" type="text" aria-describedby="demo-name-help" placeholder="e.g. Alex Morgan">
+            <small class="sg-note" id="demo-name-help">Enter the name the business should use when replying.</small>
           </div>
           <div class="form-field">
             <label class="sg-form-label" for="demo-service">Service of interest</label>
-            <select class="sg-form-control" id="demo-service">
+            <select class="sg-form-control" id="demo-service" aria-describedby="demo-service-help">
               <option>New website build</option>
               <option>Brand refresh & redesign</option>
               <option>Content & performance optimization</option>
             </select>
+            <small class="sg-note" id="demo-service-help">Choose the service closest to what you need. Use the project details field for anything else.</small>
           </div>
           <div class="form-field">
             <label class="sg-form-label" for="demo-message">Project details</label>
-            <textarea class="sg-form-control" id="demo-message" rows="3" placeholder="Briefly describe what your business needs..."></textarea>
+            <textarea class="sg-form-control" id="demo-message" rows="3" aria-describedby="demo-message-help" placeholder="Briefly describe what your business needs..."></textarea>
+            <small class="sg-note" id="demo-message-help">Describe the result you need and any known timing or constraints. The demo does not send this text.</small>
           </div>
           <div>
             <button type="button" class="button sg-disabled" disabled>Submit message (disabled in demo)</button>

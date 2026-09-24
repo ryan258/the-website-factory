@@ -822,6 +822,13 @@
   font-weight: 650;
 }
 
+.project-brief__help {
+  display: block;
+  margin-top: -6px;
+  color: var(--muted);
+  font-size: .86rem;
+}
+
 .project-brief input,
 .project-brief select,
 .project-brief textarea {

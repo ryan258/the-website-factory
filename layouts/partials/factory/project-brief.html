@@ -9,34 +9,41 @@
     <fieldset data-brief-step>
       <legend><span>Step 1 of 3</span> What work do you have in mind?</legend>
       <label for="brief-service">Service area <span aria-hidden="true">*</span></label>
-      <select id="brief-service" name="service" required>
+      <select id="brief-service" name="service" required aria-describedby="brief-service-help">
         <option value="">Choose a service</option>
         {{ range $d.services }}<option value="{{ . }}">{{ . }}</option>{{ end }}
       </select>
+      <small class="project-brief__help" id="brief-service-help">Choose the service area that best fits the work. If more than one applies, choose the main one and explain the rest below.</small>
       <label for="brief-project">What would you like done? <span aria-hidden="true">*</span></label>
-      <textarea id="brief-project" name="project" rows="5" maxlength="1200" required placeholder="Describe the result you need and what you already know about the work."></textarea>
+      <textarea id="brief-project" name="project" rows="5" maxlength="1200" required aria-describedby="brief-project-help" placeholder="Describe the result you need and what you already know about the work."></textarea>
+      <small class="project-brief__help" id="brief-project-help">Tell us what you want changed or built, what outcome you need, and any details you already know. It is fine to say what you are unsure about.</small>
     </fieldset>
     <fieldset data-brief-step hidden>
       <legend><span>Step 2 of 3</span> What should we know about the site?</legend>
       <label for="brief-location">Town or general location <span aria-hidden="true">*</span></label>
-      <input id="brief-location" name="location" type="text" maxlength="120" required autocomplete="address-level2" placeholder="Avoid entering a full private address">
+      <input id="brief-location" name="location" type="text" maxlength="120" required autocomplete="address-level2" aria-describedby="brief-location-help" placeholder="Avoid entering a full private address">
+      <small class="project-brief__help" id="brief-location-help">Enter a town, neighborhood, or general area so the business can check service coverage. Do not enter a street address.</small>
       <label for="brief-timing">Preferred timing <span aria-hidden="true">*</span></label>
-      <select id="brief-timing" name="timing" required>
+      <select id="brief-timing" name="timing" required aria-describedby="brief-timing-help">
         <option value="">Choose a timing preference</option>
         <option>As soon as practical</option>
         <option>Within the next few months</option>
         <option>Planning for later</option>
         <option>Flexible or unsure</option>
       </select>
+      <small class="project-brief__help" id="brief-timing-help">Choose your preference, not a confirmed appointment. Select “Flexible or unsure” if you do not have a date in mind.</small>
       <label for="brief-access">Access or site details <span class="project-brief__optional">Optional</span></label>
-      <textarea id="brief-access" name="access" rows="3" maxlength="800" placeholder="Known access limits, slope, utilities, or other conditions."></textarea>
+      <textarea id="brief-access" name="access" rows="3" maxlength="800" aria-describedby="brief-access-help" placeholder="Known access limits, slope, utilities, or other conditions."></textarea>
+      <small class="project-brief__help" id="brief-access-help">Mention conditions that could affect the work, such as access limits or known utilities. Leave blank if none apply or you are unsure.</small>
     </fieldset>
     <fieldset data-brief-step hidden>
       <legend><span>Step 3 of 3</span> How can the business reply?</legend>
       <label for="brief-name">Your name <span aria-hidden="true">*</span></label>
-      <input id="brief-name" name="name" type="text" maxlength="120" required autocomplete="name">
+      <input id="brief-name" name="name" type="text" maxlength="120" required autocomplete="name" aria-describedby="brief-name-help">
+      <small class="project-brief__help" id="brief-name-help">Enter the name the business should use when replying.</small>
       <label for="brief-reply-email">Email address <span aria-hidden="true">*</span></label>
-      <input id="brief-reply-email" name="replyEmail" type="email" maxlength="254" required autocomplete="email">
+      <input id="brief-reply-email" name="replyEmail" type="email" maxlength="254" required autocomplete="email" aria-describedby="brief-email-help">
+      <small class="project-brief__help" id="brief-email-help">Check the spelling; the business will use this address to reply. Enter an address like name@example.com.</small>
       <p class="project-brief__privacy">These details are included only if you choose an email handoff. The site does not save or submit this draft.</p>
     </fieldset>
     <div class="project-brief__step-actions">

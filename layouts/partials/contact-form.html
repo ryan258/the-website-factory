@@ -25,19 +25,20 @@
 <div>
 <label for="email">Email address</label>
 <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="email-help">
-<small id="email-help">Use an address in the format name@example.com.</small>
+<small id="email-help">We will use this address to reply. Check the spelling; it should look like name@example.com.</small>
 </div>
 </div>
 <label for="company">Company <span>(optional)</span>
 </label>
-<input id="company" name="company" autocomplete="organization" maxlength="160">
+<input id="company" name="company" autocomplete="organization" maxlength="160" aria-describedby="company-help">
+<small id="company-help">Enter your business or organization name, if relevant. Leave blank for a personal enquiry.</small>
 <div class="form-grid">
 <div>
 <label for="project-type">Project type</label>
 <select id="project-type" name="project-type" required aria-describedby="type-help">
 <option value="">Select a project type</option>{{ range $types }}<option>{{ . }}</option>{{ end }}<option>Not sure yet</option>
 </select>
-<small id="type-help">Choose the closest match.</small>
+<small id="type-help">Choose the closest match, or select “Not sure yet” if you are undecided.</small>
 </div>
 <div>
 <label for="budget">Budget range</label>

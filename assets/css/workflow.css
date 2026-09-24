@@ -2,3 +2,4 @@
 /* Keep the neutral wireframe readable when the agency shell uses dark mode. */
 .wf p,.wf li,.wf small,.wf legend,.wf summary{color:var(--wf-fg)}
 .wf-start-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(250px,1fr);gap:18px;align-items:start}.wf-start-grid>*{min-width:0}.wf-start-card{margin-top:12px}.wf-start-card>.wf-small:first-child{font-weight:700;letter-spacing:.08em}.wf-start-card #starter-summary{min-height:3em}.wf-start-blank{background:var(--wf-soft)}.wf-start section>h2{margin-top:28px}@media(max-width:800px){.wf-start-grid{grid-template-columns:1fr}}
+.wf small.wf-help{display:block;font-size:.85rem;font-weight:400;margin:4px 0 12px;color:#444}
