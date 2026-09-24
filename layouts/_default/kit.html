@@ -1,14 +1,29 @@
 {{ define "main" }}
 {{ $css := resources.Get "css/workflow.css" | minify | fingerprint }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
-<div class="wf" id="workflow" data-catalog-url="{{ "site-kit/catalog/" | relURL }}">
+<div class="wf" id="workflow" data-catalog-url="{{ "site-kit/catalog/" | relURL }}" data-starter-base="{{ "site-kit/" | relURL }}">
 <header class="wf-top"><div><p>INTERNAL / LOW-FIDELITY WORKSPACE</p><h1>Client projects</h1></div><a href="{{ "site-kit/catalog/" | relURL }}">Component reference ↗</a></header>
-<p class="wf-note">Work is saved in this browser on this address. Export a project for a portable backup. This prototype plans websites; it does not publish or generate a client site.</p>
+<p class="wf-note">Start from a complete, ready-to-edit site and remove what you do not need, or build a blank plan. Starter copy stays draft until a person confirms it. Work is saved in this browser on this address; export a project for a portable backup.</p>
 <p id="wf-status" role="status" aria-live="polite">Opening local projects…</p>
 <noscript><p>This editable workspace needs JavaScript for local saving. The <a href="{{ "site-kit/catalog/" | relURL }}">component reference</a> remains available without it.</p></noscript>
 <div id="wf-app"></div>
+{{ $starterDefault := index hugo.Data.presets "local-service" }}
+<template id="wf-home-template">
+<section class="wf-start"><div class="wf-start-grid">
+<article class="wf-box wf-start-card"><p class="wf-small">RECOMMENDED / READY TO EDIT</p><h2>Start with a complete site</h2><p>Load finished page and section plans with draft copy, then delete anything the site does not need. No brief required to begin.</p>
+<label for="starter-preset">Starting site</label><select id="starter-preset">{{ range $slug, $profile := hugo.Data.presets }}{{ if ne $slug "258webco" }}<option value="{{ $slug }}" {{ if eq $slug "local-service" }}selected{{ end }}>{{ $profile.name }} — {{ $profile.label | default $slug }}</option>{{ end }}{{ end }}</select><p id="starter-summary">{{ $starterDefault.description }} {{ len $starterDefault.pages }} pages with ready-to-edit draft sections.</p>
+<label for="starter-project-name">Working title <span class="wf-small">(optional; you can rename it later)</span></label><input id="starter-project-name" type="text" maxlength="100" value="{{ $starterDefault.name }}" autocomplete="off">
+<p><a id="starter-preview" href="{{ "site-kit/local-service/" | relURL }}">Preview this composition ↗</a></p><p><button type="button" data-action="start-starter" class="primary">Load this site and start chiseling</button></p>
+<p class="wf-small">Templates are fictional examples. Their copy is a draft, not client facts or approved claims.</p></article>
+<details class="wf-box wf-start-blank"><summary>Start with a blank plan</summary><p>Create an empty plan and fill it in manually.</p><form id="new-project"><label for="project-name">New project name</label><input id="project-name" name="name" maxlength="100" required><p><button class="primary" type="submit">Start project</button></p></form></details>
+</div><section><h2>Your projects</h2><div id="wf-projects"></div></section>
+<label for="import-project">Import a project backup (.json)</label><input id="import-project" type="file" accept=".json,application/json"></section>
+</template>
 </div>
 <script id="workflow-library" type="application/json">{{ hugo.Data.modules | jsonify | safeJS }}</script>
+{{ $starterProfiles := dict }}
+{{ range $slug, $profile := hugo.Data.presets }}{{ if ne $slug "258webco" }}{{ $starterProfiles = merge $starterProfiles (dict $slug $profile) }}{{ end }}{{ end }}
+<script id="workflow-starters" type="application/json">{{ $starterProfiles | jsonify | safeJS }}</script>
 {{ $js := resources.Get "js/workflow.js" | minify | fingerprint }}
 <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
 {{ end }}
