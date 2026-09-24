@@ -21,9 +21,9 @@ Plays marked ★ are the strongest earners. They solve a problem that costs the 
 
 ### What the factory has today
 
-- **30 section types** (called modules) with **61 layouts** (called variants). Listed in `data/modules.json`.
-- **8 presets** (ready-made starting plans): `agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, and `258webco`.
-- **5 color palettes**, each checked for readable contrast: `studio`, `forest`, `harbor`, `terracotta`, `plum`.
+- **31 section types** (called modules) with **62 layouts** (called variants). Listed in `data/modules.json`.
+- **9 presets** (ready-made starting plans): `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, and `258webco`.
+- **6 color palettes**, each checked for readable contrast: `studio`, `forest`, `harbor`, `terracotta`, `plum`, `earthworks`.
 - **5 font pairings**, all self-hosted and free to use: `modern`, `editorial`, `warm`, `friendly`, `readable`.
 - **AI tools:** Claude can draft a page plan from a written brief. An MCP server (a way for an AI assistant to call the factory's tools) is in `.mcp.json`.
 - **Safety checks:** a site cannot go public while it still says "To be confirmed" or uses the example domain.
@@ -98,7 +98,7 @@ content/<page>/_index.md   → the browser title and search description
 
 To add a section, add one entry to the page's `sections` list and one block under `sections`. To remove a section, delete its entry. Copy a correct starting block from `data/examples.json` in the master (client copies do not include that file).
 
-### The 30 modules
+### The 31 modules
 
 | Module | Layouts | Must have | Each item also needs |
 | --- | --- | --- | --- |
@@ -132,15 +132,17 @@ To add a section, add one entry to the page's `sections` list and one block unde
 | `policies` | `accordion`, `open` | title, intro, items, notice | — |
 | `glossary` | `definitions`, `disclosures` | title, intro, items, notice | — |
 | `support` | `routes`, `steps` | title, intro, items, notice | `url`, `link_label` |
+| `project-brief` | `wizard` | title, intro, services, notice | — |
 
-Every item needs a `title` and `text`. Only the `work` module shows item images.
+Every item needs a `title` and `text`. The `hero` and `work` modules can show local images with descriptive alternative text. The project brief stays in the current browser tab and only copies, downloads, or opens an email draft after an explicit visitor choice.
 
-### The 8 presets
+### The 9 presets
 
 | Preset | Pages | Home page stack |
 | --- | --- | --- |
 | `agency` | home, services, work, pricing, contact | `hero/split` → `stats/strip` → `services/cards` → `work/gallery` → `process/steps` → `cta/band` |
 | `contractor` | home, services, about, contact | `hero/split` → `services/cards` → `about/editorial` → `process/steps` → `areas/cards` → `cta/band` |
+| `construction` | home, services, work, about, estimate, contact, privacy | `hero/split` → `features/grid` → `services/cards` → `process/steps` → `work/gallery` → `areas/cards` → `faq/accordion` → `cta/band` |
 | `consultant` | home, services, about, contact | `hero/centered` → `services/cards` → `about/editorial` → `process/steps` → `resources/cards` → `cta/band` |
 | `local-service` | home, services, about, contact | `hero/split` → `services/cards` → `about/editorial` → `process/steps` → `areas/cards` → `cta/band` |
 | `clinic` | home, services, about, contact | `hero/split` → `services/cards` → `preparation/checklist` → `hours/table` → `cta/band` |
@@ -754,7 +756,7 @@ These use the AI tools to work faster. The human still checks every fact.
 
 **84. ★ White-label builds for other agencies**
 - **Need:** Design agencies have clients but no developer.
-- **Build:** Map their designs onto the 61 layouts. Use their palette and fonts.
+- **Build:** Map their designs onto the 62 layouts. Use their palette and fonts.
 - **Charge:** Wholesale price per site. They add their margin.
 - **Watch:** Agree who talks to the end client, and who owns the files.
 

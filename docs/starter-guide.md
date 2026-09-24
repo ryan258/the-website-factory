@@ -1,6 +1,6 @@
 # Client starter handover
 
-1. Create a fresh copy with `scripts/new_site.py --guided`, or pass options: `--preset` (any file in `data/presets/`: `agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`), plus optional `--palette` and `--fonts`. It refuses existing paths and keeps delivery disabled and `noindex` on.
+1. Create a fresh copy with `scripts/new_site.py --guided`, or pass options: `--preset` (any file in `data/presets/`: `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`), plus optional `--palette` and `--fonts`. Construction defaults to the earthworks palette and editorial fonts. It refuses existing paths and keeps delivery disabled and `noindex` on.
 2. Edit `data/site.yaml`: name/wordmark, email, address, hours, location, navigation, shared CTA, font, colors, social-card text. These are design inputs, not verified business facts.
 3. Edit ordered sections and visible copy in `data/presets/<preset>.json`. Replace page metadata and Markdown, contact service choices, and selected case studies. See `docs/factory-guide.md` for module contracts and removal behavior. All six case metrics live in each case's front matter. Remove unused case files and replace original artwork deliberately.
 4. Replace the default logo/favicon/touch icon and optional decorative hero artwork when the client has approved assets. Each font in `static/fonts/` needs its `OFL-<name>.txt` license beside it; validation fails without one.

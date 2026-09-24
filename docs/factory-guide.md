@@ -1,8 +1,10 @@
 # Sculpt a client website
 
-Follow [the agency delivery cycle](agency-workflow.md) in the master: agree the brief and scope before selecting components. The agency storefront is the default build. Run `python3 scripts/build.py --workshop --serve --port 1314` for internal planning at `http://127.0.0.1:1314/site-kit/`; workshop output goes to `public-workshop`.
+Follow [the agency delivery cycle](agency-workflow.md) in the master. Start from a complete preset, remove pages and components that do not earn their place, then confirm the brief and scope for the smaller site. The agency storefront is the default build. Run `python3 scripts/build.py --workshop --serve --port 1314` for internal planning at `http://127.0.0.1:1314/site-kit/`; workshop output goes to `public-workshop`.
 
-The master includes eight business compositions (`agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`), a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
+The master includes nine business compositions (`agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`), a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
+
+In `/site-kit/`, **Start with a complete site** loads a preset's page plan, selected components, copy, calls to action, and accessibility guidance into the workspace. It opens directly in **Shape pages and copy**; remove unnecessary pages and sections first. The working title is optional, the brief can wait, and starter copy stays in draft. **Start with a blank plan** remains available for unusual projects that do not fit an existing composition.
 
 ## Start a separate copy
 
@@ -12,7 +14,9 @@ Run `python3 scripts/new_site.py --guided` to answer lettered questions instead 
 python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor
 ```
 
-Choose `agency`, `contractor`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, or `258webco`. Add `--palette` with a name from `data/palettes.json` to start from a contrast-checked color set, and `--fonts` with a name from `data/fonts.json` for a self-hosted font pairing. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated agency project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
+Choose `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, or `258webco`. The construction example starts with the earthworks palette and editorial font pairing; override either with `--palette` or `--fonts`. Other presets accept any name from `data/palettes.json` or `data/fonts.json`. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
+
+The `construction` preset is a fictional example based on the shape of the Jones Construction site. It includes linked service-detail pages, linked project stories, process, coverage, FAQ, and contact pages, plus an `/estimate/` page with a local project brief. The brief stays in the current browser tab; visitors can copy or download it, or open an email draft after the owner replaces the example email. It does not submit or store answers. Sample construction images and copy remain clearly identified as illustrative.
 
 ## Compiling presets from the planning workshop
 
@@ -38,6 +42,7 @@ Running without `--write` previews the validated preset JSON to stdout and valid
 `data/factory.json` selects the preset. Its `workshop` flag controls whether the review catalog is included by the build helper. The selected `data/presets/<preset>.json` contains:
 
 - `name`, `label`, and `tone`: the composition identity. Tone is `yellow`, `clay`, `sage`, or `blue`. `name` must match `name` in `data/site.yaml`.
+- `palette` and `font_pairing` (optional): the starting theme for the client copy and workshop example. Construction selects `earthworks` and `editorial` by default; a scaffold command can override either choice.
 - `approved_claims` (optional): claims the business has confirmed. See `scripts/claims.py`.
 - `pages`: page title, description, and ordered section declarations. `home` and `contact` are required, and some page must include a `services` section (the contact form offers its items).
 - `sections`: the editorial content referenced by those declarations.

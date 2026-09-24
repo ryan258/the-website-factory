@@ -3,7 +3,43 @@
 One file for all acceptance evidence. **Current** is what is true today. **History** keeps
 earlier records unchanged, for reference; their numbers are not current results.
 
-## Current — 2026-09-23
+## Current — 2026-09-24
+
+Focused local verification for the construction preset on Hugo Extended 0.166.0 and Dart Sass 1.104.1.
+
+| Check | Result |
+| --- | --- |
+| Factory configuration and internal references (`scripts/factory.py`) | Pass |
+| Generated schema freshness (`python3 scripts/schemas.py --check`) | Pass |
+| Contrast (`scripts/contrast.py`): site theme and 6 palettes, light and dark | Pass (4.5:1 minimum) |
+| Master public build and generated-output checks | Pass; construction detail pages excluded from active `258webco` output |
+| Master workshop build and generated-output checks | Pass; construction composition preview included |
+| Construction client copy, public root build, and `/review/` subpath build | Pass; 5 linked service pages and 3 linked project stories |
+| Client copy privacy defaults | `noindex`; contact form rendered with `data-enabled=false` and no form action |
+| Local project brief output | Copy, download, and email-draft controls present; no server action, network, or browser-storage API in the brief script |
+| Workshop variants and accessibility (`node scripts/check_workshop.cjs`) | Pass (62 variants, living style guide, keyboard, no-JS, 8 preset previews) |
+| Workflow behavior & persistence (`node scripts/check_workflow.cjs`) | Pass (7 behavior groups, storage recovery, capacity limit, scoped axe) |
+| Component library regression (`node scripts/check_components.cjs`) | Pass (10 new families / 20 variants, 3 widths, no-JS disclosures) |
+| Factory test suite (`python3 scripts/test_factory.py`) | Pass (all 13 tests across 9 presets) |
+
+The root and subpath builds ran `scripts/check_site.py` through `scripts/build.py`. The brief script was inspected statically; its browser interactions were not exercised. The generated client copy is a fictional review artifact in `/private/tmp/wf-20260924-red-clay-client-v2`.
+
+The planner now opens on a complete-site starter, with the local-service composition selected and the blank-plan option collapsed. Loading a starter copies its selected pages and sections into the editor with sample copy marked as draft; the user can remove unneeded content before completing the brief. All fictional presets are selectable except the live `258webco` profile. The workshop build and generated-output checks passed; the rendered HTML contains the default local-service choice and construction option, and excludes `258webco`. The fingerprinted planner script is 8,612 bytes gzip against its 9,000-byte budget. `node --check assets/js/workflow.js` and `git diff --check` passed.
+
+### Not verified
+
+- No manual screen-reader, zoom, or real-device review.
+- No approval of sample content, claims, service scope, contact details, or image rights by a real business.
+- No live form submission, hosting, deployment, or publication.
+
+---
+
+## History
+
+These records are kept as written at the time. Tools, test counts, and hosting have
+changed since (for example, forms moved from Netlify to Cloudflare Pages).
+
+### Factory acceptance — 2026-09-23
 
 Verified locally on the `main` branch with Hugo Extended 0.166.0 and Dart Sass 1.104.1.
 
@@ -36,7 +72,7 @@ contact receipt. It shows no fictional case studies. The contact form stays disa
 unless the deploy workflow's **Accept enquiries** input switches the form and the
 endpoint on together.
 
-### Not verified
+### Not verified at the time of the 2026-09-23 verification
 
 - No Lighthouse run. No hosted HTTPS, compression, cache, or CSP check.
 - No live Claude API call: AI drafting was tested against a local stand-in, and only the bakery brief has a saved draft (hand-written to the same rules).
@@ -45,13 +81,6 @@ endpoint on together.
 - No manual keyboard, screen-reader, zoom, or real-device review. Automated axe checks do
   not establish full WCAG conformance.
 - The privacy notice describes what the code does. It has not had a legal review.
-
----
-
-## History
-
-These records are kept as written at the time. Tools, test counts, and hosting have
-changed since (for example, forms moved from Netlify to Cloudflare Pages).
 
 ### Factory acceptance — 2026-09-21
 

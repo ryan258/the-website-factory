@@ -1,6 +1,6 @@
 # Component library: practical visitor needs
 
-The library now contains **30 component families / 61 reference variants**. The planner reads the same module registry as the renderer, making all 30 families available under **Shape pages → Section to add**. Existing saved section names remain compatible.
+The library now contains **31 component families / 62 reference variants**. The planner reads the same module registry as the renderer, making all 31 families available under **Shape pages → Section to add**. Existing saved section names remain compatible.
 
 Choose a family to see its purpose and required content before adding a blank section. The new practical families also include copy and accessibility guidance. Section options retain that guidance and link to the corresponding reference layouts. AI prompt preparation includes the component's guidance; it does not connect to a service or create business facts.
 
@@ -16,12 +16,13 @@ Choose a family to see its purpose and required content before adding a blank se
 | Practical policies | Accordion, open | Read relevant approved conditions before committing |
 | Terms explained | Definition list, disclosures | Understand unfamiliar terminology |
 | Help and support routes | Routes, steps | Choose the appropriate help route |
+| Project brief builder | Guided steps | Organize project details in the current browser tab, then choose an explicit handoff |
 
-These are content components. Event cards do not take bookings, opening hours do not detect live availability, and support links do not create a ticket system. Preparation lists are instructions, not saved task checkboxes. Sample content is explicitly illustrative. Layout choice and client-site generation remain separate from the low-fidelity planner's content plan.
+These are content components. Event cards do not take bookings, opening hours do not detect live availability, and support links do not create a ticket system. Preparation lists are instructions, not saved task checkboxes. The project brief builder does not save or submit answers; copy, download, and email-draft actions happen only when a visitor chooses them. Replace its example email before using that handoff. Sample content is explicitly illustrative. Layout choice and client-site generation remain separate from the low-fidelity planner's content plan.
 
 ## Contracts and reuse
 
-`data/modules.json` defines variants, required fields, optional per-item required fields and allowed choices. Menu items require a price/scope value; events require when/where; support routes require a valid local URL and meaningful link label; service-fit and inclusion entries require a supported group. `scripts/factory.py` rejects missing or invalid structured values before building.
+`data/modules.json` defines variants, required fields, optional per-item required fields and allowed choices. Menu items require a price/scope value; events require when/where; support routes require a valid local URL and meaningful link label; service-fit and inclusion entries require a supported group. `scripts/factory.py` rejects missing or invalid structured values before building. The project brief module is a human-selected feature and is excluded from AI-drafted plans.
 
 `data/examples.json` supplies catalog samples. `layouts/partials/factory/practical.html` renders the new families through the same module entry point used by client compositions. Add a module to a selected preset's ordered sections and supply its required content to use it in a built client site. No new sections were automatically added to the agency storefront.
 

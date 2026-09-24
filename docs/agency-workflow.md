@@ -22,9 +22,9 @@ Open http://127.0.0.1:1314/site-kit/ for the catalog, business presets, and livi
 
 ## Delivery cycle
 
-1. **Understand the brief.** Record the business, audience, visitor goal, existing content, constraints, and who approves the work. Establish whether the project fits before selecting a preset.
-2. **Agree the scope.** Set the page list, content responsibilities, design direction, deliverables, exclusions, fees, and review points in the proposal. Actual timing and prices belong to that agreement.
-3. **Prepare the client workspace.** Create an isolated copy with `scripts/new_site.py`. Choose the closest preset internally and retain only useful pages and sections. Keep client changes in that copy.
+1. **Start from a complete site.** In `/site-kit/`, choose the closest ready-made composition. Its pages, components, and draft copy appear immediately; remove the pages and sections that do not solve a visitor need. A blank plan remains available when no starter fits.
+2. **Confirm the smaller site's brief and scope.** Record the audience, visitor goal, existing content, constraints, page list, content responsibilities, exclusions, and who approves the work. Set design direction, fees, and review points in the proposal. Actual timing and prices belong to that agreement.
+3. **Prepare the client workspace.** Create an isolated copy with `scripts/new_site.py` using the selected preset. Keep client changes in that copy. Replace starter language with confirmed facts and remove any remaining sample material.
 4. **Shape the site.** Apply the client's identity, approved copy, and authentic images. Assemble reusable sections and make project-specific changes where the brief calls for them. The client reviews their own pages, with a clear list of decisions and missing inputs.
 5. **Verify and hand over.** Check the generated site and relevant browser journeys, including mobile navigation and contact behavior. Record remaining issues, content approval, ownership, update instructions, and the launch decision. Publication and live integrations require explicit authorization.
 6. **Learn from delivery.** Record time spent, revision causes, missing components, and support questions. Bring useful general improvements back into the master deliberately, without copying client information or changing other client sites automatically.
@@ -39,7 +39,7 @@ The current agency is still a demonstration. Preserve fictional-project labels a
 
 ## Low-fidelity project workspace
 
-The workshop homepage now opens **Client projects**. Create a project, complete the brief, plan pages, edit section copy in the wireframe, and resolve the review list before preparing a design handoff. Pages and sections can be added, removed, and moved with buttons. Undo restores recent edits during the current session. Reopening a project resumes its last saved stage and page.
+The workshop homepage opens **Client projects** with a complete-site starter selected by default (the compact local-service composition). Load it to see the pages, sections, and draft copy immediately; remove pages in **Page plan** and sections in **Shape pages and copy**. A working title is optional, and the brief can wait until after the first subtraction pass. **Start with a blank plan** remains available as the second path. Pages and sections can also be added and moved with buttons. Undo restores recent edits during the current session. Reopening a project resumes its last saved stage and page.
 
 The section editor separates missing, draft, and approved copy. Editing a section returns its copy to draft; changing project content clears human review confirmations and the ready-for-design marker. Human review is an explicit operator decision, not an automated accessibility certification. Unknown business facts remain visible in the handoff.
 
