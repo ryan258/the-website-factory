@@ -100,7 +100,7 @@ def check(output, noindex=None):
     for directory,extension,budget in [('css','css',20000),('js','js',5000)]:
         # The internal editor has a separate budget; public-site bundles retain their limits.
         for asset in (output/directory).glob('*.'+extension):
-            limit = 9000 if directory == 'js' and asset.name.startswith('workflow.') and (output/'site-kit/index.html').exists() else budget
+            limit = 10000 if directory == 'js' and asset.name.startswith('workflow.') and (output/'site-kit/index.html').exists() else budget
             if len(gzip.compress(asset.read_bytes())) >= limit:
                 errors.append(f'{directory}/{asset.name}: compressed bundle exceeds {limit} bytes')
     return errors

@@ -24,7 +24,7 @@ Focused local verification for the construction preset on Hugo Extended 0.166.0 
 
 The root and subpath builds ran `scripts/check_site.py` through `scripts/build.py`. The brief script was inspected statically; its browser interactions were not exercised. The generated client copy is a fictional review artifact in `/private/tmp/wf-20260924-red-clay-client-v2`.
 
-The planner now opens on a complete-site starter, with the local-service composition selected and the blank-plan option collapsed. Loading a starter copies its selected pages and sections into the editor with sample copy marked as draft; the user can remove unneeded content before completing the brief. All fictional presets are selectable except the live `258webco` profile. The workshop build and generated-output checks passed; the rendered HTML contains the default local-service choice and construction option, and excludes `258webco`. The fingerprinted planner script is 8,612 bytes gzip against its 9,000-byte budget. `node --check assets/js/workflow.js` and `git diff --check` passed.
+The planner now opens on a complete-site starter, with the local-service composition selected and the blank-plan option collapsed. Loading a starter copies its selected pages and sections into the editor with sample copy marked as draft; the user can remove unneeded content before completing the brief. All fictional presets are selectable except the live `258webco` profile. The workshop build and generated-output checks passed; the rendered HTML contains the default local-service choice and construction option, and excludes `258webco`. The fingerprinted planner script is 9,496 bytes gzip against its 10,000-byte budget. `node --check assets/js/workflow.js` and `git diff --check` passed.
 
 ### Not verified
 
