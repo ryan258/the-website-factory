@@ -248,6 +248,79 @@ check('middleware hides dotfiles but serves /.well-known/', async () => {
   assert.equal((await visit('/contact/')).status, 200);
 });
 
+check('unexpected fields in submission are rejected with 400', async () => {
+  const ENQUIRY = store();
+  const response = await post({...ENABLED, ENQUIRY}, {body: VALID + '&extra_field=unexpected'});
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /Unexpected field/);
+  assert.equal(ENQUIRY.written.length, 0);
+});
+
+check('duplicate fields in submission are rejected with 400', async () => {
+  const ENQUIRY = store();
+  const response = await post({...ENABLED, ENQUIRY}, {body: VALID + '&name=Second+Name'});
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /Duplicate field/);
+  assert.equal(ENQUIRY.written.length, 0);
+});
+
+check('file uploads in submission are rejected with 400', async () => {
+  const ENQUIRY = store();
+  const form = new FormData();
+  form.append('name', new Blob(['file content']), 'test.txt');
+  form.append('email', 'test@example.com');
+  form.append('project-type', 'Not sure yet');
+  form.append('budget', 'Under 10k');
+  form.append('message', 'Hello');
+  const response = await onRequestPost({
+    request: new Request('https://example.invalid/api/contact', {
+      method: 'POST',
+      headers: {accept: 'application/json'},
+      body: form,
+    }),
+    env: {...ENABLED, ENQUIRY},
+  });
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /File uploads are not accepted/);
+  assert.equal(ENQUIRY.written.length, 0);
+});
+
+check('unsupported content-type is rejected with 415', async () => {
+  const ENQUIRY = store();
+  const response = await onRequestPost({
+    request: new Request('https://example.invalid/api/contact', {
+      method: 'POST',
+      headers: {'content-type': 'application/json', accept: 'application/json'},
+      body: JSON.stringify({name: 'Test'}),
+    }),
+    env: {...ENABLED, ENQUIRY},
+  });
+  assert.equal(response.status, 415);
+  assert.match((await response.json()).error, /Unsupported content type/);
+});
+
+check('non-POST requests are rejected with 405', async () => {
+  const response = await onRequestPost({
+    request: new Request('https://example.invalid/api/contact', {
+      method: 'GET',
+      headers: {accept: 'application/json'},
+    }),
+    env: {...ENABLED},
+  });
+  assert.equal(response.status, 405);
+  assert.equal(response.headers.get('allow'), 'POST');
+});
+
+check('oversize payload is rejected with 413', async () => {
+  const ENQUIRY = store();
+  const response = await post({...ENABLED, ENQUIRY}, {
+    headers: {'content-length': '70000'},
+    body: VALID,
+  });
+  assert.equal(response.status, 413);
+  assert.match((await response.json()).error, /Payload too large/);
+});
+
 let failures = 0;
 for (const [name, fn] of cases) {
   try { await fn(); } catch (error) { failures++; console.error(`FAIL: ${name}\n  ${error.message}`); }

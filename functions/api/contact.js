@@ -3,7 +3,9 @@
 // static/_headers, which weakens the CSP. Add it if spam actually arrives.
 const LIMITS = {name: 120, email: 254, company: 160, 'project-type': 80, budget: 80, message: 5000};
 const OPTIONAL = new Set(['company']);
-const reply = (status, body) => new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json'}});
+const ALLOWED_FIELDS = new Set(['name', 'email', 'company', 'project-type', 'budget', 'message', 'website']);
+const MAX_BODY_BYTES = 65536;
+const reply = (status, body) => new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json', 'cache-control': 'no-store'}});
 const escapeHTML = text => String(text).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 // A visitor without JavaScript sees this instead of raw JSON. No inline style or script, so
 // the strict CSP in static/_headers still applies.
@@ -23,12 +25,29 @@ const ipKey = async (ip, salt) => {
 };
 
 export async function onRequestPost({request, env}) {
+  if (request.method !== 'POST') {
+    return new Response(JSON.stringify({error: 'Method Not Allowed'}), {
+      status: 405,
+      headers: {'allow': 'POST', 'content-type': 'application/json', 'cache-control': 'no-store'},
+    });
+  }
   // A form posted without JavaScript expects a page, not JSON.
   const wantsPage = !(request.headers.get('accept') || '').includes('application/json');
   const done = (status, body) => {
     if (!wantsPage) return reply(status, body);
     return status < 400 ? Response.redirect(new URL('/contact/received/', request.url), 303) : errorPage(status, body.error);
   };
+
+  const contentType = (request.headers.get('content-type') || '').toLowerCase();
+  if (!contentType.includes('application/x-www-form-urlencoded') && !contentType.includes('multipart/form-data')) {
+    return done(415, {error: 'Unsupported content type. Expected form submission.'});
+  }
+
+  const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
+  if (contentLength > MAX_BODY_BYTES) {
+    return done(413, {error: 'Payload too large.'});
+  }
+
   // Intake is an explicit per-deployment decision. Inherited bindings alone never open
   // this endpoint: ENQUIRY_ENABLED must be set to "true" for the deployment that owns them.
   const open = String(env.ENQUIRY_ENABLED || '').trim().toLowerCase() === 'true';
@@ -38,6 +57,21 @@ export async function onRequestPost({request, env}) {
   if (origin && origin !== new URL(request.url).origin) return done(403, {error: 'Enquiries must be sent from this website.'});
   let form;
   try { form = await request.formData(); } catch { return done(400, {error: 'Submission could not be read.'}); }
+
+  const seen = new Set();
+  for (const [key, value] of form.entries()) {
+    if (!ALLOWED_FIELDS.has(key)) {
+      return done(400, {error: `Unexpected field: ${key}.`});
+    }
+    if (seen.has(key)) {
+      return done(400, {error: `Duplicate field: ${key}.`});
+    }
+    seen.add(key);
+    if (typeof value !== 'string') {
+      return done(400, {error: `File uploads are not accepted for ${key}.`});
+    }
+  }
+
   if (String(form.get('website') || '').trim()) return done(200, {ok: true}); // Honeypot: accept, discard.
 
   // Best-effort IP-based rate limiting via KV (max 5 requests per 10-minute window).
@@ -103,4 +137,14 @@ export async function onRequestPost({request, env}) {
     }
   }
   return done(200, {ok: true});
+}
+
+export async function onRequest(context) {
+  if (context.request.method === 'POST') {
+    return onRequestPost(context);
+  }
+  return new Response(JSON.stringify({error: 'Method Not Allowed'}), {
+    status: 405,
+    headers: {'allow': 'POST', 'content-type': 'application/json', 'cache-control': 'no-store'},
+  });
 }

@@ -35,6 +35,7 @@ CODES = [
     (r'title and description required', 'PAGE_METADATA_MISSING'),
     (r'placeholder domain', 'RELEASE_PLACEHOLDER_DOMAIN'),
     (r'placeholder text|To be confirmed', 'RELEASE_PLACEHOLDER_TEXT'),
+    (r'no usable enquiry path', 'RELEASE_CONTACTABILITY_MISSING'),
     (r'expected one H1', 'OUTPUT_H1_COUNT'),
     (r'title must be under|description must be under', 'OUTPUT_METADATA_LENGTH'),
     (r'empty or duplicate', 'OUTPUT_METADATA_DUPLICATE'),

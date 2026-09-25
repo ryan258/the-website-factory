@@ -79,5 +79,16 @@ class JsonReportTests(unittest.TestCase):
             page.write_text(page.read_text().replace('To be confirmed', 'Mon–Fri 9–5'))
             self.assertFalse(any('placeholder' in e for e in check_site.check(Path(tmp), noindex=False)))
 
+    def test_indexable_build_rejects_missing_enquiry_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            page = Path(tmp) / 'index.html'
+            page.write_text('<!doctype html><title>T</title><meta name="description" content="d">'
+                            '<link rel="canonical" href="https://real.example/"><h1>Hi</h1><p>Welcome</p>')
+            errors = check_site.check(Path(tmp), noindex=False)
+            self.assertTrue(any('no usable enquiry path' in e for e in errors), errors)
+            page.write_text(page.read_text() + '<a href="mailto:contact@real.example">Email us</a>')
+            errors = check_site.check(Path(tmp), noindex=False)
+            self.assertFalse(any('no usable enquiry path' in e for e in errors), errors)
+
 if __name__ == '__main__':
     unittest.main()

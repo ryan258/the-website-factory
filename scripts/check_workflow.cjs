@@ -7,9 +7,9 @@ const path=require('node:path');
 const {ROOT,launchOptions,preview}=require('./qa-paths.cjs');
 const KEY='website-factory-projects-v1';
 (async()=>{
- const site=await preview('public-workshop');
- let browser;const results=[];
+ let site;let browser;const results=[];
  try{
+ site=await preview('public-workshop');
  browser=await chromium.launch(launchOptions());const context=await browser.newContext();const page=await context.newPage();const url=site.base+'site-kit/';
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(url);
  await page.locator('.wf-start-blank summary').click();
@@ -68,5 +68,5 @@ const KEY='website-factory-projects-v1';
  const second=await context.newPage();await second.goto(url);await second.getByRole('button',{name:'Open project',exact:true}).first().click();await second.getByRole('button',{name:'1. Brief',exact:true}).click();await second.getByLabel('What does the business do?',{exact:true}).fill('Second tab edit');await page.waitForFunction(()=>document.querySelector('#wf-status').textContent.includes('Another tab'));const protectedValue=await second.evaluate(key=>localStorage.getItem(key),KEY);await page.getByRole('button',{name:'1. Brief',exact:true}).click();await page.getByLabel('What does the business do?',{exact:true}).fill('Stale tab edit');assert.equal(await second.evaluate(key=>localStorage.getItem(key),KEY),protectedValue);results.push('Competing tab edits cannot overwrite the newer saved version.');
  const failure=await browser.newContext();await failure.addInitScript(()=>{Storage.prototype.setItem=()=>{throw new DOMException('Quota exceeded','QuotaExceededError');};});const failed=await failure.newPage();await failed.goto(url);await failed.locator('.wf-start-blank summary').click();await failed.getByLabel('New project name',{exact:true}).fill('Unsaved fixture');await failed.getByRole('button',{name:'Start project',exact:true}).click();assert.match(await failed.locator('#wf-status').innerText(),/Save failed/);assert.equal(await failed.getByRole('button',{name:'Export backup',exact:true}).isEnabled(),true);results.push('Storage failure is visible and backup export remains available.');
  assert.deepEqual(errors,[]);fs.mkdirSync(path.join(ROOT,'reports'),{recursive:true});fs.writeFileSync(path.join(ROOT,'reports/workflow-checks.json'),JSON.stringify({status:'passed',results},null,2));console.log(`Workflow checks passed: ${results.length} behavior groups; isolated fixtures only.`);
- }finally{if(browser)await browser.close();await site.close();}
+ }finally{if(browser)await browser.close().catch(()=>{});if(site)await site.close().catch(()=>{})}
 })().catch(e=>{console.error(e);process.exitCode=1;});

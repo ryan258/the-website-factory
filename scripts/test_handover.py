@@ -30,5 +30,25 @@ class HandoverTests(unittest.TestCase):
             self.assertIn('No build output found', report)
             self.assertIn('Sample Co', report)
 
+    def test_require_ready_exits_nonzero_when_not_ready(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = new_site.create(Path(tmp) / 'client', 'Sample Co', 'consultant')
+            result = subprocess.run([sys.executable, str(dest / 'scripts/handover.py'), '--check', '--output', 'docs/acceptance.md'],
+                                    capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('not ready', result.stdout)
+
+    def test_handover_fails_immediately_when_build_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = new_site.create(Path(tmp) / 'client', 'Sample Co', 'consultant')
+            (dest / 'docs/acceptance.md').unlink()
+            build_script = dest / 'scripts/build.py'
+            build_script.write_text('def environment(): return {}\nif __name__ == "__main__":\n    import sys; sys.exit(42)\n')
+            result = subprocess.run([sys.executable, str(dest / 'scripts/handover.py'), '--build', '--output', 'docs/acceptance.md'],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 42)
+            self.assertIn('Build failed with exit code 42', result.stderr)
+            self.assertFalse((dest / 'docs/acceptance.md').exists(), 'Handover report must not be written if build fails')
+
 if __name__ == '__main__':
     unittest.main()

@@ -171,6 +171,42 @@ class FactoryTests(unittest.TestCase):
             # A rerun now owns the partial output and completes it instead of refusing it.
             build.publish_output(source,dest)
             self.assertEqual({p.name for p in dest.glob('*.html')},{'a.html','b.html','c.html'})
+    def test_interrupted_overwrite_preserves_intact_file_and_recovers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp=Path(tmp);source=tmp/'source';source.mkdir()
+            (source/'a.html').write_text('initial-a')
+            dest=tmp/'output'
+            build.publish_output(source, dest)
+            self.assertEqual((dest/'a.html').read_text(), 'initial-a')
+            (source/'a.html').write_text('updated-a')
+            import shutil
+            original=shutil.copy2
+            def fail_mid_copy(src, target, *args, **kwargs):
+                Path(target).write_bytes(b'partial')
+                raise OSError('power cut')
+            build.shutil.copy2=fail_mid_copy
+            try:
+                with self.assertRaises(OSError):build.publish_output(source, dest)
+            finally:
+                build.shutil.copy2=original
+            self.assertEqual((dest/'a.html').read_text(), 'initial-a')
+            build.publish_output(source, dest)
+            self.assertEqual((dest/'a.html').read_text(), 'updated-a')
+    def test_concurrent_build_raises_locked_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp=Path(tmp);source=tmp/'source';source.mkdir();(source/'a.html').write_text('a')
+            dest=tmp/'output';dest.mkdir()
+            import fcntl
+            lock_path = dest / '.factory-build.lock'
+            lock_file = open(lock_path, 'a')
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            try:
+                with self.assertRaises(ValueError) as caught:
+                    build.publish_output(source, dest)
+                self.assertIn('locked by another build process', str(caught.exception))
+            finally:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+                lock_file.close()
     def test_output_reconciliation_refuses_unowned_targets(self):
         with tempfile.TemporaryDirectory() as tmp:
             source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')

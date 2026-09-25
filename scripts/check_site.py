@@ -49,9 +49,20 @@ def check(output, noindex=None):
         if len(set(values))!=len(values) or not all(values): errors.append(f'{field}: empty or duplicate values')
     descriptions=[p.meta.get('description','') for p in pages.values()]
     if not all(descriptions) or len(set(descriptions))!=len(descriptions):errors.append('Descriptions: empty or duplicate values')
-    # An indexable build is a public release; it must name its real domain, not the placeholder.
     placeholder=[p.canonical for p in pages.values() if (urlparse(p.canonical).hostname or '').endswith('example.invalid')]
     if not noindex and placeholder:errors.append(f'Indexable build still uses the placeholder domain: {placeholder[0]}. Build with --base-url set to the real domain.')
+    if not noindex:
+        has_active_form = any(
+            '<form' in file.read_text() and 'data-enabled="true"' in file.read_text()
+            for file in pages.keys()
+        )
+        has_alternative_contact = any(
+            ref.startswith(('mailto:', 'tel:')) and not contact_link_error(unquote(ref))
+            for p in pages.values()
+            for ref in p.refs
+        )
+        if not has_active_form and not has_alternative_contact:
+            errors.append('Indexable build has no usable enquiry path: contact form is disabled and no alternative email or phone link is provided')
     for file,p in pages.items():
         label=str(file.relative_to(output))
         # Unconfirmed facts are marked "To be confirmed" (scripts/from_plan.py, draft_plan.py); a public release must not show one.

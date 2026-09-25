@@ -13,15 +13,17 @@ function noindexExpected() {
 (async () => {
   const routes = paths('CHECK_PATHS');
   const expectedNoindex = noindexExpected();
-  const site = await preview('public');
-  const base = site.base;
-  const browser = await chromium.launch(launchOptions());
+  let site;
+  let browser;
   const results = [];
   const failures = [];
   const reportDir = path.join(ROOT, 'reports');
   fs.mkdirSync(reportDir, {recursive:true});
   fs.writeFileSync(path.join(reportDir,'browser-checks.json'), JSON.stringify({status:'running'}));
   try {
+    site = await preview('public');
+    const base = site.base;
+    browser = await chromium.launch(launchOptions());
     const context = await browser.newContext();
     const page = await context.newPage();
     const csp = [];
@@ -52,7 +54,10 @@ function noindexExpected() {
     fs.writeFileSync(path.join(reportDir,'browser-checks.json'),JSON.stringify(results,null,2));
     console.log(`${routes.length} pages, two color modes, four widths: ${failures.length ? 'FAILED '+failures.join(', ') : 'passed'}. Report: reports/browser-checks.json`);
     process.exitCode = failures.length ? 1 : 0;
-  } finally { await browser.close(); await site.close(); }
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+    if (site) await site.close().catch(() => {});
+  }
 })().catch(error => {
   fs.mkdirSync(path.join(ROOT,'reports'),{recursive:true});
   fs.writeFileSync(path.join(ROOT,'reports/browser-checks.json'),JSON.stringify({status:'failed',error:error.message},null,2));

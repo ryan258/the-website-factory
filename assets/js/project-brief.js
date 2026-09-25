@@ -30,7 +30,7 @@
       `Reply email: ${fieldValue('replyEmail')}`,
     ].join('\n');
 
-    const showStep = (index) => {
+    const showStep = (index, shouldFocus = true) => {
       currentStep = index;
       steps.forEach((step, i) => { step.hidden = i !== index; });
       indicators.forEach((indicator, i) => {
@@ -40,7 +40,9 @@
       backButton.hidden = index === 0;
       nextButton.textContent = index === steps.length - 1 ? 'Prepare brief' : 'Next step';
       status.textContent = '';
-      steps[index].querySelector('input, select, textarea')?.focus();
+      if (shouldFocus) {
+        steps[index].querySelector('input, select, textarea')?.focus();
+      }
     };
 
     const validCurrentStep = () => {
@@ -119,6 +121,6 @@
       showStep(0);
     });
 
-    showStep(0);
+    showStep(0, false);
   });
 })();

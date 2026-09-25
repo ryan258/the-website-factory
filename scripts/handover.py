@@ -61,11 +61,30 @@ def report(root=ROOT, output_dir=None):
     form = setting(r'^\s*formEnabled\s*=\s*(\w+)', hugo, 'false')
     intake = setting(r'^ENQUIRY_ENABLED\s*=\s*"(\w+)"', wrangler, 'not set')
     base = setting(r"^baseURL\s*=\s*'([^']+)'", hugo, '?')
+    manifest_file = output_dir / '.factory-build.json'
+    manifest_info = 'not found'
+    if manifest_file.is_file():
+        import hashlib
+        manifest_info = f'`{hashlib.sha256(manifest_file.read_bytes()).hexdigest()[:16]}`'
+
+    git_info = 'unknown'
+    try:
+        git_res = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], cwd=root, capture_output=True, text=True)
+        if git_res.returncode == 0:
+            dirty_res = subprocess.run(['git', 'status', '--porcelain'], cwd=root, capture_output=True, text=True)
+            dirty = '-dirty' if dirty_res.stdout.strip() else ''
+            git_info = f'`{git_res.stdout.strip()}{dirty}`'
+    except Exception:
+        pass
+
     ready = not (config_errors or output_errors or open_claims or gaps)
     ok = lambda good: '✅' if good else '❌'
     lines = [
         f'# Handover report: {preset["name"]}', '',
         f'Generated {date.today().isoformat()} by `scripts/handover.py`. Preset `{config["preset"]}`.', '',
+        f'- Revision: {git_info}',
+        f'- Build manifest: {manifest_info}',
+        f'- Python: `{sys.version.split()[0]}`', '',
         f'**Automated status: {"ready for owner review" if ready else "not ready"}.** '
         'This report covers automated checks only; see "Still to check by hand".', '',
         '## Automated checks', '',
@@ -93,16 +112,23 @@ def report(root=ROOT, output_dir=None):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--build', action='store_true', help='Run scripts/build.py first')
+    parser.add_argument('--check', '--require-ready', dest='require_ready', action='store_true',
+                        help='Exit with non-zero status if not ready')
     parser.add_argument('--output', default='reports/handover.md', help='Where to write (relative to the project)')
     args = parser.parse_args(argv)
     if args.build:
         import build
-        subprocess.run([sys.executable, str(ROOT / 'scripts/build.py')], cwd=ROOT, env=build.environment(), stdout=sys.stderr)
+        res = subprocess.run([sys.executable, str(ROOT / 'scripts/build.py')], cwd=ROOT, env=build.environment(), stdout=sys.stderr)
+        if res.returncode != 0:
+            print(f'ERROR: Build failed with exit code {res.returncode}. Handover report aborted.', file=sys.stderr)
+            return res.returncode
     text, ready = report()
     target = ROOT / args.output
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(text)
     print(f'Wrote {args.output}: {"ready for owner review" if ready else "not ready"}.')
+    if args.require_ready and not ready:
+        return 1
     return 0
 
 if __name__ == '__main__':

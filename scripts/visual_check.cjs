@@ -111,11 +111,13 @@ async function run() {
   // Diff images describe this run only; stale ones would point at problems already fixed.
   for (const old of fs.readdirSync(dirs.diff)) fs.unlinkSync(path.join(dirs.diff, old));
   const routes = paths('VISUAL_PATHS');
-  const site = await preview('public');
-  const browser = await chromium.launch(launchOptions());
+  let site;
+  let browser;
   const failures = [];
   let recorded = 0, compared = 0;
   try {
+    site = await preview('public');
+    browser = await chromium.launch(launchOptions());
     const page = await browser.newPage();
     await page.emulateMedia({colorScheme: 'light', reducedMotion: 'reduce'});
     for (const route of routes) {
@@ -139,8 +141,8 @@ async function run() {
       }
     }
   } finally {
-    await browser.close();
-    await site.close();
+    if (browser) await browser.close().catch(() => {});
+    if (site) await site.close().catch(() => {});
   }
   if (update) { console.log(`Recorded ${recorded} baseline screenshot(s) in reports/visual/baseline/.`); return; }
   if (failures.length) { console.error(failures.join('\n')); process.exitCode = 1; return; }

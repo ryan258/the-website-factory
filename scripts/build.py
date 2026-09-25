@@ -58,7 +58,10 @@ def publish_output(source, destination):
             conflicts.append(f'{name}: edited since the last build')
     if destination.is_dir():
         for path in destination.rglob('*'):
-            if path.is_file() and path.name != '.factory-build.json':
+            if path.is_file() and path.name not in ('.factory-build.json', '.factory-build.lock'):
+                if '.tmp.' in path.name:
+                    path.unlink(missing_ok=True)
+                    continue
                 name = path.relative_to(destination).as_posix()
                 if name not in current and name not in previous:
                     if path.suffix in ('.html', '.js', '.css', '.map'):
@@ -66,34 +69,54 @@ def publish_output(source, destination):
     if conflicts:
         raise ValueError('Refusing to write generated output; nothing was changed:\n  ' + '\n  '.join(conflicts)
                          + '\nChoose an empty destination or restore these files.')
-    # ponytail: preflight only, no staged directory swap, and no destination lock for
-    # concurrent builds. A copy that fails mid-loop leaves a mixed tree, but the manifest
-    # below is written to match what actually landed, so the next build owns that output
-    # and replaces it instead of refusing it as untracked.
-    recorded = dict(previous)
-    def store():
-        pending = manifest.with_suffix('.json.tmp')
-        pending.write_text(json.dumps(recorded, indent=2)+'\n')
-        os.replace(pending, manifest)
     destination.mkdir(parents=True, exist_ok=True)
+    lock_file = None
     try:
-        for name in current:
-            path = destination / name
-            path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source / name, path)
-            recorded[name] = current[name]
-        for name in stale:
-            (destination / name).unlink(missing_ok=True)
-            recorded.pop(name, None)
-            # A retired page leaves its folder behind; remove folders this emptied.
-            parent = (destination / name).parent
-            while parent != destination and parent.is_dir() and not any(parent.iterdir()):
-                parent.rmdir()
-                parent = parent.parent
-    except Exception:
+        try:
+            import fcntl
+            lock_path = destination / '.factory-build.lock'
+            lock_file = open(lock_path, 'a')
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (BlockingIOError, OSError) as e:
+            if isinstance(e, BlockingIOError) or getattr(e, 'errno', None) in (11, 35):
+                raise ValueError(f'Destination {destination} is locked by another build process.')
+        recorded = dict(previous)
+        def store():
+            pending = manifest.with_suffix('.json.tmp')
+            pending.write_text(json.dumps(recorded, indent=2)+'\n')
+            os.replace(pending, manifest)
+        try:
+            for name in current:
+                path = destination / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                tmp_path = path.with_name(f'{path.name}.tmp.{os.getpid()}')
+                try:
+                    shutil.copy2(source / name, tmp_path)
+                    os.replace(tmp_path, path)
+                    recorded[name] = current[name]
+                finally:
+                    if tmp_path.exists():
+                        tmp_path.unlink(missing_ok=True)
+            for name in stale:
+                (destination / name).unlink(missing_ok=True)
+                recorded.pop(name, None)
+                # A retired page leaves its folder behind; remove folders this emptied.
+                parent = (destination / name).parent
+                while parent != destination and parent.is_dir() and not any(parent.iterdir()):
+                    parent.rmdir()
+                    parent = parent.parent
+        except Exception:
+            store()
+            raise
         store()
-        raise
-    store()
+    finally:
+        if lock_file:
+            try:
+                import fcntl
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+                lock_file.close()
+            except Exception:
+                pass
 
 def form_origin():
     """The outside form service origin (hugo.toml params.formAction or HUGO_PARAMS_FORMACTION), or None."""

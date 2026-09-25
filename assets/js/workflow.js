@@ -11,7 +11,7 @@ const kinds=Object.keys(library);
 const categories=[...new Set(kinds.map(k=>library[k].category||'Core sections'))];
 const guidance=kind=>{const item=library[kind];return `<p><strong>Purpose:</strong> ${esc(item.purpose)}</p>${item.copy_guidance?`<p><strong>Copy:</strong> ${esc(item.copy_guidance)}</p>`:''}${item.a11y_guidance?`<p><strong>Accessibility:</strong> ${esc(item.a11y_guidance)}</p>`:''}<p class="wf-small">${item.variants.length} reference layouts · ${item.required.map(esc).join(', ')}${item.dependencies.length?' · Requires page: '+item.dependencies.map(esc).join(', '):''}</p><a href="${esc(document.querySelector('#workflow').dataset.catalogUrl)}#catalog-${esc(item.key)}">Inspect ${esc(kind)} layouts</a>`;};
 const checks=['I followed the main visitor journey and checked that each page has a useful next step.','I reviewed headings, link wording, image needs, and form labels for accessibility.','I checked business claims and recorded any remaining content or design questions.'];
-let db={version:1,projects:[]}, active=null, pageId=null, sectionId=null, step=0, history=[], storageOK=true, conflict=false, lastRaw=null;
+let db={version:1,projects:[]}, active=null, pageId=null, sectionId=null, step=0, history=[], storageOK=true, conflict=false, storageAlert=null, lastRaw=null;
 // One capacity limit, enforced where work is added, so every backup this app writes is a
 // backup it can also read. Measured in UTF-8 bytes on the exact exported text.
 const MAX_BACKUP=2000000, MAX_BACKUP_LABEL='2 MB';
@@ -36,19 +36,23 @@ function valid(data){
  const strings=(o,keys)=>o&&keys.every(k=>typeof o[k]==='string'&&o[k].length<=12000);
  return data.projects.every(p=>idOK(p.id)&&strings(p,['name','business','audience','goal','scope','facts','unknowns','notes','updated'])&&(p.starterPreset===undefined||(typeof p.starterPreset==='string'&&Object.hasOwn(starters,p.starterPreset)))&&Array.isArray(p.checks)&&p.checks.length===3&&p.checks.every(x=>typeof x==='boolean')&&Array.isArray(p.pages)&&p.pages.length<=30&&p.pages.every(pg=>idOK(pg.id)&&strings(pg,['name','purpose','action'])&&Array.isArray(pg.sections)&&pg.sections.length<=40&&pg.sections.every(s=>idOK(s.id)&&strings(s,['kind','title','body','cta','target','a11y','state'])&&(s.variant===undefined||(typeof s.variant==='string'&&s.variant.length<=80))&&kinds.includes(s.kind)&&(s.proposal===undefined||(typeof s.proposal==='string'&&s.proposal.length<=12000))&&['missing','draft','approved'].includes(s.state))));
 }
-try{lastRaw=localStorage.getItem(KEY);if(lastRaw){const parsed=JSON.parse(lastRaw);if(!valid(parsed))throw Error('Invalid saved project data');db=parsed;}say('Local projects ready.');}catch(e){storageOK=false;say('Saved data could not be opened. Existing storage is untouched. Export your work before leaving; saving is unavailable.');}
+try{lastRaw=localStorage.getItem(KEY);if(lastRaw){const parsed=JSON.parse(lastRaw);if(!valid(parsed))throw Error('Invalid saved project data');db=parsed;}say('Local projects ready.');}catch(e){storageOK=false;storageAlert='Saved data could not be opened. Existing storage is untouched. Export your work before leaving; saving is unavailable.';say(storageAlert);}
 function save(){
  if(project()&&oversize(project())){
   // Refuse the edit rather than let the project grow past what its backup can restore.
   if(history.length)db=JSON.parse(history.pop());
-  say(`That change was undone: this project would exceed the ${MAX_BACKUP_LABEL} backup limit. Export it, then split the work across projects.`);
-  render();return;
+  const msg=`That change was undone: this project would exceed the ${MAX_BACKUP_LABEL} backup limit. Export it, then split the work across projects.`;
+  say(msg);
+  render();return {ok:false,reason:'oversize',message:msg};
  }
  if(project()){project().updated=new Date().toISOString();project().view={step,pageId,sectionId};}
- if(!storageOK||conflict){say('Not saved to this browser. Export a backup before leaving.');return;}
- try{if(localStorage.getItem(KEY)!==lastRaw){conflict=true;say('Another tab changed these projects. Export this version, then reload to open the saved version.');return;}
- lastRaw=JSON.stringify(db);localStorage.setItem(KEY,lastRaw);say('Saved in this browser · '+new Date().toLocaleTimeString());
- }catch(e){storageOK=false;say('Save failed. Your edits remain on this screen. Export a backup before leaving.');}
+ if(!storageOK||conflict){
+  const msg=storageAlert||'Not saved to this browser. Export a backup before leaving.';
+  say(msg);return {ok:false,reason:'unavailable',message:msg};
+ }
+ try{if(localStorage.getItem(KEY)!==lastRaw){conflict=true;storageAlert='Another tab changed these projects. Export this version, then reload to open the saved version.';say(storageAlert);return {ok:false,reason:'conflict',message:storageAlert};}
+ lastRaw=JSON.stringify(db);localStorage.setItem(KEY,lastRaw);storageAlert=null;say('Saved in this browser · '+new Date().toLocaleTimeString());return {ok:true};
+ }catch(e){storageOK=false;storageAlert='Save failed. Your edits remain on this screen. Export a backup before leaving.';say(storageAlert);return {ok:false,reason:'failed',message:storageAlert};}
 }
 function remember(){const undo=app.querySelector('[data-action=undo]');if(undo)undo.disabled=false;history.push(JSON.stringify(db));if(history.length>40)history.shift();}
 function invalidate(){const p=project();if(p){p.checks=[false,false,false];delete p.handoff;}}
@@ -92,7 +96,10 @@ function createStarter(slug,name=''){
  }).filter(page=>page.sections.length);
  if(!pages.length){say('This starter has no pages to load. Choose another site.');return;}
  const p={id:uid(),name:(name||'').trim()||preset.name,business:'',audience:'',goal:preset.description||'',scope:'',facts:'',unknowns:'Starter content is illustrative. Confirm the business, services, locations, contact details, claims, and image rights before approval.',notes:'Remove pages and sections that do not earn their place, then replace sample copy with confirmed business information.',starterPreset:slug,updated:new Date().toISOString(),checks:[false,false,false],pages};
- remember();db.projects.push(p);active=p.id;pageId=pages[0].id;sectionId=pages[0].sections[0]?.id||null;step=2;save();render();say(`${preset.name} starter loaded. Remove pages and sections that are not needed; all template copy is still a draft.`);
+ remember();db.projects.push(p);active=p.id;pageId=pages[0].id;sectionId=pages[0].sections[0]?.id||null;step=2;
+ const res=save();render();
+ if(res.ok){say(`${preset.name} starter loaded. Remove pages and sections that are not needed; all template copy is still a draft.`);}
+ else{say(`${preset.name} starter loaded in memory. ${res.message}`);}
 }
 function issues(){const p=project(),out=[];for(const [key,label] of [['business','Business description'],['audience','Audience'],['goal','Visitor goal'],['scope','Agreed scope'],['facts','Confirmed business facts']])if(!p[key].trim())out.push({text:label+' is missing.',step:0});
  if(!p.pages.length)out.push({text:'Add at least one page.',step:1});
@@ -112,7 +119,8 @@ function shape(){const pg=page(),s=section();return `<h2>3. Shape pages and copy
 function review(){const p=project(),items=issues();return `<h2>4. Review the experience</h2><p>Content checks identify gaps. The manual review below records your judgment; it is not an automated accessibility certification.</p><p class="wf-progress">${items.length} open content checks</p>${items.length?`<ul>${items.map((x,i)=>`<li>${esc(x.text)} ${button('Resolve','resolve',`data-issue="${i}"`)}</li>`).join('')}</ul>`:'<p>No missing fields or unapproved sections found.</p>'}<fieldset><legend>Human review</legend>${checks.map((x,i)=>`<label class="wf-check"><input type="checkbox" data-check="${i}" ${p.checks[i]?'checked':''}>${esc(x)}</label>`).join('')}</fieldset>${field('Remaining questions and design considerations','project.notes',p.notes,true,'Record decisions the brief does not settle, design questions, and any caveats another person should review before work proceeds.')}<p class="wf-small">Changing the brief, pages, or copy clears the review confirmations and design handoff. Keep unresolved questions explicit.</p>${button('Prepare design handoff','step','data-step="4"')}`;}
 function handoff(){const p=project(),count=issues().length,ready=!count&&p.checks.every(Boolean);return `<h2>5. Prepare for design</h2><p>This saves a reviewed low-fidelity plan. Visual design, contrast, responsive behavior, implementation, and live contact testing come next.</p><div class="wf-box"><h3>${esc(p.name)}</h3><p>${p.pages.length} pages · ${p.pages.reduce((n,pg)=>n+pg.sections.length,0)} sections · ${count} open content checks</p><p>${ready?'Content fields and human review are complete.':'Resolve content checks and complete the human review before marking the plan ready.'}</p><p><strong>Unknowns:</strong> ${esc(p.unknowns)||'None recorded'}</p><p><strong>Design questions:</strong> ${esc(p.notes)||'None recorded'}</p>${button('Mark plan ready for design','ready',ready?'class="primary"':'disabled')}${p.handoff?`<p>Plan marked ready: ${esc(new Date(p.handoff).toLocaleString())}. Export to keep this version.</p>`:''}</div><div class="wf-actions">${button('Return to review','step','data-step="3"')}${button('Export project backup','export')}${button('Download design brief','brief-export')}</div>`;}
 function render(){const p=project();if(p&&!p.pages.some(pg=>pg.id===pageId))pageId=p.pages[0]?.id;if(!page()?.sections.some(s=>s.id===sectionId))sectionId=page()?.sections[0]?.id;
- app.innerHTML=p?`<div class="wf-bar"><h2>${esc(p.name||'Untitled project')}</h2><div class="wf-actions">${button('All projects','home')}${button('Undo','undo',history.length?'':'disabled')}${button('Export backup','export')}</div></div><nav class="wf-steps" aria-label="Project workflow">${steps.map((x,i)=>button(`${i+1}. ${x}`,'step',`data-step="${i}" ${i===step?'aria-current="step"':''}`)).join('')}</nav><div id="wf-stage" tabindex="-1">${[brief,plan,shape,review,handoff][step]()}</div>`:home();}
+ const banner=storageAlert?`<div class="wf-box" role="alert"><strong>Storage notice:</strong> ${esc(storageAlert)}</div>`:'';
+ app.innerHTML=banner+(p?`<div class="wf-bar"><h2>${esc(p.name||'Untitled project')}</h2><div class="wf-actions">${button('All projects','home')}${button('Undo','undo',history.length?'':'disabled')}${button('Export backup','export')}</div></div><nav class="wf-steps" aria-label="Project workflow">${steps.map((x,i)=>button(`${i+1}. ${x}`,'step',`data-step="${i}" ${i===step?'aria-current="step"':''}`)).join('')}</nav><div id="wf-stage" tabindex="-1">${[brief,plan,shape,review,handoff][step]()}</div>`:home());}
 function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);say('Download requested. Keep the file to back up this version.');}
 function move(list,id,delta){const i=list.findIndex(x=>x.id===id),j=i+delta;if(i>=0&&j>=0&&j<list.length)[list[i],list[j]]=[list[j],list[i]];}
 app.addEventListener('submit',e=>{e.preventDefault();if(e.target.id==='new-project'){const name=new FormData(e.target).get('name').trim();if(name)newProject(name);}});
