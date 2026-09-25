@@ -121,8 +121,10 @@ def publish_output(source, destination):
 def form_origin():
     """The outside form service origin (hugo.toml params.formAction or HUGO_PARAMS_FORMACTION), or None."""
     from urllib.parse import urlsplit
-    found = re.search(r"(?m)^\s*formAction\s*=\s*'([^']*)'", (ROOT/'hugo.toml').read_text())
-    action = os.environ.get('HUGO_PARAMS_FORMACTION', found.group(1) if found else '').strip()
+    # ponytail: quote-agnostic regex, not a TOML parser. tomllib is 3.11+ and local dev runs
+    # 3.9, so a real reader would need a dependency. Swap in tomllib if the floor moves to 3.11.
+    found = re.search(r'''(?m)^\s*formAction\s*=\s*(['"])(.*?)\1''', (ROOT/'hugo.toml').read_text())
+    action = os.environ.get('HUGO_PARAMS_FORMACTION', found.group(2) if found else '').strip()
     if not action:
         return None
     parts = urlsplit(action)

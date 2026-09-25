@@ -1,4 +1,4 @@
-{{ $img := resources.Get .Params.image }}{{ $small := $img.Resize "560x webp q80" }}{{ $large := $img.Resize "1120x webp q80" }}{{ $fallback := $img.Resize "560x jpg q80" }}<picture>
+{{ $img := resources.Get .Params.image }}{{ if not $img }}{{ errorf "picture.html: %q references the image %q, which is not in assets/. Either restore the file or remove the image from that page's front matter." .File.Path .Params.image }}{{ end }}{{ $small := $img.Resize "560x webp q80" }}{{ $large := $img.Resize "1120x webp q80" }}{{ $fallback := $img.Resize "560x jpg q80" }}<picture>
 <source type="image/webp" srcset="{{ $small.RelPermalink }} 560w, {{ $large.RelPermalink }} 1120w" sizes="(min-width: 900px) 544px, 100vw">
 <img src="{{ $fallback.RelPermalink }}" width="{{ $fallback.Width }}" height="{{ $fallback.Height }}" alt="{{ .Params.alt }}" loading="lazy" decoding="async">
 </picture>

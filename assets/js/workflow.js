@@ -34,7 +34,7 @@ function valid(data){
  if(!data||data.version!==1||!Array.isArray(data.projects)||data.projects.length>100) return false;
  const ids=new Set();const idOK=id=>typeof id==='string'&&id.length>0&&!ids.has(id)&&!!ids.add(id);
  const strings=(o,keys)=>o&&keys.every(k=>typeof o[k]==='string'&&o[k].length<=12000);
- return data.projects.every(p=>idOK(p.id)&&strings(p,['name','business','audience','goal','scope','facts','unknowns','notes','updated'])&&(p.starterPreset===undefined||(typeof p.starterPreset==='string'&&Object.hasOwn(starters,p.starterPreset)))&&Array.isArray(p.checks)&&p.checks.length===3&&p.checks.every(x=>typeof x==='boolean')&&Array.isArray(p.pages)&&p.pages.length<=30&&p.pages.every(pg=>idOK(pg.id)&&strings(pg,['name','purpose','action'])&&Array.isArray(pg.sections)&&pg.sections.length<=40&&pg.sections.every(s=>idOK(s.id)&&strings(s,['kind','title','body','cta','target','a11y','state'])&&(s.variant===undefined||(typeof s.variant==='string'&&s.variant.length<=80))&&kinds.includes(s.kind)&&(s.proposal===undefined||(typeof s.proposal==='string'&&s.proposal.length<=12000))&&['missing','draft','approved'].includes(s.state))));
+ return data.projects.every(p=>idOK(p.id)&&strings(p,['name','business','audience','goal','scope','facts','unknowns','notes','updated'])&&(p.starterPreset===undefined||(typeof p.starterPreset==='string'&&Object.hasOwn(starters,p.starterPreset)))&&Array.isArray(p.checks)&&p.checks.length===3&&p.checks.every(x=>typeof x==='boolean')&&Array.isArray(p.pages)&&p.pages.length<=30&&p.pages.every(pg=>idOK(pg.id)&&strings(pg,['name','purpose','action'])&&(pg.slug===undefined||(typeof pg.slug==='string'&&/^[a-z0-9][a-z0-9-]{0,60}$/.test(pg.slug)))&&Array.isArray(pg.sections)&&pg.sections.length<=40&&pg.sections.every(s=>idOK(s.id)&&strings(s,['kind','title','body','cta','target','a11y','state'])&&(s.variant===undefined||(typeof s.variant==='string'&&s.variant.length<=80))&&kinds.includes(s.kind)&&(s.proposal===undefined||(typeof s.proposal==='string'&&s.proposal.length<=12000))&&(s.anchor===undefined||(typeof s.anchor==='string'&&/^[a-z0-9][a-z0-9-]{0,60}$/.test(s.anchor)))&&(s.services===undefined||(Array.isArray(s.services)&&s.services.length<=40&&s.services.every(x=>typeof x==='string'&&x.length<=12000)))&&(s.items===undefined||(Array.isArray(s.items)&&s.items.length<=40&&s.items.every(it=>it&&typeof it==='object'&&!Array.isArray(it)&&Object.values(it).every(v=>typeof v==='string'&&v.length<=12000))))&&['missing','draft','approved'].includes(s.state))));
 }
 try{lastRaw=localStorage.getItem(KEY);if(lastRaw){const parsed=JSON.parse(lastRaw);if(!valid(parsed))throw Error('Invalid saved project data');db=parsed;}say('Local projects ready.');}catch(e){storageOK=false;storageAlert='Saved data could not be opened. Existing storage is untouched. Export your work before leaving; saving is unavailable.';say(storageAlert);}
 function save(){
@@ -75,13 +75,38 @@ function starterBody(content){
  if(content.notice)parts.push(`Example note: ${content.notice}`);
  return (parts.join('\n\n')||'Draft copy needed. Use confirmed facts and keep unknowns explicit.').slice(0,12000);
 }
+// A section's prose body is for reading; starterItems is what survives export into a preset.
+// scripts/from_plan.py already prefers a structured `items` list over parsing the body, so
+// classifications such as fit/alternative `group`, item URLs and images are no longer guessed
+// from flattened text. Dropped as soon as the body is edited, so the two cannot disagree.
+const ITEM_FIELDS=['title','text','group','url','link_label','image','imageAlt','value','when','place','scope','best','phase','label','description'];
+function starterItems(content){
+ if(!Array.isArray(content.items))return undefined;
+ const items=content.items.filter(item=>item&&typeof item==='object').slice(0,40).map(item=>{
+  const kept={};
+  for(const key of ITEM_FIELDS)if(typeof item[key]==='string'&&item[key])kept[key]=item[key].slice(0,12000);
+  return kept;
+ }).filter(item=>Object.keys(item).length);
+ return items.length?items:undefined;
+}
 function starterSection(preset,spec){
  const content=preset.sections?.[spec.content]||{}, definition=registry[spec.module]||{};
  const kind=legacy[spec.module]||definition.name||spec.module;
  const action=content.action||content.secondary||{};
  const alternatives=Array.isArray(content.items)?content.items.filter(item=>item.imageAlt).map(item=>`${item.title||'Image'} alt: ${item.imageAlt}`):[];
  const a11y=[spec.variant?`Selected layout: ${spec.variant}.`:'',definition.a11y_guidance||'',content.imageAlt?`Lead image alt: ${content.imageAlt}`:'',...alternatives].filter(Boolean).join('\n').slice(0,12000);
- return {id:uid(),kind,variant:spec.variant||'',title:content.title||content.label||definition.name||kind,body:starterBody(content),cta:action.label||'',target:action.url||'',a11y,state:'draft'};
+ const items=starterItems(content);
+ const section={id:uid(),kind,variant:spec.variant||'',title:content.title||content.label||definition.name||kind,body:starterBody(content),cta:action.label||'',target:action.url||'',a11y,state:'draft'};
+ if(items)section.items=items;
+ // An anchor is the address of this section; losing it breaks every link written against it.
+ if(typeof spec.anchor==='string'&&spec.anchor)section.anchor=spec.anchor;
+ // A list the module requires outright (the brief builder's service choices) is a business
+ // decision, so it travels with the section instead of being re-derived from prose.
+ if(Array.isArray(content.services)){
+  const services=content.services.filter(s=>typeof s==='string'&&s.trim()).slice(0,40).map(s=>s.slice(0,12000));
+  if(services.length)section.services=services;
+ }
+ return section;
 }
 function createStarter(slug,name=''){
  if(db.projects.length>=100){say('This prototype supports up to 100 projects. Export a backup before starting another workspace.');return;}
@@ -92,7 +117,9 @@ function createStarter(slug,name=''){
   const lead=specs.find(spec=>spec.module==='hero');
   const leadData=lead?(preset.sections?.[lead.content]||{}):{};
   const action=leadData.action||leadData.secondary||{};
-  return {id:uid(),name:definition.title||key,purpose:definition.description||`${definition.title||key} page for ${preset.name}.`,action:action.label||'Choose the next step for this page.',sections:specs.map(spec=>starterSection(preset,spec))};
+  // Carry the preset's own page key. Deriving it from the display title renamed routes on the way
+  // back out ("Sample work" became /sample-work/), which broke every link that pointed at them.
+  return {id:uid(),slug:key,name:definition.title||key,purpose:definition.description||`${definition.title||key} page for ${preset.name}.`,action:action.label||'Choose the next step for this page.',sections:specs.map(spec=>starterSection(preset,spec))};
  }).filter(page=>page.sections.length);
  if(!pages.length){say('This starter has no pages to load. Choose another site.');return;}
  const p={id:uid(),name:(name||'').trim()||preset.name,business:'',audience:'',goal:preset.description||'',scope:'',facts:'',unknowns:'Starter content is illustrative. Confirm the business, services, locations, contact details, claims, and image rights before approval.',notes:'Remove pages and sections that do not earn their place, then replace sample copy with confirmed business information.',starterPreset:slug,updated:new Date().toISOString(),checks:[false,false,false],pages};
@@ -124,7 +151,7 @@ function render(){const p=project();if(p&&!p.pages.some(pg=>pg.id===pageId))page
 function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);say('Download requested. Keep the file to back up this version.');}
 function move(list,id,delta){const i=list.findIndex(x=>x.id===id),j=i+delta;if(i>=0&&j>=0&&j<list.length)[list[i],list[j]]=[list[j],list[i]];}
 app.addEventListener('submit',e=>{e.preventDefault();if(e.target.id==='new-project'){const name=new FormData(e.target).get('name').trim();if(name)newProject(name);}});
-app.addEventListener('input',e=>{const el=e.target;if(el.id==='section-kind'){document.querySelector('#section-guidance').innerHTML=guidance(el.value);return;}if(el.id==='proposal'){remember();section().proposal=el.value;save();return;}if(el.dataset.copy){const s=page().sections.find(s=>s.id===el.dataset.id);change(()=>{s[el.dataset.copy]=el.value;s.state=el.value.trim()?'draft':'missing';},false);el.closest('article').querySelector('.wf-small').textContent=`${page().sections.indexOf(s)+1}. ${s.kind} · ${s.state}`;if(s.id===sectionId&&document.querySelector('#copy-state'))document.querySelector('#copy-state').value=s.state;}
+app.addEventListener('input',e=>{const el=e.target;if(el.id==='section-kind'){document.querySelector('#section-guidance').innerHTML=guidance(el.value);return;}if(el.id==='proposal'){remember();section().proposal=el.value;save();return;}if(el.dataset.copy){const s=page().sections.find(s=>s.id===el.dataset.id);change(()=>{s[el.dataset.copy]=el.value;s.state=el.value.trim()?'draft':'missing';if(el.dataset.copy==='body')delete s.items;},false);el.closest('article').querySelector('.wf-small').textContent=`${page().sections.indexOf(s)+1}. ${s.kind} · ${s.state}`;if(s.id===sectionId&&document.querySelector('#copy-state'))document.querySelector('#copy-state').value=s.state;}
  else if(el.dataset.field){const [group,key]=el.dataset.field.split('.'),target=group==='project'?project():group==='page'?page():section();change(()=>{target[key]=el.value;if(group==='section'&&key!=='state'){target.state='draft';document.querySelector('#copy-state').value='draft';}},false);}
  else if(el.dataset.check!==undefined){remember();project().checks[Number(el.dataset.check)]=el.checked;delete project().handoff;save();}
 });

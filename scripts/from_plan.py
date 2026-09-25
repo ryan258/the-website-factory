@@ -30,13 +30,19 @@ def slugify(text):
     slug = re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
     return slug or 'page'
 
-def parse_items(text, default_title="Detail"):
+MAX_PARSED_ITEMS = 8
+
+def parse_items(text, default_title="Detail", where=''):
     # Strip list markers ("- ", "* ", "• ", "1. ", "2) ") only, so "24/7 support" keeps its digits.
     lines = [re.sub(r'^(?:[-*•]|\d+[.)])\s+', '', line.strip()) for line in (text or '').splitlines() if line.strip()]
     if not lines:
         return [{"title": f"{default_title} {TBC.lower()}", "text": f"{TBC}: add confirmed details before publishing."}]
+    if len(lines) > MAX_PARSED_ITEMS:
+        raise ValueError(f'{where or default_title}: {len(lines)} lines of section copy would become items, but '
+                         f'only {MAX_PARSED_ITEMS} are kept. Shorten the copy, or give the section an "items" '
+                         'list so every entry is carried deliberately.')
     items = []
-    for i, line in enumerate(lines[:8]):
+    for i, line in enumerate(lines[:MAX_PARSED_ITEMS]):
         if ' - ' in line:
             parts = line.split(' - ', 1)
             items.append({"title": parts[0].strip(), "text": parts[1].strip()})
@@ -49,6 +55,29 @@ def parse_items(text, default_title="Detail"):
         else:
             items.append({"title": f"{default_title} {i+1}", "text": line})
     return items
+
+def action_url(target, page_slugs, fallback, where):
+    """The destination a plan asked for, or `fallback` when it named none.
+
+    A planned destination is never quietly replaced: an internal path that no page answers, or an
+    address this compiler cannot represent, stops the build instead of redirecting the visitor
+    somewhere the plan did not choose."""
+    target = (target or '').strip()
+    if not target:
+        return fallback
+    if target.startswith(('http://', 'https://', 'mailto:', 'tel:')):
+        return target
+    if target.startswith('#'):
+        return target
+    if not target.startswith('/'):
+        raise ValueError(f'{where}: action destination {target!r} is not a usable address. Use a path '
+                         'like /services/, an #anchor, or a full https:// URL.')
+    page = re.split(r'[#?]', target, 1)[0]
+    slug = page.strip('/').split('/')[0]
+    if slug and slug not in page_slugs:
+        raise ValueError(f'{where}: action destination {target!r} points at /{slug}/, which this plan has '
+                         'no page for. Add that page or change the destination.')
+    return target
 
 def convert_plan_to_preset(project_data, registry):
     # Support both full backup export {"version":1,"projects":[...]} and direct project object
@@ -77,10 +106,17 @@ def convert_plan_to_preset(project_data, registry):
     page_map = {}
     for p in raw_pages:
         p_name = p.get('name', 'Page').strip()
-        p_slug = 'home' if p_name.lower() in ('home', 'index', 'welcome') else slugify(p_name)
+        # A plan that carries its own page key keeps it, so a route never changes because the
+        # display title did. Only pages without one are named after their title.
+        carried = str(p.get('slug') or '').strip()
+        if carried and not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,60}', carried):
+            raise ValueError(f'Page "{p_name}" has an unusable page key {carried!r}. '
+                             'Use lowercase letters, digits, and hyphens.')
+        p_slug = carried or ('home' if p_name.lower() in ('home', 'index', 'welcome') else slugify(p_name))
         if p_slug in page_map:
             raise ValueError(f'Two pages would share the address /{p_slug}/. Rename one of them.')
         page_map[p_slug] = dict(p, sections=[dict(s, kind=names[s['kind']]) for s in p.get('sections', [])])
+    plan_order = list(page_map)
 
     # Ensure required pages: home and contact
     if 'home' not in page_map:
@@ -113,8 +149,12 @@ def convert_plan_to_preset(project_data, registry):
             'body': f'Services {TBC.lower()}: list the services this business actually offers.'
         })
 
-    # Order pages with home first, contact last
-    ordered_slugs = ['home'] + [s for s in sorted(page_map.keys()) if s not in ('home', 'contact')] + ['contact']
+    # Keep the order the plan gave, with home first because it is the site root. Pages the
+    # compiler added itself go last; it must not silently reshuffle a navigation someone chose.
+    added = [s for s in page_map if s not in plan_order]
+    ordered_slugs = (['home'] if 'home' in page_map else []) \
+        + [s for s in plan_order if s != 'home'] \
+        + [s for s in added if s != 'home']
     
     for p_slug in ordered_slugs:
         pg = page_map[p_slug]
@@ -147,11 +187,18 @@ def convert_plan_to_preset(project_data, registry):
                 variant = allowed_variants[0]
 
             content_key = f"{p_slug}-{kind}-{idx+1}"
-            page_sections.append({
+            spec = {
                 "module": kind,
                 "variant": variant,
                 "content": content_key
-            })
+            }
+            anchor = str(s.get('anchor') or '').strip()
+            if anchor:
+                if not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,60}', anchor):
+                    raise ValueError(f'{p_title} / {kind}: anchor {anchor!r} is not usable. Use lowercase '
+                                     'letters, digits, and hyphens.')
+                spec['anchor'] = anchor
+            page_sections.append(spec)
 
             # Build content block adhering to registry schema
             req_fields = mod_meta.get('required', [])
@@ -169,9 +216,10 @@ def convert_plan_to_preset(project_data, registry):
                     content_block['body'] = intro_text
 
             if 'action' in req_fields:
+                fallback = "/contact/" if "contact" in ordered_slugs else "/"
                 content_block['action'] = {
                     "label": (s.get('cta') or "Get in touch").strip(),
-                    "url": "/contact/" if "contact" in ordered_slugs else "/"
+                    "url": action_url(s.get('target'), ordered_slugs, fallback, f'{p_title} / {kind}')
                 }
 
             if 'items' in req_fields:
@@ -179,7 +227,7 @@ def convert_plan_to_preset(project_data, registry):
                     items = [{"title": str(it.get('title') or f'Item {TBC.lower()}'), "text": str(it.get('text') or TBC),
                               **{k: str(it[k]) for k in item_req if it.get(k)}} for it in s['items']]
                 else:
-                    items = parse_items(s.get('body'), default_title=kind.capitalize())
+                    items = parse_items(s.get('body'), default_title=kind.capitalize(), where=f'{p_title} / {kind}')
                 
                 # Fill special item requirements
                 for it in items:
@@ -202,6 +250,14 @@ def convert_plan_to_preset(project_data, registry):
                         it.setdefault('scope', TBC)
                         it.setdefault('best', TBC)
                 content_block['items'] = items
+
+            if 'services' in req_fields:
+                services = [str(x).strip() for x in (s.get('services') or []) if str(x).strip()]
+                if not services:
+                    raise ValueError(f'{p_title} / {kind}: this section needs a "services" list naming the '
+                                     'services a visitor can choose. It is a business decision, so it is '
+                                     'never generated.')
+                content_block['services'] = services
 
             if 'notice' in req_fields:
                 content_block['notice'] = (s.get('notice') or s.get('a11y') or f"{TBC}: details agreed in the project brief.").strip()

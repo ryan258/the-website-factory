@@ -59,8 +59,9 @@ def report(root=ROOT, output_dir=None):
     gaps = placeholders(preset)
     noindex = setting(r'^\s*noindex\s*=\s*(\w+)', hugo, 'true')
     form = setting(r'^\s*formEnabled\s*=\s*(\w+)', hugo, 'false')
-    intake = setting(r'^ENQUIRY_ENABLED\s*=\s*"(\w+)"', wrangler, 'not set')
-    base = setting(r"^baseURL\s*=\s*'([^']+)'", hugo, '?')
+    intake = setting(r'''^ENQUIRY_ENABLED\s*=\s*['"](\w+)['"]''', wrangler, 'not set')
+    # ponytail: same quote-agnostic shortcut as build.py form_origin; not a TOML parser.
+    base = setting(r'''^baseURL\s*=\s*['"]([^'"]+)['"]''', hugo, '?')
     manifest_file = output_dir / '.factory-build.json'
     manifest_info = 'not found'
     if manifest_file.is_file():

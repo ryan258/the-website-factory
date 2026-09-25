@@ -190,20 +190,65 @@ def replace_block(text, key, value):
     one line (a copy can be re-sculpted with another preset, which runs this twice)."""
     return re.sub(r'^'+key+r':(?:[ \t]*\n(?:[ \t]+.*\n)*|[ \t]+\S.*\n)', lambda _: key+': '+json.dumps(value)+'\n', text, flags=re.M)
 
+def internal_links(value):
+    """Every site-internal path anywhere in a JSON-ish structure, fragments and queries removed.
+
+    Walking the whole structure instead of naming fields means action, secondary, item and any
+    field added later all count as links, so a detail page is never dropped because the link
+    that reaches it lives in a field this function had not heard of."""
+    found = set()
+    def walk(node):
+        if isinstance(node, dict):
+            for item in node.values(): walk(item)
+        elif isinstance(node, (list, tuple)):
+            for item in node: walk(item)
+        elif isinstance(node, str):
+            # The string itself (a JSON field), a Markdown link target, or a quoted path in YAML
+            # front matter. Over-retaining is the safe direction: a path only counts once it
+            # matches a page that actually exists.
+            for raw in [node] + re.findall(r'\]\(([^)\s]+)\)', node) + re.findall(r'["\'](/[^"\'\s]*)["\']', node):
+                if raw.startswith('/'):
+                    found.add(re.split(r'[#?]', raw, 1)[0])
+    walk(value)
+    return found
+
+IMAGE_REF = re.compile(r'images/[\w./-]+\.(?:png|webp|jpe?g|svg|avif)')
+
+def referenced_assets(profile, content_root):
+    """Every images/... path the preset or any remaining content file refers to."""
+    found = set(IMAGE_REF.findall(json.dumps(profile)))
+    root = Path(content_root)
+    if root.is_dir():
+        for page in root.rglob('*.md'):
+            found |= set(IMAGE_REF.findall(page.read_text()))
+    return found
+
 def prune_unlinked_details(content_root, profile):
-    """Keep detail pages only when a selected composition links to them."""
-    linked = {
-        item.get('url')
-        for section in profile.get('sections', {}).values() if isinstance(section, dict)
-        for item in section.get('items', []) if isinstance(item, dict) and isinstance(item.get('url'), str)
-    }
+    """Keep detail pages only when something retained links to them.
+
+    Links are followed transitively: a retained detail page's own front matter and Markdown can
+    reach further detail pages, and those are kept too."""
+    root = Path(content_root)
+    linked = internal_links(profile)
+    details = {}
     for section in ('services', 'work'):
-        directory = Path(content_root) / section
+        directory = root / section
         if not directory.is_dir():
             continue
         for page in directory.glob('*.md'):
-            if page.name != '_index.md' and f'/{section}/{page.stem}/' not in linked:
-                page.unlink()
+            if page.name != '_index.md':
+                details[f'/{section}/{page.stem}/'] = page
+    # Fixed point: keeping a page can pull in whatever that page links to.
+    keep, frontier = set(), linked & set(details)
+    while frontier:
+        keep |= frontier
+        reached = set()
+        for url in frontier:
+            reached |= internal_links(details[url].read_text())
+        frontier = (reached & set(details)) - keep
+    for url, page in details.items():
+        if url not in keep:
+            page.unlink()
 
 def apply_palette(destination, palette):
     """Replace the theme colors in a copy's data/site.yaml with a named palette from data/palettes.json."""
@@ -296,7 +341,10 @@ def apply_preset(destination, slug, name):
     for key,page in profile['pages'].items():
         path=root/'content'/('_index.md' if key=='home' else f'{key}/_index.md')
         path.parent.mkdir(parents=True,exist_ok=True)
-        path.write_text(json.dumps(dict(title=page['title'],description=f"{name}: {page['title'].lower()} and sample information. Content awaits business review."),indent=2)+'\n')
+        # The preset's own page description is the authoritative one; head.html, llms.txt and the
+        # sitemap all read it from here. Only fall back to sample wording when the preset omits it.
+        description=(page.get('description') or '').strip() or f"{name}: {page['title'].lower()} and sample information. Content awaits business review."
+        path.write_text(json.dumps(dict(title=page['title'],description=description),indent=2)+'\n')
     prune_unlinked_details(root/'content', profile)
     # Structured contact choices follow the selected business instead of the agency demo.
     # Project types come from the preset's services section at render time, so only budgets are written here.
@@ -304,7 +352,7 @@ def apply_preset(destination, slug, name):
     site=root/'data/site.yaml';text=site.read_text()
     navigation=[dict(label=p['title'],url='/' if k=='home' else '/'+k+'/') for k,p in profile['pages'].items()]
     text=replace_block(text,'navigation',navigation)
-    values=dict(notice='Preview · Content awaiting review',description=f'{name}: sample business website. Content awaits review.',tagline=profile['label'],address='Example business · Details awaiting confirmation',email='hello@example.invalid',hours='Hours to be confirmed',location='Service location to be confirmed')
+    values=dict(notice='Preview · Content awaiting review',description=(profile.get('description') or '').strip() or f'{name}: sample business website. Content awaits review.',tagline=profile['label'],address='Example business · Details awaiting confirmation',email='hello@example.invalid',hours='Hours to be confirmed',location='Service location to be confirmed')
     for key,value in values.items(): text=re.sub(r'^'+key+r':.*$',lambda _:key+': '+json.dumps(value),text,flags=re.M)
     # Remove agency-specific footer/legacy copy from the client source.
     text=replace_block(text,'cta',dict(label='Your next step',heading='Let’s talk about what you need.'))
@@ -316,16 +364,12 @@ def apply_preset(destination, slug, name):
     if 'estimate' in profile['pages']:
         text=replace_block(text,'primary_cta',dict(label='Build a project brief',url='/estimate/'))
     site.write_text(text)
-    referenced_images = set()
-    for content in profile['sections'].values():
-        if isinstance(content, dict):
-            if isinstance(content.get('image'), str): referenced_images.add(content['image'])
-            for item in content.get('items', []):
-                if isinstance(item, dict) and isinstance(item.get('image'), str):
-                    referenced_images.add(item['image'])
+    # Asset references live in the preset *and* in the detail pages that survived pruning, whose
+    # front matter names its own artwork. Scanning only the preset deleted images that a retained
+    # page still rendered, which failed the build instead of the validation.
+    referenced_images = referenced_assets(profile, root/'content')
     for stem in ('fieldwork','forma','common-ground','northline'):
-        name=f'images/{stem}.png'
-        if name not in referenced_images:
+        if f'images/{stem}.png' not in referenced_images:
             (root/'assets/images'/f'{stem}.png').unlink(missing_ok=True)
     construction_images = root/'assets/images/construction'
     if construction_images.is_dir():

@@ -3,6 +3,7 @@
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -242,4 +243,61 @@ class FactoryTests(unittest.TestCase):
             page.write_text('<title>T</title><meta name="description" content="D"><link rel="canonical" href="https://example.invalid/">'
                             '<h1>H</h1><script src="https://tracker.example.com/t.js"></script>')
             self.assertTrue(any('another site' in e for e in check_site.check(Path(tmp),noindex=False)))
+    def _construction_copy(self, tmp, edit=None):
+        """A client copy made from the construction preset, optionally with the preset edited first."""
+        import shutil
+        dest=Path(tmp)/'copy'
+        shutil.copytree(ROOT,dest,ignore=shutil.ignore_patterns('public','public-workshop','resources','reports',
+                                                                '__pycache__','.tools','node_modules','.git'))
+        if edit:
+            source=dest/'data/presets/construction.json'
+            profile=json.loads(source.read_text());edit(profile)
+            source.write_text(json.dumps(profile,indent=2)+'\n')
+        factory.apply_preset(dest,'construction','Fixture Earthworks')
+        return dest
+
+    def test_retained_detail_pages_keep_their_images(self):
+        # Removing card images from the preset must not delete artwork that a retained detail
+        # page still renders; Hugo failed on the nil resource after validation had passed.
+        def strip_card_images(profile):
+            for section in profile['sections'].values():
+                if isinstance(section,dict):
+                    for item in section.get('items') or []:
+                        if isinstance(item,dict): item.pop('image',None); item.pop('imageAlt',None)
+        with tempfile.TemporaryDirectory(prefix='factory-assets-') as tmp:
+            dest=self._construction_copy(tmp,strip_card_images)
+            missing=[]
+            for page in (dest/'content').rglob('*.md'):
+                found=re.search(r'^image:\s*"([^"]+)"',page.read_text(),re.M)
+                if found and not (dest/'assets'/found.group(1)).is_file():
+                    missing.append(f'{page.relative_to(dest)} -> {found.group(1)}')
+            self.assertEqual(missing,[],'retained pages must keep the images they render')
+
+    def test_detail_pages_survive_action_and_markdown_links(self):
+        # A detail page reached only from a section action, or from a Markdown link in another
+        # retained page, is still a dependency.
+        def link_without_items(profile):
+            for section in profile['sections'].values():
+                if isinstance(section,dict):
+                    for item in section.get('items') or []:
+                        if isinstance(item,dict): item.pop('url',None)
+            profile['sections']['cta']['action']={'label':'Septic systems','url':'/services/septic-systems/'}
+            profile['sections']['intro-services']['body']='See [land clearing](/services/land-clearing/).'
+        with tempfile.TemporaryDirectory(prefix='factory-links-') as tmp:
+            dest=self._construction_copy(tmp,link_without_items)
+            kept={page.stem for page in (dest/'content/services').glob('*.md')}
+            self.assertIn('septic-systems',kept,'an action-only link must retain its target')
+            self.assertIn('land-clearing',kept,'a Markdown link must retain its target')
+
+    def test_client_copy_keeps_the_presets_own_descriptions(self):
+        # head.html, llms.txt and the sitemap all read these; generated sample wording used to
+        # overwrite the editorial description the preset actually defined.
+        with tempfile.TemporaryDirectory(prefix='factory-meta-') as tmp:
+            dest=self._construction_copy(tmp)
+            profile=json.loads((ROOT/'data/presets/construction.json').read_text())
+            for key,page in profile['pages'].items():
+                path=dest/'content'/('_index.md' if key=='home' else f'{key}/_index.md')
+                self.assertEqual(json.loads(path.read_text())['description'],page['description'],key)
+            self.assertIn(profile['description'],(dest/'data/site.yaml').read_text())
+
 if __name__=='__main__': unittest.main()

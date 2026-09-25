@@ -55,6 +55,22 @@ const expectedVariants=Object.values(JSON.parse(fs.readFileSync(path.join(ROOT,'
    await hero_buttons.getByRole('link',{name:lead.secondary.label,exact:false}).click();
    const target=lead.secondary.url.replaceAll('/','');
    if(!page.url().includes('/site-kit/'+slug+'/#'+target+'-') && !page.url().endsWith('/site-kit/'+slug+'/#'+target))failures.push(slug+' '+target+' preview');
+   // A preview that asks for a font must actually load it. Comparing the computed family only
+   // proves the variable is set; document.fonts proves the face arrived, so the preview and the
+   // generated client site show the same typography instead of a silent fallback.
+   const pairing=hero.font_pairing&&JSON.parse(fs.readFileSync(path.join(ROOT,'data/fonts.json'),'utf8'))[hero.font_pairing];
+   if(pairing){
+    const wanted=[pairing.body,pairing.heading||pairing.body].map(f=>f.family);
+    // document.fonts.check() is no use here: an undeclared family falls back to a system font and
+    // still reports true. Enumerating the face set shows which @font-face actually arrived.
+    const loaded=await page.evaluate(async families=>{
+     await document.fonts.ready;
+     const arrived=new Set();
+     document.fonts.forEach(face=>{if(face.status==='loaded')arrived.add(face.family.replace(/^['"]|['"]$/g,'').toLowerCase());});
+     return families.filter(family=>arrived.has(family.toLowerCase()));
+    },wanted);
+    for(const family of wanted)if(!loaded.includes(family))failures.push(slug+' preview font '+family+' not loaded');
+   }
   }
   const nojs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
   const p=await nojs.newPage();await p.goto(base+'site-kit/catalog/');

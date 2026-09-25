@@ -1,26 +1,50 @@
+{{/* Scoped theme CSS for the workshop's preset previews.
+
+Fonts are declared here as well as bound to variables: the compiled stylesheet only carries the
+master's own @font-face, so a preview asking for another family used to fall back silently and
+render differently from the generated client site. Font handling is deliberately independent of
+palette: a preset may change pairing without overriding colors.
+
+ponytail: one @font-face per family used by any preview, emitted whether or not the current page
+shows that preview. Split per-composition if the preview page ever loads enough families that the
+extra declarations cost something measurable. */}}
 {{ $rules := "" }}
+{{ $faces := dict }}
 {{ range $slug, $profile := hugo.Data.presets }}
+  {{ $decls := "" }}
   {{ with $profile.palette }}
     {{ $palette := index hugo.Data.palettes . }}
     {{ if $palette }}
-      {{ $light := "color-scheme: light dark;" }}
+      {{ $decls = printf "%scolor-scheme: light dark;" $decls }}
       {{ range $key, $value := $palette.colors }}
         {{ if not (hasPrefix $key "dark_") }}
-          {{ $light = printf "%s--%s: %s;" $light (replace $key "_" "-") $value }}
+          {{ $decls = printf "%s--%s: %s;" $decls (replace $key "_" "-") $value }}
         {{ end }}
       {{ end }}
-      {{ with $profile.font_pairing }}
-        {{ $pairing := index hugo.Data.fonts . }}
-        {{ if $pairing }}
-          {{ $body := $pairing.body }}
-          {{ $heading := $pairing.heading | default $body }}
-          {{ $light = printf "%s--font: \"%s\", %s;" $light $body.family $body.fallback }}
-          {{ $light = printf "%s--heading-font: \"%s\", %s;" $light $heading.family $heading.fallback }}
-          {{ $light = printf "%s--heading-tracking: %s;" $light $pairing.tracking }}
+    {{ end }}
+  {{ end }}
+  {{ with $profile.font_pairing }}
+    {{ $pairing := index hugo.Data.fonts . }}
+    {{ if $pairing }}
+      {{ $body := $pairing.body }}
+      {{ $heading := $pairing.heading | default $body }}
+      {{ $decls = printf "%s--font: \"%s\", %s;" $decls $body.family $body.fallback }}
+      {{ $decls = printf "%s--heading-font: \"%s\", %s;" $decls $heading.family $heading.fallback }}
+      {{ $decls = printf "%s--heading-tracking: %s;" $decls $pairing.tracking }}
+      {{ range $font := slice $body $heading }}
+        {{ if and $font.family $font.file }}
+          {{ $faces = merge $faces (dict $font.family $font) }}
         {{ end }}
       {{ end }}
-      {{ $selector := printf ".composition[data-preset=\"%s\"]" $slug }}
-      {{ $rules = printf "%s%s{%s}\n" $rules $selector $light }}
+    {{ end }}
+  {{ end }}
+  {{ $selector := printf ".composition[data-preset=\"%s\"]" $slug }}
+  {{ with $decls }}
+    {{ $rules = printf "%s%s{%s}\n" $rules $selector . }}
+  {{ end }}
+  {{ with $profile.palette }}
+    {{ $palette := index hugo.Data.palettes . }}
+    {{ if $palette }}
       {{ $dark := "" }}
       {{ range $key, $value := $palette.colors }}
         {{ if hasPrefix $key "dark_" }}
@@ -34,4 +58,8 @@
     {{ end }}
   {{ end }}
 {{ end }}
-{{ return $rules }}
+{{ $declarations := "" }}
+{{ range $family, $font := $faces }}
+  {{ $declarations = printf "%s@font-face{font-family:\"%s\";font-style:normal;font-weight:%s;font-display:swap;src:url(\"%s\") format('woff2');}\n" $declarations $family $font.weights (relURL $font.file) }}
+{{ end }}
+{{ return printf "%s%s" $declarations $rules }}

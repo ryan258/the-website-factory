@@ -3,7 +3,9 @@ const {chromium}=require('playwright');
 const {AxeBuilder}=require('@axe-core/playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+const os=require('node:os');
 const path=require('node:path');
+const {spawnSync}=require('node:child_process');
 const {ROOT,launchOptions,preview}=require('./qa-paths.cjs');
 const KEY='website-factory-projects-v1';
 (async()=>{
@@ -67,6 +69,43 @@ const KEY='website-factory-projects-v1';
  await page.getByRole('button',{name:'3. Shape pages',exact:true}).click();await page.getByLabel('Section copy',{exact:true}).first().fill('Changed after review');await page.getByRole('button',{name:'4. Review',exact:true}).click();assert.equal(await page.locator('[data-check]:checked').count(),0);await page.getByRole('button',{name:'5. Design handoff',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Mark plan ready for design',exact:true}).isEnabled(),false);assert.equal((await page.locator('#wf-stage').innerText()).includes('Plan marked ready'),false);results.push('Ready-for-design requires complete content and explicit review; subsequent copy edits revoke readiness and review confirmations.');
  const second=await context.newPage();await second.goto(url);await second.getByRole('button',{name:'Open project',exact:true}).first().click();await second.getByRole('button',{name:'1. Brief',exact:true}).click();await second.getByLabel('What does the business do?',{exact:true}).fill('Second tab edit');await page.waitForFunction(()=>document.querySelector('#wf-status').textContent.includes('Another tab'));const protectedValue=await second.evaluate(key=>localStorage.getItem(key),KEY);await page.getByRole('button',{name:'1. Brief',exact:true}).click();await page.getByLabel('What does the business do?',{exact:true}).fill('Stale tab edit');assert.equal(await second.evaluate(key=>localStorage.getItem(key),KEY),protectedValue);results.push('Competing tab edits cannot overwrite the newer saved version.');
  const failure=await browser.newContext();await failure.addInitScript(()=>{Storage.prototype.setItem=()=>{throw new DOMException('Quota exceeded','QuotaExceededError');};});const failed=await failure.newPage();await failed.goto(url);await failed.locator('.wf-start-blank summary').click();await failed.getByLabel('New project name',{exact:true}).fill('Unsaved fixture');await failed.getByRole('button',{name:'Start project',exact:true}).click();assert.match(await failed.locator('#wf-status').innerText(),/Save failed/);assert.equal(await failed.getByRole('button',{name:'Export backup',exact:true}).isEnabled(),true);results.push('Storage failure is visible and backup export remains available.');
+ // Every offered starter must survive load -> export -> compile. The planner writes display
+ // titles and prose; a starter that cannot become a preset again is a starter that cannot become
+ // a site. Runs in its own storage so the capacity fixture above cannot crowd it out.
+ const starterContext=await browser.newContext();const starterPage=await starterContext.newPage();
+ const starterErrors=[];starterPage.on('pageerror',e=>starterErrors.push(e.message));
+ await starterPage.goto(url);
+ const starterSlugs=await starterPage.locator('#starter-preset option').evaluateAll(els=>els.map(e=>e.value));
+ assert.ok(starterSlugs.length>=8,`expected at least 8 offered starters, got ${starterSlugs.length}`);
+ const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'starter-roundtrip-'));
+ for(const slug of starterSlugs){
+  await starterPage.locator('#starter-preset').selectOption(slug);
+  await starterPage.locator('[data-action=start-starter]').click();
+  const project=await starterPage.evaluate(key=>JSON.parse(localStorage.getItem(key)).projects.at(-1),KEY);
+  const planFile=path.join(scratch,`${slug}.json`);
+  fs.writeFileSync(planFile,JSON.stringify({version:1,projects:[project]}));
+  const compiled=spawnSync('python3',[path.join(ROOT,'scripts/from_plan.py'),planFile],{encoding:'utf8'});
+  assert.equal(compiled.status,0,`${slug} starter does not compile back into a preset:\n${compiled.stderr}`);
+  const preset=JSON.parse(compiled.stdout);
+  for(const page of project.pages){
+   assert.ok(page.slug,`${slug}: exported page ${page.name} carries no page key`);
+   assert.ok(preset.pages[page.slug],`${slug}: page key ${page.slug} was renamed to something else (got ${Object.keys(preset.pages).join(', ')})`);
+  }
+  const compiledActions=new Set(Object.values(preset.sections).map(s=>s&&s.action&&s.action.url).filter(Boolean));
+  for(const target of new Set(project.pages.flatMap(p=>p.sections.map(s=>s.target)).filter(Boolean))){
+   assert.ok(compiledActions.has(target),`${slug}: planned destination ${target} is missing from the compiled preset (got ${[...compiledActions].join(', ')})`);
+  }
+  const plannedGroups=project.pages.flatMap(p=>p.sections.flatMap(s=>(s.items||[]).map(i=>i.group))).filter(Boolean);
+  if(plannedGroups.length){
+   const compiledGroups=Object.values(preset.sections).flatMap(s=>((s&&s.items)||[]).map(i=>i.group)).filter(Boolean);
+   assert.deepEqual([...plannedGroups].sort(),[...compiledGroups].sort(),`${slug}: fit/alternative classifications changed in compilation`);
+  }
+  await starterPage.getByRole('button',{name:'All projects',exact:true}).click();
+ }
+ fs.rmSync(scratch,{recursive:true,force:true});
+ assert.deepEqual(starterErrors,[]);
+ await starterContext.close();
+ results.push(`All ${starterSlugs.length} offered starters compile back into a valid preset with their page keys, planned destinations, and item classifications intact.`);
  assert.deepEqual(errors,[]);fs.mkdirSync(path.join(ROOT,'reports'),{recursive:true});fs.writeFileSync(path.join(ROOT,'reports/workflow-checks.json'),JSON.stringify({status:'passed',results},null,2));console.log(`Workflow checks passed: ${results.length} behavior groups; isolated fixtures only.`);
  }finally{if(browser)await browser.close().catch(()=>{});if(site)await site.close().catch(()=>{})}
 })().catch(e=>{console.error(e);process.exitCode=1;});

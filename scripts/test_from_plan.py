@@ -189,5 +189,69 @@ class FromPlanTests(unittest.TestCase):
         self.assertIn('already exists', res.stderr)
         self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(), original)
 
+    def test_planned_destination_is_not_replaced(self):
+        # A section that names where its action goes keeps that destination. Sending every visitor
+        # to /contact/ regardless is a silent change of the plan.
+        plan = {"name": "Destinations", "pages": [
+            {"name": "Home", "slug": "home", "sections": [
+                {"kind": "hero", "title": "Welcome", "body": "Intro copy.", "cta": "See services", "target": "/services/"}]},
+            {"name": "Services", "slug": "services", "sections": [
+                {"kind": "services", "title": "Services", "body": "One\nTwo"}]},
+        ]}
+        _, preset = convert_plan_to_preset(plan, self.registry)
+        self.assertEqual(preset['sections']['home-hero-1']['action']['url'], '/services/')
+
+    def test_destination_without_a_page_is_refused(self):
+        plan = {"name": "Dangling", "pages": [{"name": "Home", "slug": "home", "sections": [
+            {"kind": "hero", "title": "Welcome", "body": "Intro.", "cta": "Book", "target": "/booking/"}]}]}
+        with self.assertRaises(ValueError) as caught:
+            convert_plan_to_preset(plan, self.registry)
+        self.assertIn('/booking/', str(caught.exception))
+
+    def test_carried_page_key_survives_a_renamed_title(self):
+        # "Sample work" used to compile to /sample-work/, breaking every link to /work/.
+        plan = {"name": "Keys", "pages": [
+            {"name": "Home", "slug": "home", "sections": [{"kind": "hero", "title": "Home", "body": "Intro."}]},
+            {"name": "Sample work", "slug": "work", "sections": [{"kind": "work", "title": "Work", "body": "One\nTwo"}]},
+        ]}
+        _, preset = convert_plan_to_preset(plan, self.registry)
+        self.assertIn('work', preset['pages'])
+        self.assertNotIn('sample-work', preset['pages'])
+        self.assertEqual(preset['pages']['work']['title'], 'Sample work')
+
+    def test_page_order_follows_the_plan(self):
+        plan = {"name": "Order", "pages": [
+            {"name": "Home", "slug": "home", "sections": [{"kind": "hero", "title": "Home", "body": "Intro."}]},
+            {"name": "Zebra", "slug": "zebra", "sections": [{"kind": "about", "title": "Zebra", "body": "Copy."}]},
+            {"name": "Apple", "slug": "apple", "sections": [{"kind": "about", "title": "Apple", "body": "Copy."}]},
+        ]}
+        _, preset = convert_plan_to_preset(plan, self.registry)
+        planned = [k for k in preset['pages'] if k in ('home', 'zebra', 'apple')]
+        self.assertEqual(planned, ['home', 'zebra', 'apple'])
+
+    def test_section_anchor_is_kept(self):
+        plan = {"name": "Anchors", "pages": [{"name": "Home", "slug": "home", "sections": [
+            {"kind": "hero", "title": "Home", "body": "Intro.", "anchor": "top"}]}]}
+        _, preset = convert_plan_to_preset(plan, self.registry)
+        self.assertEqual(preset['pages']['home']['sections'][0]['anchor'], 'top')
+
+    def test_dropped_items_are_refused_not_truncated(self):
+        body = '\n'.join(f'Item {n}: detail {n}' for n in range(1, 12))
+        plan = {"name": "Long", "pages": [{"name": "Home", "slug": "home", "sections": [
+            {"kind": "hero", "title": "Home", "body": "Intro."},
+            {"kind": "services", "title": "Services", "body": body}]}]}
+        with self.assertRaises(ValueError) as caught:
+            convert_plan_to_preset(plan, self.registry)
+        self.assertIn('11 lines', str(caught.exception))
+
+    def test_structured_items_carry_their_classification(self):
+        plan = {"name": "Groups", "pages": [{"name": "Home", "slug": "home", "sections": [
+            {"kind": "hero", "title": "Home", "body": "Intro."},
+            {"kind": "fit", "title": "Fit", "body": "ignored", "items": [
+                {"title": "Groundworks", "text": "Yes", "group": "fit"},
+                {"title": "Interior design", "text": "No", "group": "alternative"}]}]}]}
+        _, preset = convert_plan_to_preset(plan, self.registry)
+        self.assertEqual([i['group'] for i in preset['sections']['home-fit-2']['items']], ['fit', 'alternative'])
+
 if __name__ == '__main__':
     unittest.main()
