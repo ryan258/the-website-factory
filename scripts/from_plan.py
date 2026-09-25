@@ -56,6 +56,41 @@ def parse_items(text, default_title="Detail", where=''):
             items.append({"title": f"{default_title} {i+1}", "text": line})
     return items
 
+def starter_reference(project):
+    """What the starter a plan came from still knows, for backups that predate carrying it.
+
+    Older exports kept only display titles, so a link written against the original page key
+    (/estimate/) matched nothing once "Project brief" became /project-brief/, and a field the
+    planner has no editor for (the brief builder's service list) was simply absent. Both are
+    recovered from the recorded starter's own content, never guessed, and an unrecognised starter
+    yields nothing. Returns (display title -> page key, (page key, module) -> content block,
+    (page key, module) -> anchor).
+
+    ponytail: keyed by page and module, so the first of two same-module sections on one page wins.
+    Key on the section's position as well if a starter ever needs two of the same module."""
+    slug = str(project.get('starterPreset') or '').strip()
+    if not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,60}', slug):
+        return {}, {}, {}
+    source = ROOT / 'data/presets' / f'{slug}.json'
+    if not source.is_file():
+        return {}, {}, {}
+    try:
+        profile = json.loads(source.read_text())
+    except (ValueError, OSError):
+        return {}, {}, {}
+    pages = profile.get('pages', {})
+    sections = profile.get('sections', {})
+    keys = {str(page.get('title', '')).strip(): key for key, page in pages.items() if page.get('title')}
+    content, anchors = {}, {}
+    for key, page in pages.items():
+        for spec in page.get('sections', []) or []:
+            found = sections.get(spec.get('content'))
+            if isinstance(found, dict):
+                content.setdefault((key, spec.get('module')), found)
+            if spec.get('anchor'):
+                anchors.setdefault((key, spec.get('module')), str(spec['anchor']))
+    return keys, content, anchors
+
 def action_url(target, page_slugs, fallback, where):
     """The destination a plan asked for, or `fallback` when it named none.
 
@@ -103,12 +138,13 @@ def convert_plan_to_preset(project_data, registry):
 
     # Normalize pages
     raw_pages = project.get('pages', [])
+    recovered, starter_content, starter_anchors = starter_reference(project)
     page_map = {}
     for p in raw_pages:
         p_name = p.get('name', 'Page').strip()
         # A plan that carries its own page key keeps it, so a route never changes because the
         # display title did. Only pages without one are named after their title.
-        carried = str(p.get('slug') or '').strip()
+        carried = str(p.get('slug') or '').strip() or recovered.get(p_name, '')
         if carried and not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,60}', carried):
             raise ValueError(f'Page "{p_name}" has an unusable page key {carried!r}. '
                              'Use lowercase letters, digits, and hyphens.')
@@ -192,7 +228,7 @@ def convert_plan_to_preset(project_data, registry):
                 "variant": variant,
                 "content": content_key
             }
-            anchor = str(s.get('anchor') or '').strip()
+            anchor = str(s.get('anchor') or starter_anchors.get((p_slug, kind), '')).strip()
             if anchor:
                 if not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,60}', anchor):
                     raise ValueError(f'{p_title} / {kind}: anchor {anchor!r} is not usable. Use lowercase '
@@ -223,18 +259,39 @@ def convert_plan_to_preset(project_data, registry):
                 }
 
             if 'items' in req_fields:
-                if isinstance(s.get('items'), list) and s['items']:
+                source_items = s.get('items') if isinstance(s.get('items'), list) and s['items'] else None
+                if source_items is None:
+                    # A backup from before the planner carried items holds only the prose those
+                    # items were rendered into, mixed in with the section intro and notes. When
+                    # every starter item title is still present, the body is unedited starter copy,
+                    # so the structure it came from is recovered instead of re-parsed out of prose.
+                    known = starter_content.get((p_slug, kind), {}).get('items') or []
+                    titles = [str(x.get('title', '')).strip() for x in known if isinstance(x, dict)]
+                    body_text = s.get('body') or ''
+                    if titles and all(title and title in body_text for title in titles):
+                        source_items = known
+                if source_items is not None:
                     items = [{"title": str(it.get('title') or f'Item {TBC.lower()}'), "text": str(it.get('text') or TBC),
-                              **{k: str(it[k]) for k in item_req if it.get(k)}} for it in s['items']]
+                              **{k: str(it[k]) for k in item_req if it.get(k)}} for it in source_items]
                 else:
                     items = parse_items(s.get('body'), default_title=kind.capitalize(), where=f'{p_title} / {kind}')
                 
+                # A classification the starter already made can be recovered by title, for backups
+                # written before the planner carried structured items. Anything the plan itself
+                # says wins, and a retitled item finds no match and still stops the build.
+                from_starter = {str(x.get('title', '')).strip(): x
+                                for x in starter_content.get((p_slug, kind), {}).get('items', []) or []
+                                if isinstance(x, dict)}
                 # Fill special item requirements
                 for it in items:
                     for field, choices in mod_meta.get('item_choices', {}).items():
                         # A classification such as included/excluded is a business decision,
                         # so it is never guessed.
                         if it.get(field) not in choices:
+                            known = from_starter.get(it['title'], {}).get(field)
+                            if known in choices:
+                                it[field] = known
+                                continue
                             raise ValueError(f'{p_title} / {kind}: item "{it["title"]}" needs {field} set to one of: '
                                              + ', '.join(choices) + '. Give the section an "items" list that sets it.')
                     if 'value' in item_req:
@@ -252,7 +309,8 @@ def convert_plan_to_preset(project_data, registry):
                 content_block['items'] = items
 
             if 'services' in req_fields:
-                services = [str(x).strip() for x in (s.get('services') or []) if str(x).strip()]
+                planned = s.get('services') or starter_content.get((p_slug, kind), {}).get('services') or []
+                services = [str(x).strip() for x in planned if str(x).strip()]
                 if not services:
                     raise ValueError(f'{p_title} / {kind}: this section needs a "services" list naming the '
                                      'services a visitor can choose. It is a business decision, so it is '

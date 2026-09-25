@@ -253,5 +253,33 @@ class FromPlanTests(unittest.TestCase):
         _, preset = convert_plan_to_preset(plan, self.registry)
         self.assertEqual([i['group'] for i in preset['sections']['home-fit-2']['items']], ['fit', 'alternative'])
 
+    def test_legacy_backups_without_page_keys_still_compile(self):
+        # Exports written before the planner carried page keys, structured items, anchors, and the
+        # brief builder's service list. They record which starter they came from, so those are
+        # recovered from it rather than guessed, and the original routes survive.
+        legacy = json.loads((ROOT / 'reports/review-2026-09-25/starter-exports.json').read_text())
+        for entry in legacy:
+            with self.subTest(starter=entry['slug']):
+                project = entry['project']
+                self.assertTrue(all(page.get('slug') is None for page in project['pages']),
+                                'fixture must predate carried page keys')
+                _, preset = convert_plan_to_preset(project, self.registry)
+                original = json.loads((ROOT / 'data/presets' / f"{entry['slug']}.json").read_text())
+                for key in original['pages']:
+                    self.assertIn(key, preset['pages'], f"{entry['slug']}: route /{key}/ was renamed")
+
+    def test_legacy_construction_keeps_its_brief_and_classifications(self):
+        legacy = [e for e in json.loads((ROOT / 'reports/review-2026-09-25/starter-exports.json').read_text())
+                  if e['slug'] == 'construction'][0]
+        _, preset = convert_plan_to_preset(legacy['project'], self.registry)
+        brief = next(s for key, s in preset['sections'].items() if 'services' in s and key.startswith('estimate-'))
+        self.assertEqual(brief['services'],
+                         json.loads((ROOT / 'data/presets/construction.json').read_text())['sections']['brief']['services'])
+        fit = next(s for s in preset['sections'].values()
+                   if isinstance(s.get('items'), list) and any(i.get('group') for i in s['items']))
+        self.assertEqual([i['group'] for i in fit['items']], ['fit', 'fit', 'alternative'])
+        anchors = [spec.get('anchor') for spec in preset['pages']['estimate']['sections']]
+        self.assertIn('project-brief', anchors, 'the anchor /estimate/#project-brief points at must survive')
+
 if __name__ == '__main__':
     unittest.main()
