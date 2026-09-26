@@ -2,4 +2,5 @@ budget_help: "Prices in USD."
 budgets:
   - "$450 website"
   - "$450 website + $50/month retainer"
+  - "$450 website + 12-month retainer for $500 (save $100)"
   - "Not sure yet"
