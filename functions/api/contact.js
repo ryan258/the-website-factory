@@ -27,7 +27,7 @@ const ipKey = async (ip, salt) => {
 // Content-Length is only the sender's claim, and a streamed body has none. Count the bytes
 // themselves and stop reading past the limit; null means too large.
 const readCapped = async request => {
-  if (!request.body) return new Uint8Array();
+  if (!request.body) return new Blob([]);
   const reader = request.body.getReader();
   const chunks = [];
   let size = 0;
@@ -38,10 +38,7 @@ const readCapped = async request => {
     if (size > MAX_BODY_BYTES) { await reader.cancel(); return null; }
     chunks.push(value);
   }
-  const body = new Uint8Array(size);
-  let offset = 0;
-  for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.byteLength; }
-  return body;
+  return new Blob(chunks);
 };
 
 export async function onRequestPost({request, env}) {

@@ -133,8 +133,9 @@ def check(output, noindex=None):
     # A stylesheet's own url() targets are part of the release. Site-absolute ones carry the base
     # path when the site is published under a subdirectory, so strip it the same way pages do.
     home=pages.get((output/'index.html').resolve())
-    site_prefix=urlparse(home.canonical).path.rstrip('/') if home else ''
-    site_netloc=urlparse(home.canonical).netloc if home else ''
+    home_url=urlparse(home.canonical) if home else urlparse('')
+    site_prefix=home_url.path.rstrip('/')
+    site_netloc=home_url.netloc
     for sheet in output.rglob('*.css'):
         css=sheet.read_text()
         for found in re.findall(r'url\(([^)]*)\)', css)+re.findall(r'@import\s+([\'"][^\'"]*[\'"])', css):
