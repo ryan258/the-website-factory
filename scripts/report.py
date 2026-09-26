@@ -8,8 +8,20 @@ import json
 import re
 import sys
 
+# Schema diagnostics from scripts/schemas.py always start with a JSON pointer ("$.pages.home"),
+# so anchoring on it keeps them from matching checker prose. Without these, "$: missing name" was
+# reported as a broken output reference and a wrong shape fell through to the generic code.
+# ponytail: still pattern matching, one layer earlier. Typed diagnostics at each error site are
+# the real fix; do that when a caller needs the field pointer as data rather than inside a string.
+SCHEMA_POINTER = r'^\$[\w.\[\]]*: '
 # First match wins. Keep patterns in step with the messages the checkers print.
 CODES = [
+    (SCHEMA_POINTER + r'expected ', 'SCHEMA_TYPE_INVALID'),
+    (SCHEMA_POINTER + r'missing ', 'SCHEMA_FIELD_MISSING'),
+    (SCHEMA_POINTER + r'unexpected field ', 'SCHEMA_FIELD_UNKNOWN'),
+    # The value comes first in these ("$.x: 'nope' is not one of [...]"), so the phrase is not
+    # anchored to the colon the way "missing" and "expected" are.
+    (SCHEMA_POINTER + r'.*(must be|must not be empty|is not one of|does not match|needs at least)', 'SCHEMA_VALUE_INVALID'),
     (r'replaced as unsafe', 'OUTPUT_UNSAFE_URL'),
     (r'link to missing anchor|anchor .* must be|share an anchor', 'CONTENT_ANCHOR_INVALID'),
     (r'mailto link|tel link', 'CONTENT_CONTACT_LINK_INVALID'),
@@ -36,6 +48,7 @@ CODES = [
     (r'placeholder domain', 'RELEASE_PLACEHOLDER_DOMAIN'),
     (r'placeholder text|To be confirmed', 'RELEASE_PLACEHOLDER_TEXT'),
     (r'no usable enquiry path', 'RELEASE_CONTACTABILITY_MISSING'),
+    (r'No 404\.html in the build root', 'RELEASE_ERROR_PAGE_MISSING'),
     (r'expected one H1', 'OUTPUT_H1_COUNT'),
     (r'title must be under|description must be under', 'OUTPUT_METADATA_LENGTH'),
     (r'empty or duplicate', 'OUTPUT_METADATA_DUPLICATE'),

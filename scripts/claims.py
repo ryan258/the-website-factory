@@ -11,9 +11,11 @@ percentages, counts ("200 clients", "10 years"), ratings, testimonials, and abso
 words ("best", "guaranteed", "award-winning"). It cannot tell true from false; it points
 at what a person must confirm.
 
-Approve a claim by adding its exact text, or a phrase inside it, to the preset's
-"approved_claims" list once the business has confirmed it. Client copies start with no
-approvals (scripts/factory.py apply_preset drops the list).
+Approve a claim by adding the field's exact rendered text to the preset's "approved_claims"
+list once the business has confirmed it. A phrase inside the text is not enough: approving
+"We" once approved every price, count and guarantee in any sentence containing it. Exact text
+also means editing the copy revokes its approval, because the new wording no longer matches.
+Client copies start with no approvals (scripts/factory.py apply_preset drops the list).
 """
 import argparse
 import json
@@ -35,6 +37,57 @@ RULES = [
 # Every testimonial is a claim that a real person said it.
 QUOTE_MODULES = {'testimonials'}
 
+SKIP_KEYS = ('url', 'image', 'variant', 'group', 'art', 'file', 'heading_file', 'email', 'phone',
+             'formAction', 'weights', 'fallback', 'tracking', 'accent')
+
+def site_strings(root):
+    """(source path, None, text) for the site text a preset renders but does not contain.
+
+    Brand and form data live outside the preset, so scanning only the preset reported zero claims
+    for a site whose contact form still offered monetary ranges."""
+    import yaml
+    for name in ('data/site.yaml', 'data/contact.yaml'):
+        source = Path(root) / name
+        if not source.is_file():
+            continue
+        try:
+            data = yaml.safe_load(source.read_text())
+        except Exception:
+            continue
+        def walk(value, path):
+            if isinstance(value, str):
+                yield path, None, value
+            elif isinstance(value, dict):
+                for key, item in value.items():
+                    if key not in SKIP_KEYS:
+                        yield from walk(item, f'{path}.{key}')
+            elif isinstance(value, list):
+                for i, item in enumerate(value):
+                    yield from walk(item, f'{path}[{i}]')
+        yield from walk(data, name)
+
+def content_strings(preset, root):
+    """(source path, None, text) for the Markdown a preset's pages render, detail pages included.
+
+    Uses the build's own retention rule (factory.retained_details) so this scans what actually
+    renders: a detail page the preset never links is pruned before Hugo sees it."""
+    root = Path(root)
+    content = root / 'content'
+    if not content.is_dir():
+        return
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    import factory
+    keys = set(preset.get('pages', {}))
+    kept = {page.resolve() for page in factory.retained_details(content, preset)[0]}
+    for source in sorted(content.rglob('*.md')):
+        section = source.relative_to(content).parts[0]
+        if source.name != '_index.md' and source.parent != content and section in ('services', 'work'):
+            if source.resolve() not in kept:
+                continue
+        elif source.parent != content and section not in keys:
+            continue
+        yield source.relative_to(root).as_posix(), None, source.read_text()
+
 def rendered_strings(preset):
     """(json path, module, text) for every string the preset's pages render."""
     used = {}
@@ -46,7 +99,7 @@ def rendered_strings(preset):
             yield path, module, value
         elif isinstance(value, dict):
             for key, item in value.items():
-                if key not in ('url', 'image', 'variant', 'group', 'art'):
+                if key not in SKIP_KEYS:
                     yield from walk(item, f'{path}.{key}', module)
         elif isinstance(value, list):
             for i, item in enumerate(value):
@@ -65,10 +118,14 @@ def denied(sentence, start):
     return bool(re.search(r"(?i)\b(?:not|no|never|without|don't|doesn't|cannot|can't|isn't)\b(?:\W+\w+){0,3}\W*$",
                           sentence[:start]))
 
-def find(preset):
-    approved = [a for a in preset.get('approved_claims', []) if isinstance(a, str) and a.strip()]
+def find(preset, root=None):
+    """Findings for a preset. With `root`, also the site data and Markdown its pages render."""
+    approved = {a.strip() for a in preset.get('approved_claims') or [] if isinstance(a, str) and a.strip()}
     findings = []
-    for path, module, text in rendered_strings(preset):
+    sources = list(rendered_strings(preset))
+    if root:
+        sources += list(site_strings(root)) + list(content_strings(preset, root))
+    for path, module, text in sources:
         hits = [(code, m.group(0), why) for sentence in re.split(r'(?<=[.!?])\s+', text)
                 for code, pattern, why in RULES for m in re.finditer(pattern, sentence)
                 if not denied(sentence, m.start())]
@@ -76,7 +133,7 @@ def find(preset):
             hits.append(('TESTIMONIAL', text[:60], 'a quote attributed to a real person'))
         for code, match, why in hits:
             findings.append(dict(code=f'CLAIM_{code}', path=path, match=match.strip(), text=text, reason=why,
-                                 approved=any(a in text or text in a for a in approved)))
+                                 approved=text.strip() in approved))
     return findings
 
 def main(argv=None):
@@ -89,7 +146,7 @@ def main(argv=None):
     path = ROOT / 'data/presets' / f'{slug}.json'
     if not path.is_file():
         parser.error(f'No preset {slug}.')
-    findings = find(json.loads(path.read_text()))
+    findings = find(json.loads(path.read_text()), root=ROOT)
     open_items = [f for f in findings if not f['approved']]
     if args.json:
         json.dump(dict(ok=not open_items, preset=slug, findings=findings), sys.stdout, indent=2, ensure_ascii=False)

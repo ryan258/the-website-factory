@@ -64,7 +64,7 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
             if not content.get(field): errors.append(f'{label}: missing required field {field}')
         for field in ('title','intro','body','notice','label','aside','note','image','imageAlt'):
             if field in content and not isinstance(content[field], str): errors.append(f'{label}: {field} must be text')
-        if content.get('image'):
+        if content.get('image') and isinstance(content['image'], str):
             image = Path(content['image'])
             if image.is_absolute() or '..' in image.parts or not (root/'assets'/image).is_file():
                 errors.append(f'{label}: missing or unsafe image {image}')
@@ -223,11 +223,12 @@ def referenced_assets(profile, content_root):
             found |= set(IMAGE_REF.findall(page.read_text()))
     return found
 
-def prune_unlinked_details(content_root, profile):
-    """Keep detail pages only when something retained links to them.
+def retained_details(content_root, profile):
+    """(kept, dropped) detail page files, by the rule the build itself applies.
 
     Links are followed transitively: a retained detail page's own front matter and Markdown can
-    reach further detail pages, and those are kept too."""
+    reach further detail pages, and those are kept too. scripts/claims.py reads this too, so what
+    gets scanned for unconfirmed claims is exactly what gets rendered."""
     root = Path(content_root)
     linked = internal_links(profile)
     details = {}
@@ -246,9 +247,13 @@ def prune_unlinked_details(content_root, profile):
         for url in frontier:
             reached |= internal_links(details[url].read_text())
         frontier = (reached & set(details)) - keep
-    for url, page in details.items():
-        if url not in keep:
-            page.unlink()
+    return ([page for url, page in details.items() if url in keep],
+            [page for url, page in details.items() if url not in keep])
+
+def prune_unlinked_details(content_root, profile):
+    """Remove detail pages nothing retained links to."""
+    for page in retained_details(content_root, profile)[1]:
+        page.unlink()
 
 def apply_palette(destination, palette):
     """Replace the theme colors in a copy's data/site.yaml with a named palette from data/palettes.json."""

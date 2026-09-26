@@ -66,8 +66,16 @@ def get_schema(name):
     return schemas.generated()[f'{name}.schema.json']
 
 def validate_preset(preset, slug='candidate'):
-    """Schema shape plus the full factory rules, without writing anything."""
+    """Schema shape plus the full factory rules, without writing anything.
+
+    The semantic rules walk the preset freely, so they only run on something walkable: given a
+    string or None they raised instead of reporting, and a crash tells the caller nothing about
+    which field was wrong. A merely invalid preset still gets both sets of diagnostics."""
     shape = schemas.validate(preset, schemas.generated()['preset.schema.json'])
+    walkable = (isinstance(preset, dict) and isinstance(preset.get('pages'), dict)
+                and isinstance(preset.get('sections'), dict))
+    if not walkable:
+        return report.result(shape or ['$: expected a preset object with "pages" and "sections"'])
     rules = factory.validate(ROOT, extra_presets={slug: preset})
     return report.result(shape + [e for e in rules if e.startswith(f'{slug}')])
 

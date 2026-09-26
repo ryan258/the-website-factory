@@ -19,13 +19,17 @@ def noindex_expected():
     return os.environ.get('HUGO_PARAMS_NOINDEX', found.group(1) if found else 'true').lower() not in ('false', '0', 'no')
 class Page(HTMLParser):
     def __init__(self):
-        super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]; self.loads=[]; self.fonts=[]
+        super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]; self.loads=[]; self.fonts=[]; self.media=[]
     def handle_starttag(self, tag, attrs):
         a=dict(attrs)
         if tag=='h1': self.h1+=1
         if tag=='title': self.in_title=True
         if 'id' in a: self.ids.append(a['id'])
-        if tag=='meta': self.meta[a.get('name','')]=a.get('content','')
+        if tag=='meta':
+            self.meta[a.get('name','')]=a.get('content','')
+            if a.get('property'): self.meta[a['property']]=a.get('content','')
+            if a.get('name','') in ('twitter:image',) or a.get('property','') in ('og:image',):
+                self.media.append(a.get('content',''))
         if tag=='link' and a.get('rel')=='canonical': self.canonical=a.get('href','')
         if tag=='a' and a.get('href'): self.refs.append(a['href'])
         if tag in ('img','script') and a.get('src'): self.refs.append(a['src']); self.loads.append(a['src'])
@@ -36,6 +40,13 @@ class Page(HTMLParser):
         if tag=='title': self.in_title=False
     def handle_data(self, value):
         if self.in_title:self.title+=value
+
+def _unique(references):
+    """One entry per reference, anchor-checked if any occurrence was a link."""
+    seen={}
+    for ref,anchored in references:
+        seen[ref]=seen.get(ref,False) or anchored
+    return list(seen.items())
 
 def check(output, noindex=None):
     output = Path(output).resolve()
@@ -51,6 +62,11 @@ def check(output, noindex=None):
     if not all(descriptions) or len(set(descriptions))!=len(descriptions):errors.append('Descriptions: empty or duplicate values')
     placeholder=[p.canonical for p in pages.values() if (urlparse(p.canonical).hostname or '').endswith('example.invalid')]
     if not noindex and placeholder:errors.append(f'Indexable build still uses the placeholder domain: {placeholder[0]}. Build with --base-url set to the real domain.')
+    error_page=output/'404.html'
+    if not error_page.is_file():
+        errors.append('No 404.html in the build root; unknown routes would fall back to the home page instead of an error')
+    elif pages.get(error_page.resolve()) and pages[error_page.resolve()].meta.get('robots')!='noindex':
+        errors.append('404.html: the error page must be noindex whatever the release indexing setting')
     if not noindex:
         has_active_form = any(
             '<form' in file.read_text() and 'data-enabled="true"' in file.read_text()
@@ -73,7 +89,7 @@ def check(output, noindex=None):
         if len(p.title)>=60:errors.append(f'{label}: title must be under 60 characters')
         if len(p.meta.get('description',''))>=155:errors.append(f'{label}: description must be under 155 characters')
         if noindex and p.meta.get('robots')!='noindex':errors.append(f'{label}: noindex missing')
-        if not noindex and p.meta.get('robots')=='noindex':errors.append(f'{label}: noindex present in an indexable build')
+        if not noindex and p.meta.get('robots')=='noindex' and label!='404.html':errors.append(f'{label}: noindex present in an indexable build')
         if len(set(p.ids))!=len(p.ids):errors.append(f'{label}: duplicate IDs')
         base=urlparse(p.canonical)
         # The CSP in static/_headers allows only this site's own files; catch any other origin here.
@@ -87,7 +103,11 @@ def check(output, noindex=None):
         font_files=[output/unquote(urlparse(f).path).removeprefix(prefix).lstrip('/') for f in p.fonts]
         font_bytes=sum(f.stat().st_size for f in font_files if f.is_file())
         if font_bytes>90000:errors.append(f'{label}: preloaded fonts total {font_bytes} bytes; keep them under 90000')
-        for ref in p.refs:
+        # Everything the page depends on, not only its links: responsive sources, social images
+        # and same-origin absolute URLs are all things a release breaks by going missing.
+        # `anchored` marks the ones whose #fragment names a real element.
+        references=[(ref,True) for ref in p.refs]+[(ref,False) for ref in p.loads+p.media]
+        for ref,anchored in _unique(references):
             # Hugo swaps a URL it considers unsafe for this marker instead of failing the build.
             if 'ZgotmplZ' in ref:errors.append(f'{label}: a link was replaced as unsafe ({ref}); mark it with safeURL only after validating it');continue
             if ref.startswith(('mailto:','tel:')):
@@ -95,8 +115,10 @@ def check(output, noindex=None):
                 if problem:errors.append(f'{label}: {problem}')
                 continue
             u=urlparse(ref)
-            if u.scheme or u.netloc:continue
+            if u.scheme in ('data','javascript'):continue
+            if u.netloc and u.netloc!=base.netloc:continue  # another origin; reported above
             path=unquote(u.path)
+            if u.netloc and not path:continue
             if path.startswith('/'):
                 if prefix and not path.startswith(prefix+'/'):
                     errors.append(f'{label}: reference escapes base path: {ref}')
@@ -107,7 +129,23 @@ def check(output, noindex=None):
             else:target=file
             if target.is_dir():target=target/'index.html'
             if not target.exists():errors.append(f'{label}: missing {ref}')
-            elif u.fragment and target in pages and unquote(u.fragment) not in pages[target].ids:errors.append(f'{label}: missing anchor {ref}')
+            elif anchored and u.fragment and target in pages and unquote(u.fragment) not in pages[target].ids:errors.append(f'{label}: missing anchor {ref}')
+    # A stylesheet's own url() targets are part of the release. Site-absolute ones carry the base
+    # path when the site is published under a subdirectory, so strip it the same way pages do.
+    home=pages.get((output/'index.html').resolve())
+    site_prefix=urlparse(home.canonical).path.rstrip('/') if home else ''
+    for sheet in output.rglob('*.css'):
+        for found in re.findall(r'url\(([^)]*)\)', sheet.read_text()):
+            ref=found.strip().strip('\'"')
+            u=urlparse(ref)
+            if u.scheme in ('data','javascript') or u.netloc or not u.path:continue
+            path=unquote(u.path)
+            if path.startswith('/'):
+                if site_prefix and path.startswith(site_prefix+'/'):path=path[len(site_prefix):]
+                target=(output/path.lstrip('/')).resolve()
+            else:
+                target=(sheet.parent/path).resolve()
+            if not target.exists():errors.append(f'{sheet.relative_to(output)}: missing {ref}')
     for directory,extension,budget in [('css','css',20000),('js','js',5000)]:
         # The internal editor has a separate budget; public-site bundles retain their limits.
         for asset in (output/directory).glob('*.'+extension):

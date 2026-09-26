@@ -1,0 +1,9 @@
+{{ define "main" }}<section class="page-intro container">
+<p class="eyebrow">Page not found</p>
+<h1>That page is not here.</h1>
+<p>The address may be mistyped, or the page may have moved. These are the main pages of this site.</p>
+{{/* nav.html lists only pages the selected preset actually builds, so this page cannot
+     offer a link the site does not have. */}}
+<nav class="page-intro__nav" aria-label="Main pages">{{ partial "nav.html" . }}</nav>
+{{ partial "button.html" (dict "url" "/" "label" "Back to home") }}
+</section>{{ end }}

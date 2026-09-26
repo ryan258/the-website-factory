@@ -1,22 +1,28 @@
 {{ partial "validate-site.html" . }}
 {{ $title := printf "%s — %s" .Title hugo.Data.site.name }}
+{{/* One resolved description for search, social tags and the page itself. Hugo's error page has
+     no content file to carry front matter, so its own wording is set here; the page body is
+     layouts/404.html. */}}
+{{ $description := .Description | default hugo.Data.site.description }}
+{{ if eq .Kind "404" }}{{ $description = "That address does not exist on this site. Use the main pages to find what you need." }}{{ end }}
 {{ $social := partial "social-image.html" . }}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{ $title }}</title>
-<meta name="description" content="{{ .Description | default hugo.Data.site.description }}">
-{{ if site.Params.noindex }}<meta name="robots" content="noindex">{{ end }}
+<meta name="description" content="{{ $description }}">
+{{/* The error page is never a search result, whatever the release's indexing setting. */}}
+{{ if or site.Params.noindex (eq .Kind "404") }}<meta name="robots" content="noindex">{{ end }}
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="{{ .Permalink }}">
 <meta property="og:title" content="{{ $title }}">
-<meta property="og:description" content="{{ .Description | default hugo.Data.site.description }}">
+<meta property="og:description" content="{{ $description }}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ .Permalink }}">
 <meta property="og:image" content="{{ $social.Permalink }}">
 <meta property="og:image:alt" content="{{ strings.TrimSuffix "." hugo.Data.site.name }}. {{ hugo.Data.site.social.heading }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $title }}">
-<meta name="twitter:description" content="{{ .Description | default hugo.Data.site.description }}">
+<meta name="twitter:description" content="{{ $description }}">
 <meta name="twitter:image" content="{{ $social.Permalink }}">
 <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | relURL }}">
