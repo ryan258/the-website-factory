@@ -30,6 +30,7 @@ This compiles the planner JSON into `data/presets/<name>.json`, normalizes the p
 
 The compiler never invents facts. Anything the plan leaves out (prices, dates, places, service copy) is written as `To confirm with the client.`, and the command lists every section that still contains it. Replace each one with confirmed copy before client review.
 
+- The compiler validates input structures against the plan JSON schema (`scripts/schemas.py`), reporting standard JSON path errors (e.g. `$.pages[0].sections: expected array`) for malformed fields while gracefully accepting planner backup exports.
 - Sections may use the planner's names ("Introduction", "Services", "FAQ", …) or module keys (`hero`, `services`, `faq`). An unknown section type, or two pages that would share one address, stops the compile with an error instead of being dropped.
 - The compiler never invents business facts. Any required field the plan leaves empty (prices, times, places, services) is filled with **"To be confirmed"**, and the command prints how many there are. Replace each one before publishing.
 - `--write` refuses to replace an existing preset. Choose another `--name`, or add `--force` to replace it on purpose.

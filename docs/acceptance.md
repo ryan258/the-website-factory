@@ -3,7 +3,38 @@
 One file for all acceptance evidence. **Current** is what is true today. **History** keeps
 earlier records unchanged, for reference; their numbers are not current results.
 
-## Current — 2026-09-24
+## Current — 2026-09-26
+
+Targeted verification of plan compiler schema validation, contact endpoint streamed body reading, and site output checking.
+
+| Check | Result |
+| --- | --- |
+| Contact endpoint suite (`scripts/test_contact_endpoint.mjs`) | 33 pass (including storage failure, notification failure, webhook errors, unopened intake, dotfile protection, and streamed payload cap) |
+| Plan compiler tests (`scripts/test_from_plan.py`) | 23 pass (schema-driven shape validation, relaxed planner import boundary, action target resolution) |
+| Factory test suite (`scripts/test_factory.py`) | 20 pass (across all 9 presets) |
+| Schema validation & freshness (`scripts/test_schemas.py`, `schemas.py --check`) | 14 pass; schemas up to date |
+| Deep links & anchors (`scripts/test_links.py`) | 7 pass |
+| Site output checking (`scripts/check_site.py`) | Pass (including cross-origin stylesheet asset detection and single-pass canonical URL parsing) |
+
+Verification confirmed:
+1. `functions/api/contact.js`: Streamed body byte counting capped at 64 KB returning standard `Blob` instances for multipart and form data parsing.
+2. `scripts/from_plan.py`: Input shape checking refactored onto `schemas.plan_schema` and `schemas.validate`, producing standard JSON path diagnostics (`$.path`) for malformed fields while retaining relaxed acceptance of planner backup exports.
+3. `scripts/check_site.py`: Single-pass URL parsing for home canonical URL prefix and netloc in stylesheet asset audits.
+
+### Not verified
+
+- No manual screen-reader, zoom, or real-device review.
+- No approval of sample content, claims, service scope, contact details, or image rights by a real business.
+- No live form submission, hosting, deployment, or publication.
+
+---
+
+## History
+
+These records are kept as written at the time. Tools, test counts, and hosting have
+changed since (for example, forms moved from Netlify to Cloudflare Pages).
+
+### Factory acceptance — 2026-09-24
 
 Focused local verification for the construction preset on Hugo Extended 0.166.0 and Dart Sass 1.104.1.
 
@@ -24,20 +55,7 @@ Focused local verification for the construction preset on Hugo Extended 0.166.0 
 
 The root and subpath builds ran `scripts/check_site.py` through `scripts/build.py`. The brief script was inspected statically; its browser interactions were not exercised. The generated client copy is a fictional review artifact in `/private/tmp/wf-20260924-red-clay-client-v2`.
 
-The planner now opens on a complete-site starter, with the local-service composition selected and the blank-plan option collapsed. Loading a starter copies its selected pages and sections into the editor with sample copy marked as draft; the user can remove unneeded content before completing the brief. All fictional presets are selectable except the live `258webco` profile. The workshop build and generated-output checks passed; the rendered HTML contains the default local-service choice and construction option, and excludes `258webco`. The fingerprinted planner script is 9,496 bytes gzip against its 10,000-byte budget. `node --check assets/js/workflow.js` and `git diff --check` passed.
-
-### Not verified
-
-- No manual screen-reader, zoom, or real-device review.
-- No approval of sample content, claims, service scope, contact details, or image rights by a real business.
-- No live form submission, hosting, deployment, or publication.
-
----
-
-## History
-
-These records are kept as written at the time. Tools, test counts, and hosting have
-changed since (for example, forms moved from Netlify to Cloudflare Pages).
+The planner opens on a complete-site starter, with the local-service composition selected and the blank-plan option collapsed. Loading a starter copies its selected pages and sections into the editor with sample copy marked as draft; the user can remove unneeded content before completing the brief. All fictional presets are selectable except the live `258webco` profile. The workshop build and generated-output checks passed; the rendered HTML contains the default local-service choice and construction option, and excludes `258webco`. The fingerprinted planner script is 9,496 bytes gzip against its 10,000-byte budget. `node --check assets/js/workflow.js` and `git diff --check` passed.
 
 ### Factory acceptance — 2026-09-23
 

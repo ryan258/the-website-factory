@@ -177,6 +177,7 @@ Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the ca
 ### Security & Privacy Protections
 
 - **Rate Limiting:** `functions/api/contact.js` counts submissions per visitor in KV under `ratelimit:<hash>`, a SHA-256 hash of the IP address (never the raw address), and returns HTTP 429 after 5 enquiries within 10 minutes. Add a `RATE_LIMIT_SALT` secret so the hash cannot be reversed by trying every address. KV is eventually consistent, so this is a best-effort limit: a fast burst can exceed it. Counters share the `ENQUIRY` namespace unless you bind a separate `RATE_LIMIT` KV namespace, so list enquiries with `--prefix enquiry:` (as `scripts/enquiries.py` does).
+- **Payload Size Cap:** `functions/api/contact.js` enforces a 64 KB limit counting streamed body bytes directly (protecting against oversized chunked requests without Content-Length), parsed via web-standard `Blob` chunks into `FormData`.
 - **Cross-site Posts:** a POST whose `Origin` header names another website is refused with HTTP 403.
 - **No-JavaScript Errors:** visitors without JavaScript get a small HTML error page with a link back to the form, not raw JSON.
 - **Data Retention TTL:** Enquiries are stored with a 90-day expiration TTL in KV to avoid hoarding personal information indefinitely.
