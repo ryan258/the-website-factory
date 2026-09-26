@@ -24,6 +24,26 @@ const ipKey = async (ip, salt) => {
   return [...new Uint8Array(digest)].slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join('');
 };
 
+// Content-Length is only the sender's claim, and a streamed body has none. Count the bytes
+// themselves and stop reading past the limit; null means too large.
+const readCapped = async request => {
+  if (!request.body) return new Uint8Array();
+  const reader = request.body.getReader();
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_BODY_BYTES) { await reader.cancel(); return null; }
+    chunks.push(value);
+  }
+  const body = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.byteLength; }
+  return body;
+};
+
 export async function onRequestPost({request, env}) {
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({error: 'Method Not Allowed'}), {
@@ -56,7 +76,12 @@ export async function onRequestPost({request, env}) {
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) return done(403, {error: 'Enquiries must be sent from this website.'});
   let form;
-  try { form = await request.formData(); } catch { return done(400, {error: 'Submission could not be read.'}); }
+  try {
+    const body = await readCapped(request);
+    if (body === null) return done(413, {error: 'Payload too large.'});
+    // The original header carries the multipart boundary, so it is passed through unchanged.
+    form = await new Response(body, {headers: {'content-type': request.headers.get('content-type')}}).formData();
+  } catch { return done(400, {error: 'Submission could not be read.'}); }
 
   const seen = new Set();
   for (const [key, value] of form.entries()) {

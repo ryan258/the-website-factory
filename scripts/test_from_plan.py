@@ -208,6 +208,38 @@ class FromPlanTests(unittest.TestCase):
             convert_plan_to_preset(plan, self.registry)
         self.assertIn('/booking/', str(caught.exception))
 
+    def test_destinations_are_only_ones_the_validator_accepts(self):
+        def plan(target):
+            return {"name": "Links", "pages": [
+                {"name": "Home", "slug": "home", "sections": [{"kind": "hero", "title": "Home", "body": "Intro."}]},
+                {"name": "Pricing", "slug": "pricing", "sections": [
+                    {"kind": "about", "title": "About", "body": "Copy.", "anchor": "story"},
+                    {"kind": "cta", "title": "Next", "body": "Go.", "target": target}]}]}
+        slug, preset = convert_plan_to_preset(plan('#story'), self.registry)
+        self.assertEqual(preset['sections']['pricing-cta-3']['action']['url'], '/pricing/#story')
+        self.assertEqual([e for e in validate(ROOT, extra_presets={slug: preset}) if e.startswith(slug)], [])
+        # The compiler used to pass other websites through, then validation refused them.
+        with self.assertRaisesRegex(ValueError, 'other websites'):
+            convert_plan_to_preset(plan('https://example.com/book'), self.registry)
+
+    def test_malformed_plan_names_the_field(self):
+        cases = [
+            ([], 'must be a JSON object'),
+            ({"projects": []}, 'no projects'),
+            ({"name": 5}, 'plan: name must be text'),
+            ({"name": "X", "pages": "Home"}, 'pages must be a list'),
+            ({"name": "X", "pages": [{"name": "Home", "sections": ["hero"]}]}, r'pages\[0\]\.sections must be'),
+            ({"name": "X", "pages": [{"name": "Home", "sections": [{"kind": "hero", "body": ["x"]}]}]},
+             r'pages\[0\]\.sections\[0\]: body must be text'),
+        ]
+        for plan, message in cases:
+            with self.subTest(plan=plan), self.assertRaisesRegex(ValueError, message):
+                convert_plan_to_preset(plan, self.registry)
+
+    def test_null_fields_count_as_missing(self):
+        _, preset = convert_plan_to_preset({"name": None, "business": None, "pages": None}, self.registry)
+        self.assertEqual(preset['name'], 'Untitled Website')
+
     def test_carried_page_key_survives_a_renamed_title(self):
         # "Sample work" used to compile to /sample-work/, breaking every link to /work/.
         plan = {"name": "Keys", "pages": [

@@ -134,10 +134,14 @@ def check(output, noindex=None):
     # path when the site is published under a subdirectory, so strip it the same way pages do.
     home=pages.get((output/'index.html').resolve())
     site_prefix=urlparse(home.canonical).path.rstrip('/') if home else ''
+    site_netloc=urlparse(home.canonical).netloc if home else ''
     for sheet in output.rglob('*.css'):
-        for found in re.findall(r'url\(([^)]*)\)', sheet.read_text()):
+        css=sheet.read_text()
+        for found in re.findall(r'url\(([^)]*)\)', css)+re.findall(r'@import\s+([\'"][^\'"]*[\'"])', css):
             ref=found.strip().strip('\'"')
             u=urlparse(ref)
+            # A stylesheet's font or image from another origin is blocked by the CSP, so it breaks silently.
+            if u.netloc and u.netloc!=site_netloc:errors.append(f'{sheet.relative_to(output)}: loads a file from another site: {ref}');continue
             if u.scheme in ('data','javascript') or u.netloc or not u.path:continue
             path=unquote(u.path)
             if path.startswith('/'):

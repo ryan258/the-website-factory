@@ -26,9 +26,25 @@ def module_names(registry):
     names.update({PLANNER_LABELS.get(key, value['name']): key for key, value in registry.items()})
     return names
 
-def slugify(text):
-    slug = re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
+def slugify(value):
+    slug = re.sub(r'[^a-z0-9]+', '-', value.lower()).strip('-')
     return slug or 'page'
+
+def text(value, where):
+    """A plan field as trimmed text: missing is empty, anything but text names the field."""
+    if value is None:
+        return ''
+    if not isinstance(value, str):
+        raise ValueError(f'{where} must be text, not {type(value).__name__}.')
+    return value.strip()
+
+def objects(value, where):
+    """A plan list whose entries must all be objects; missing is empty."""
+    if value is None:
+        return []
+    if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
+        raise ValueError(f'{where} must be a list of objects.')
+    return value
 
 MAX_PARSED_ITEMS = 8
 
@@ -91,22 +107,24 @@ def starter_reference(project):
                 anchors.setdefault((key, spec.get('module')), str(spec['anchor']))
     return keys, content, anchors
 
-def action_url(target, page_slugs, fallback, where):
+def action_url(target, page_slugs, fallback, where, page='home'):
     """The destination a plan asked for, or `fallback` when it named none.
 
     A planned destination is never quietly replaced: an internal path that no page answers, or an
     address this compiler cannot represent, stops the build instead of redirecting the visitor
-    somewhere the plan did not choose."""
-    target = (target or '').strip()
+    somewhere the plan did not choose. Only what factory.validate accepts is produced: a local
+    path, mailto:, or tel:. A bare #anchor means that anchor on the section's own page."""
+    target = text(target, f'{where}: target')
     if not target:
         return fallback
-    if target.startswith(('http://', 'https://', 'mailto:', 'tel:')):
+    if target.startswith(('mailto:', 'tel:')):
         return target
     if target.startswith('#'):
-        return target
+        return ('/' if page == 'home' else f'/{page}/') + target
     if not target.startswith('/'):
-        raise ValueError(f'{where}: action destination {target!r} is not a usable address. Use a path '
-                         'like /services/, an #anchor, or a full https:// URL.')
+        raise ValueError(f'{where}: action destination {target!r} is not a usable address. Use a page '
+                         'path like /services/, a page anchor like /services/#pricing or #pricing, '
+                         'mailto:, or tel:. Links to other websites are not supported in buttons.')
     page = re.split(r'[#?]', target, 1)[0]
     slug = page.strip('/').split('/')[0]
     if slug and slug not in page_slugs:
@@ -114,9 +132,43 @@ def action_url(target, page_slugs, fallback, where):
                          'no page for. Add that page or change the destination.')
     return target
 
+PROJECT_TEXT = ('name', 'business', 'goal', 'scope', 'tone', 'starterPreset')
+PAGE_TEXT = ('name', 'purpose', 'slug')
+SECTION_TEXT = ('kind', 'variant', 'title', 'body', 'cta', 'target', 'notice', 'a11y', 'anchor')
+
+def plan_project(project_data):
+    """The plan's project with its shape checked, so a malformed plan names the field at fault
+    instead of failing somewhere inside the compiler. Empty (null) fields count as missing."""
+    def clean(value, fields, where):
+        for field in fields:
+            text(value.get(field), f'{where}: {field}')
+        return {key: item for key, item in value.items() if item is not None}
+    if not isinstance(project_data, dict):
+        raise ValueError('The plan must be a JSON object.')
+    if 'projects' in project_data:
+        # A full backup export {"version":1,"projects":[...]}; the first project is compiled.
+        projects = objects(project_data['projects'], 'projects')
+        if not projects:
+            raise ValueError('The plan backup has no projects.')
+        project_data = projects[0]
+    project = clean(project_data, PROJECT_TEXT, 'plan')
+    pages = []
+    for i, page in enumerate(objects(project.get('pages'), 'pages')):
+        where = f'pages[{i}]'
+        page = clean(page, PAGE_TEXT, where)
+        sections = []
+        for j, section in enumerate(objects(page.get('sections'), f'{where}.sections')):
+            section = clean(section, SECTION_TEXT, f'{where}.sections[{j}]')
+            if 'items' in section:
+                objects(section['items'], f'{where}.sections[{j}].items')
+            if 'services' in section and not isinstance(section['services'], list):
+                raise ValueError(f'{where}.sections[{j}].services must be a list of service names.')
+            sections.append(section)
+        pages.append(dict(page, sections=sections))
+    return dict(project, pages=pages)
+
 def convert_plan_to_preset(project_data, registry):
-    # Support both full backup export {"version":1,"projects":[...]} and direct project object
-    project = project_data['projects'][0] if 'projects' in project_data else project_data
+    project = plan_project(project_data)
     names = module_names(registry)
     unknown = sorted({str(s.get('kind') or '(missing)') for p in project.get('pages', []) for s in p.get('sections', [])
                       if s.get('kind') not in names})
@@ -255,7 +307,7 @@ def convert_plan_to_preset(project_data, registry):
                 fallback = "/contact/" if "contact" in ordered_slugs else "/"
                 content_block['action'] = {
                     "label": (s.get('cta') or "Get in touch").strip(),
-                    "url": action_url(s.get('target'), ordered_slugs, fallback, f'{p_title} / {kind}')
+                    "url": action_url(s.get('target'), ordered_slugs, fallback, f'{p_title} / {kind}', p_slug)
                 }
 
             if 'items' in req_fields:

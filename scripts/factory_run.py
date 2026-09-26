@@ -14,6 +14,7 @@ copy lists what a person must confirm before anything is published.
 import argparse
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -61,14 +62,19 @@ def run(plan, destination, name=None, plan_file='plan.json'):
     if errors:
         raise ValueError('The compiled preset is not valid:\n  ' + '\n  '.join(errors))
     dest = new_site.create(destination, name, BASE)
-    (dest / 'data/presets' / f'{slug}.json').write_text(json.dumps(preset, indent=2, ensure_ascii=False) + '\n')
-    factory.apply_preset(dest, slug, name)
-    errors = factory.validate(dest)
-    if errors:
-        raise ValueError('The new copy did not validate:\n  ' + '\n  '.join(errors))
-    (dest / 'docs/plan.json').write_text(json.dumps(plan, indent=2, ensure_ascii=False) + '\n')
-    text, gaps, found = review(preset, plan_file)
-    (dest / 'docs/plan-review.md').write_text(text)
+    # A copy that fails before it is complete is removed, so the same destination can be retried.
+    try:
+        (dest / 'data/presets' / f'{slug}.json').write_text(json.dumps(preset, indent=2, ensure_ascii=False) + '\n')
+        factory.apply_preset(dest, slug, name)
+        errors = factory.validate(dest)
+        if errors:
+            raise ValueError('The new copy did not validate:\n  ' + '\n  '.join(errors))
+        (dest / 'docs/plan.json').write_text(json.dumps(plan, indent=2, ensure_ascii=False) + '\n')
+        text, gaps, found = review(preset, plan_file)
+        (dest / 'docs/plan-review.md').write_text(text)
+    except BaseException:
+        shutil.rmtree(dest, ignore_errors=True)
+        raise
     # The copy has no .tools of its own yet; build with the master's pinned Hugo and Sass.
     # Build progress goes to stderr, so a caller that owns stdout (the MCP server) stays clean.
     built = subprocess.run([sys.executable, str(dest / 'scripts/build.py')], cwd=dest, env=build.environment(),

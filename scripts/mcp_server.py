@@ -13,6 +13,7 @@ deploys, or enables a contact form.
 import contextlib
 import io
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -71,6 +72,9 @@ def validate_preset(preset, slug='candidate'):
     The semantic rules walk the preset freely, so they only run on something walkable: given a
     string or None they raised instead of reporting, and a crash tells the caller nothing about
     which field was wrong. A merely invalid preset still gets both sets of diagnostics."""
+    # Errors are filtered by the slug prefix below, so a bad slug's own error would be dropped.
+    if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9][a-z0-9-]*', slug):
+        return report.result([f'Invalid preset identifier {slug!r}: use lowercase letters, digits, and hyphens.'])
     shape = schemas.validate(preset, schemas.generated()['preset.schema.json'])
     walkable = (isinstance(preset, dict) and isinstance(preset.get('pages'), dict)
                 and isinstance(preset.get('sections'), dict))

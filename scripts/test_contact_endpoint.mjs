@@ -321,6 +321,37 @@ check('oversize payload is rejected with 413', async () => {
   assert.match((await response.json()).error, /Payload too large/);
 });
 
+check('oversize payload without a size header is still rejected with 413', async () => {
+  const ENQUIRY = store();
+  const encode = text => new TextEncoder().encode(text);
+  const body = new ReadableStream({start(controller) {
+    controller.enqueue(encode(`${VALID}${'x'.repeat(40000)}`));
+    controller.enqueue(encode('x'.repeat(40000)));
+    controller.close();
+  }});
+  const response = await onRequestPost({
+    request: new Request('https://example.invalid/api/contact', {
+      method: 'POST', duplex: 'half', body,
+      headers: {'content-type': 'application/x-www-form-urlencoded', accept: 'application/json'},
+    }),
+    env: {...ENABLED, ENQUIRY},
+  });
+  assert.equal(response.status, 413);
+  assert.equal(ENQUIRY.written.length, 0);
+});
+
+check('a multipart submission is still read', async () => {
+  const form = new FormData();
+  for (const [key, value] of new URLSearchParams(VALID)) form.append(key, value);
+  const ENQUIRY = store();
+  const response = await onRequestPost({
+    request: new Request('https://example.invalid/api/contact', {method: 'POST', body: form, headers: {accept: 'application/json'}}),
+    env: {...ENABLED, ENQUIRY},
+  });
+  assert.equal(response.status, 200);
+  assert.equal(ENQUIRY.written.length, 1);
+});
+
 let failures = 0;
 for (const [name, fn] of cases) {
   try { await fn(); } catch (error) { failures++; console.error(`FAIL: ${name}\n  ${error.message}`); }

@@ -132,6 +132,22 @@ class FactoryTests(unittest.TestCase):
             self.assertEqual((dest/'old.html').read_text(),'unknown page')
             self.assertEqual((dest/'notes.txt').read_text(),'owner notes')
             self.assertFalse((dest/'index.html').exists())
+    def test_refused_output_keeps_files_that_only_look_temporary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')
+            dest=Path(tmp)/'output';dest.mkdir();(dest/'index.html').write_text('owner page')
+            (dest/'notes.tmp.txt').write_text('owner notes');(dest/'index.html.tmp.123').write_text('leftover')
+            with self.assertRaises(ValueError):build.publish_output(source,dest)
+            self.assertEqual((dest/'notes.tmp.txt').read_text(),'owner notes')
+            self.assertTrue((dest/'index.html.tmp.123').exists(),'a refused build changes nothing')
+    def test_successful_output_removes_only_owned_leftovers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')
+            dest=Path(tmp)/'output';dest.mkdir()
+            (dest/'notes.tmp.txt').write_text('owner notes');(dest/'index.html.tmp.123').write_text('leftover')
+            build.publish_output(source,dest)
+            self.assertEqual((dest/'notes.tmp.txt').read_text(),'owner notes')
+            self.assertFalse((dest/'index.html.tmp.123').exists())
     def test_output_reconciliation_refuses_untracked_assets(self):
         with tempfile.TemporaryDirectory() as tmp:
             source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')

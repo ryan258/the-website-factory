@@ -73,6 +73,13 @@ class MCPTests(unittest.TestCase):
         codes = {e['code'] for e in result['structuredContent']['errors']}
         self.assertIn('MODULE_VARIANT_UNKNOWN', codes)
 
+    def test_validate_preset_refuses_a_bad_slug(self):
+        preset = json.loads((ROOT / 'data/presets/agency.json').read_text())
+        for slug in ('Bad Slug', '../x'):
+            with self.subTest(slug=slug):
+                result = self.session.call('validate_preset', preset=preset, slug=slug)
+                self.assertTrue(result['isError'], 'a slug error must not be filtered out')
+
     def test_compile_plan_and_claims(self):
         registry = json.loads((ROOT / 'data/modules.json').read_text())
         plan = draft_plan.to_planner(json.loads((ROOT / 'evals/recorded/bakery.json').read_text()), registry)

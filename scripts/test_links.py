@@ -82,5 +82,19 @@ class OutputTests(unittest.TestCase):
                 page.write_text(head + f'<a href="{link}">x</a>')
                 self.assertTrue(any(expected in e for e in check_site.check(Path(tmp), noindex=True)), link)
 
+    def test_output_check_catches_stylesheets_loading_other_sites(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / 'index.html').write_text(
+                '<!doctype html><title>T</title><meta name="description" content="d"><meta name="robots" content="noindex">'
+                '<link rel="canonical" href="https://example.invalid/"><h1>Hi</h1>')
+            sheet = Path(tmp) / 'site.css'
+            for css in ('@font-face{src:url(https://fonts.example.com/a.woff2)}', '@import "//cdn.example.com/x.css";'):
+                sheet.write_text(css)
+                self.assertTrue(any('site.css: loads a file from another site' in e
+                                    for e in check_site.check(Path(tmp), noindex=True)), css)
+            sheet.write_text('body{background:url(https://example.invalid/bg.png)}')
+            self.assertFalse(any('another site' in e for e in check_site.check(Path(tmp), noindex=True)),
+                             'the site\'s own origin is allowed')
+
 if __name__ == '__main__':
     unittest.main()
