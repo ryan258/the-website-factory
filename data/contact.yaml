@@ -1,7 +1,5 @@
-budget_help: "Rough ranges in USD to help us scope your project. Not a quote."
+budget_help: "Prices in USD."
 budgets:
-  - "Under $2,400"
-  - "$2,400–$6,800"
-  - "$6,800–$15,000"
-  - "$15,000+"
+  - "$450 website"
+  - "$450 website + $50/month retainer"
   - "Not sure yet"

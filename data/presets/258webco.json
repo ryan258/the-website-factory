@@ -3,6 +3,10 @@
   "label": "Independent Web Development Studio",
   "tone": "yellow",
   "description": "High-performance, accessible websites for small businesses. Handcrafted, lightweight, and engineered for speed.",
+  "approved_claims": [
+    "$450 website",
+    "$450 website + $50/month retainer"
+  ],
   "pages": {
     "home": {
       "title": "Home",
