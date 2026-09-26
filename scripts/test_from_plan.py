@@ -224,13 +224,14 @@ class FromPlanTests(unittest.TestCase):
 
     def test_malformed_plan_names_the_field(self):
         cases = [
-            ([], 'must be a JSON object'),
+            ([], r'\$: expected object'),
             ({"projects": []}, 'no projects'),
-            ({"name": 5}, 'plan: name must be text'),
-            ({"name": "X", "pages": "Home"}, 'pages must be a list'),
-            ({"name": "X", "pages": [{"name": "Home", "sections": ["hero"]}]}, r'pages\[0\]\.sections must be'),
+            ({"name": 5}, r'\$\.name: expected string'),
+            ({"name": "X", "pages": "Home"}, r'\$\.pages: expected array'),
+            ({"name": "X", "pages": [{"name": "Home", "sections": ["hero"]}]},
+             r'\$\.pages\[0\]\.sections\[0\]: expected object'),
             ({"name": "X", "pages": [{"name": "Home", "sections": [{"kind": "hero", "body": ["x"]}]}]},
-             r'pages\[0\]\.sections\[0\]: body must be text'),
+             r'\$\.pages\[0\]\.sections\[0\]\.body: expected string'),
         ]
         for plan, message in cases:
             with self.subTest(plan=plan), self.assertRaisesRegex(ValueError, message):

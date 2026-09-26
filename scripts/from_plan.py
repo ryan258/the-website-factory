@@ -8,6 +8,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
+import schemas
 from factory import validate
 
 # Missing facts are marked, never invented: every generated placeholder carries this text so
@@ -29,22 +30,6 @@ def module_names(registry):
 def slugify(value):
     slug = re.sub(r'[^a-z0-9]+', '-', value.lower()).strip('-')
     return slug or 'page'
-
-def text(value, where):
-    """A plan field as trimmed text: missing is empty, anything but text names the field."""
-    if value is None:
-        return ''
-    if not isinstance(value, str):
-        raise ValueError(f'{where} must be text, not {type(value).__name__}.')
-    return value.strip()
-
-def objects(value, where):
-    """A plan list whose entries must all be objects; missing is empty."""
-    if value is None:
-        return []
-    if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
-        raise ValueError(f'{where} must be a list of objects.')
-    return value
 
 MAX_PARSED_ITEMS = 8
 
@@ -107,14 +92,14 @@ def starter_reference(project):
                 anchors.setdefault((key, spec.get('module')), str(spec['anchor']))
     return keys, content, anchors
 
-def action_url(target, page_slugs, fallback, where, page='home'):
+def action_url(target, page_slugs, fallback, where, page):
     """The destination a plan asked for, or `fallback` when it named none.
 
     A planned destination is never quietly replaced: an internal path that no page answers, or an
     address this compiler cannot represent, stops the build instead of redirecting the visitor
     somewhere the plan did not choose. Only what factory.validate accepts is produced: a local
     path, mailto:, or tel:. A bare #anchor means that anchor on the section's own page."""
-    target = text(target, f'{where}: target')
+    target = (target or '').strip()
     if not target:
         return fallback
     if target.startswith(('mailto:', 'tel:')):
@@ -132,43 +117,37 @@ def action_url(target, page_slugs, fallback, where, page='home'):
                          'no page for. Add that page or change the destination.')
     return target
 
-PROJECT_TEXT = ('name', 'business', 'goal', 'scope', 'tone', 'starterPreset')
-PAGE_TEXT = ('name', 'purpose', 'slug')
-SECTION_TEXT = ('kind', 'variant', 'title', 'body', 'cta', 'target', 'notice', 'a11y', 'anchor')
+def plan_project(project_data, registry):
+    """Select a planner project, strip nulls, and report common shape errors consistently."""
+    schema = schemas.plan_schema(registry)
+    # plan_schema is strict because it is also sent to the model. Planner backups carry extra
+    # fields, optional fields, and human-facing section labels, so keep its type definitions while
+    # relaxing those output-only constraints for this import boundary.
+    page = schema['properties']['pages']['items']
+    section = page['properties']['sections']['items']
+    for shape in (schema, page, section):
+        shape.pop('required', None)
+        shape['additionalProperties'] = True
+    schema['properties'].pop('facts', None)
+    schema['properties'].pop('unknowns', None)
+    kind = section['properties']['kind']
+    kind.pop('enum', None)
+    kind['type'] = 'string'
 
-def plan_project(project_data):
-    """The plan's project with its shape checked, so a malformed plan names the field at fault
-    instead of failing somewhere inside the compiler. Empty (null) fields count as missing."""
-    def clean(value, fields, where):
-        for field in fields:
-            text(value.get(field), f'{where}: {field}')
-        return {key: item for key, item in value.items() if item is not None}
-    if not isinstance(project_data, dict):
-        raise ValueError('The plan must be a JSON object.')
-    if 'projects' in project_data:
-        # A full backup export {"version":1,"projects":[...]}; the first project is compiled.
-        projects = objects(project_data['projects'], 'projects')
-        if not projects:
+    if isinstance(project_data, dict) and 'projects' in project_data:
+        projects = project_data['projects']
+        if not isinstance(projects, list) or not projects:
             raise ValueError('The plan backup has no projects.')
         project_data = projects[0]
-    project = clean(project_data, PROJECT_TEXT, 'plan')
-    pages = []
-    for i, page in enumerate(objects(project.get('pages'), 'pages')):
-        where = f'pages[{i}]'
-        page = clean(page, PAGE_TEXT, where)
-        sections = []
-        for j, section in enumerate(objects(page.get('sections'), f'{where}.sections')):
-            section = clean(section, SECTION_TEXT, f'{where}.sections[{j}]')
-            if 'items' in section:
-                objects(section['items'], f'{where}.sections[{j}].items')
-            if 'services' in section and not isinstance(section['services'], list):
-                raise ValueError(f'{where}.sections[{j}].services must be a list of service names.')
-            sections.append(section)
-        pages.append(dict(page, sections=sections))
-    return dict(project, pages=pages)
+    project = ({key: item for key, item in project_data.items() if item is not None}
+               if isinstance(project_data, dict) else project_data)
+    errors = schemas.validate(project, schema)
+    if errors:
+        raise ValueError('\n'.join(errors))
+    return project
 
 def convert_plan_to_preset(project_data, registry):
-    project = plan_project(project_data)
+    project = plan_project(project_data, registry)
     names = module_names(registry)
     unknown = sorted({str(s.get('kind') or '(missing)') for p in project.get('pages', []) for s in p.get('sections', [])
                       if s.get('kind') not in names})
