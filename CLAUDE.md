@@ -2,7 +2,10 @@
 
 ## Git: work directly on `main`
 
-- Do **not** commit or push unless Ryan asks. When he does, commit and push straight to `main`.
+- **Never run `git add`, `git commit`, or `git push` unless Ryan explicitly says so.** Any command or tool that stages, commits, or pushes counts, including `git commit -a`.
+- "Explicitly" means he names the action in his message ("commit this", "push it"). Finishing a task, passing tests, or "go ahead" is not permission.
+- Permission covers only the action he named. "Commit" does not mean "push", and it does not carry over to the next task.
+- When he does say so, work directly on `main`: commit and push straight to `main`.
 - Do **not** create branches.
 - Do **not** open pull requests.
 - Only do either of those when Ryan asks for it specifically.

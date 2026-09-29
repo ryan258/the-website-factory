@@ -13,7 +13,7 @@ A Hugo site factory: a brief becomes a validated page plan, then a fast static s
 - Validate before editing by hand: `validate_preset`, `check_claims`, `compile_plan`.
 - `draft_plan.py` and `eval_plans.py --live` make paid API calls. Say so first.
 - Add to `approved_claims` only when the business has confirmed the claim.
-- Do not commit, push, deploy, or turn the contact form on unless the owner asked. Details: [CLAUDE.md](CLAUDE.md).
+- Never run `git add`, `git commit`, or `git push` unless the owner explicitly says so. Do not deploy or turn the contact form on unless the owner asked. Details: [CLAUDE.md](CLAUDE.md).
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
