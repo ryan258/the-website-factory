@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """JSON Schemas stay current and agree with the presets; --json reports stay machine-readable."""
+import copy
 import json
 from pathlib import Path
 import subprocess
@@ -10,6 +11,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import check_site  # noqa: E402
+import factory  # noqa: E402
 import report  # noqa: E402
 import schemas  # noqa: E402
 
@@ -32,6 +34,80 @@ class SchemaTests(unittest.TestCase):
         errors = ' | '.join(schemas.validate(preset, preset_schema()))
         for expected in ('$.tone', "'nope'", 'missing contact'):
             self.assertIn(expected, errors)
+
+    def test_errors_carry_code_pointer_and_hint(self):
+        # An agent repairs a field it can find: every broken input below must name the field (a JSON
+        # pointer that resolves in the preset) and say what to do, not only describe the problem.
+        base = json.loads((ROOT / 'data/presets/consultant.json').read_text())
+        registry = json.loads((ROOT / 'data/modules.json').read_text())
+        def edit(change):
+            preset = copy.deepcopy(base)
+            change(preset)
+            return preset, [e for e in factory.validate(ROOT, extra_presets={'probe': preset}) if e.startswith('probe')]
+        def resolve(document, pointer):
+            for part in [p for p in pointer.split('/') if p]:
+                document = document[int(part)] if isinstance(document, list) else document[part]
+            return document
+        services = base['pages']['home']['sections'][1]['content']
+        cases = {
+            'MODULE_VARIANT_UNKNOWN': lambda p: p['pages']['home']['sections'][1].update(variant='nope'),
+            'MODULE_UNKNOWN': lambda p: p['pages']['home']['sections'][1].update(module='nope'),
+            'PRESET_TONE_UNKNOWN': lambda p: p.update(tone='pink'),
+            'PRESET_HERO_POSITION': lambda p: p['pages']['home']['sections'].reverse(),
+            'CONTENT_FIELD_MISSING': lambda p: p['sections'][services].pop('title'),
+            'CONTENT_ITEM_INVALID': lambda p: p['sections'][services]['items'][0].pop('text'),
+            'CONTENT_LINK_INVALID': lambda p: p['sections'][services].__setitem__('action', {'label': 'Go', 'url': '/nowhere/'}),
+        }
+        for code, change in cases.items():
+            with self.subTest(code=code):
+                preset, errors = edit(change)
+                found = [e for e in errors if e.code == code]
+                self.assertTrue(found, f'{code} not reported: {errors}')
+                issue = report.diagnostic(found[0])
+                self.assertTrue(issue.get('hint'), 'a hint says what to do')
+                self.assertIn('path', issue)
+                # The pointer lands on the field at fault (or, for a missing one, its parent).
+                resolve(preset, issue['path'].rsplit('/', 1)[0] if code == 'CONTENT_FIELD_MISSING' else issue['path'])
+        # A hint names the real options, not a placeholder.
+        _, errors = edit(cases['MODULE_VARIANT_UNKNOWN'])
+        hint = next(e.hint for e in errors if e.code == 'MODULE_VARIANT_UNKNOWN')
+        for variant in registry['services']['variants']:
+            self.assertIn(variant, hint)
+
+    def test_a_missing_content_entry_points_at_the_sections_own_field(self):
+        preset = json.loads((ROOT / 'data/presets/consultant.json').read_text())
+        del preset['pages']['home']['sections'][1]['content']
+        preset['pages']['home']['sections'][2]['content'] = 'ghost'
+        found = [e for e in factory.validate(ROOT, extra_presets={'probe': preset}) if e.startswith('probe') and e.code == 'CONTENT_TYPE_INVALID']
+        self.assertEqual([e.path for e in found], ['/pages/home/sections/1/content', '/pages/home/sections/2/content'])
+        self.assertIn('"ghost"', found[1].hint)
+
+    def test_an_issue_survives_copy_and_pickle(self):
+        import pickle
+        issue = report.Issue('x: unknown variant', 'MODULE_VARIANT_UNKNOWN', '/a', 'hint')
+        for clone in (copy.copy(issue), copy.deepcopy(issue), pickle.loads(pickle.dumps(issue))):
+            self.assertEqual((str(clone), clone.code, clone.path, clone.hint), (str(issue), issue.code, issue.path, issue.hint))
+
+    def test_typed_codes_never_disagree_with_the_pattern_map(self):
+        # Codes agents already branch on must not change when an error site becomes typed. A typed
+        # code may improve on the generic fallback ("ERROR"), never contradict a specific one.
+        base = json.loads((ROOT / 'data/presets/agency.json').read_text())
+        broken = copy.deepcopy(base)
+        broken['tone'] = 'pink'
+        broken['palette'] = 'nope'
+        broken['pages']['home']['sections'][1]['variant'] = 'nope'
+        broken['pages']['home']['sections'].append({'module': 'ghost', 'variant': 'x', 'content': 'x'})
+        broken['pages']['about'] = {'title': '', 'description': '', 'sections': []}
+        errors = [e for e in factory.validate(ROOT, extra_presets={'probe': broken}) if e.startswith('probe')]
+        self.assertGreaterEqual(len(errors), 5)
+        for issue in errors:
+            with self.subTest(message=str(issue)[:60]):
+                self.assertNotEqual(issue.code, 'ERROR')
+                self.assertIn(report.code_for(str(issue)), (issue.code, 'ERROR'))
+
+    def test_schema_diagnostics_get_a_pointer_from_their_prefix(self):
+        self.assertEqual(report.diagnostic('$.pages[0].sections[1].title: expected string')['path'], '/pages/0/sections/1/title')
+        self.assertNotIn('path', report.diagnostic('No 404.html in the build root'))
 
     def test_plan_schema_is_structured_output_ready(self):
         plan = json.loads((ROOT / 'schemas/plan.schema.json').read_text())

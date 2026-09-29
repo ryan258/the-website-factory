@@ -2,7 +2,8 @@
 
 Each error keeps its human message and gains a stable code, so an agent or CI step can
 branch on the code without parsing prose. Unknown messages get a generic code rather
-than being dropped.
+than being dropped. An error may also carry a JSON pointer to the field at fault (`path`) and
+what to do about it (`hint`), which lets an agent repair the field instead of guessing.
 """
 import json
 import re
@@ -11,8 +12,9 @@ import sys
 # Schema diagnostics from scripts/schemas.py always start with a JSON pointer ("$.pages.home"),
 # so anchoring on it keeps them from matching checker prose. Without these, "$: missing name" was
 # reported as a broken output reference and a wrong shape fell through to the generic code.
-# ponytail: still pattern matching, one layer earlier. Typed diagnostics at each error site are
-# the real fix; do that when a caller needs the field pointer as data rather than inside a string.
+# ponytail: plain-string errors are still matched by pattern. factory.validate raises Issue for the
+# preset, page, section, and content rules, so those carry their own code, path, and hint. Convert
+# the remaining producers (check_site, build, fonts) the same way when an agent needs their fields.
 SCHEMA_POINTER = r'^\$[\w.\[\]]*: '
 # First match wins. Keep patterns in step with the messages the checkers print.
 CODES = [
@@ -62,6 +64,32 @@ CODES = [
     (r'hugo|sass|Hugo Extended', 'BUILD_TOOL'),
 ]
 
+class Issue(str):
+    """An error message that also carries a code, a JSON pointer, and a hint.
+
+    It is a str, so everything that treats errors as text (join, startswith, printing) keeps working."""
+    def __new__(cls, message, code, path=None, hint=None):
+        issue = super().__new__(cls, message)
+        issue.code, issue.path, issue.hint = code, path, hint
+        return issue
+
+    def __getnewargs__(self):
+        return (str(self), self.code, self.path, self.hint)  # copy and pickle call __new__ with these
+
+def pointer(message):
+    """The JSON pointer for a schema diagnostic: "$.pages[0].title: ..." becomes "/pages/0/title"."""
+    found = re.match(r'^\$([\w.\[\]]*): ', message)
+    if not found:
+        return None
+    return ''.join('/' + part for part in re.split(r'[.\[\]]+', found.group(1)) if part)
+
+def diagnostic(error):
+    """One error as data: code and message always; path and hint when known."""
+    path = getattr(error, 'path', None)
+    found = dict(code=getattr(error, 'code', None) or code_for(error), message=str(error),
+                 path=pointer(error) if path is None else path, hint=getattr(error, 'hint', None))
+    return {key: value for key, value in found.items() if value is not None}
+
 def code_for(message):
     for pattern, code in CODES:
         if re.search(pattern, message):
@@ -69,7 +97,7 @@ def code_for(message):
     return 'ERROR'
 
 def result(errors, **extra):
-    return dict(ok=not errors, errors=[dict(code=code_for(e), message=e) for e in errors], **extra)
+    return dict(ok=not errors, errors=[diagnostic(e) for e in errors], **extra)
 
 def emit(errors, **extra):
     """Print the JSON result on stdout; return the process exit code."""
