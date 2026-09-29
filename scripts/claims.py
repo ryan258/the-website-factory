@@ -45,26 +45,23 @@ def site_strings(root):
 
     Brand and form data live outside the preset, so scanning only the preset reported zero claims
     for a site whose contact form still offered monetary ranges."""
-    import yaml
+    # ponytail: a line scanner, not a YAML parser. PyYAML is not on a bare machine and these checks
+    # promise to need no packages. Every value is read as text, so a block scalar is still scanned;
+    # the path of a finding is its line number. Swap in yaml.safe_load if the files gain flow syntax.
+    import factory
     for name in ('data/site.yaml', 'data/contact.yaml'):
         source = Path(root) / name
         if not source.is_file():
             continue
-        try:
-            data = yaml.safe_load(source.read_text())
-        except Exception:
-            continue
-        def walk(value, path):
-            if isinstance(value, str):
-                yield path, None, value
-            elif isinstance(value, dict):
-                for key, item in value.items():
-                    if key not in SKIP_KEYS:
-                        yield from walk(item, f'{path}.{key}')
-            elif isinstance(value, list):
-                for i, item in enumerate(value):
-                    yield from walk(item, f'{path}[{i}]')
-        yield from walk(data, name)
+        for number, line in enumerate(source.read_text().splitlines(), 1):
+            key, value = re.match(r'\s*(?:-\s+)?(?:([A-Za-z_][\w-]*):(?:\s+|$))?(.*)$', line).groups()
+            if key in SKIP_KEYS or not value.strip() or line.lstrip().startswith('#'):
+                continue
+            try:
+                value = factory.yaml_scalar(value)
+            except ValueError:
+                pass
+            yield f'{name}:{number}', None, value
 
 def content_strings(preset, root):
     """(source path, None, text) for the Markdown a preset's pages render, detail pages included.

@@ -152,6 +152,7 @@ def create(destination, name, preset="agency", palette=None, fonts=None):
         (destination / 'docs').mkdir()
         for test in MASTER_ONLY_TESTS:
             (destination / 'scripts' / test).unlink(missing_ok=True)
+        shutil.rmtree(destination / 'scripts/fixtures', ignore_errors=True)  # recorded planner exports for the master's tests
         client_package(destination)
         shutil.copy2(ROOT / 'docs/starter-guide.md', destination / 'docs/starter-guide.md')
         shutil.copy2(ROOT / 'docs/factory-guide.md', destination / 'docs/factory-guide.md')

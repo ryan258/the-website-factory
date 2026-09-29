@@ -290,7 +290,7 @@ class FromPlanTests(unittest.TestCase):
         # Exports written before the planner carried page keys, structured items, anchors, and the
         # brief builder's service list. They record which starter they came from, so those are
         # recovered from it rather than guessed, and the original routes survive.
-        legacy = json.loads((ROOT / 'reports/review-2026-09-25/starter-exports.json').read_text())
+        legacy = json.loads((ROOT / 'scripts/fixtures/legacy-starter-exports.json').read_text())
         for entry in legacy:
             with self.subTest(starter=entry['slug']):
                 project = entry['project']
@@ -302,7 +302,7 @@ class FromPlanTests(unittest.TestCase):
                     self.assertIn(key, preset['pages'], f"{entry['slug']}: route /{key}/ was renamed")
 
     def test_legacy_construction_keeps_its_brief_and_classifications(self):
-        legacy = [e for e in json.loads((ROOT / 'reports/review-2026-09-25/starter-exports.json').read_text())
+        legacy = [e for e in json.loads((ROOT / 'scripts/fixtures/legacy-starter-exports.json').read_text())
                   if e['slug'] == 'construction'][0]
         _, preset = convert_plan_to_preset(legacy['project'], self.registry)
         brief = next(s for key, s in preset['sections'].items() if 'services' in s and key.startswith('estimate-'))
