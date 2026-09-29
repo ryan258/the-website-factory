@@ -95,7 +95,7 @@ const KEY='website-factory-projects-v1';
   for(const target of new Set(project.pages.flatMap(p=>p.sections.map(s=>s.target)).filter(Boolean))){
    assert.ok(compiledActions.has(target),`${slug}: planned destination ${target} is missing from the compiled preset (got ${[...compiledActions].join(', ')})`);
   }
-  const plannedGroups=project.pages.flatMap(p=>p.sections.flatMap(s=>(s.items||[]).map(i=>i.group))).filter(Boolean);
+  const plannedGroups=project.pages.flatMap(p=>p.sections.flatMap(s=>(s.content?.items||s.items||[]).map(i=>i.group))).filter(Boolean);
   if(plannedGroups.length){
    const compiledGroups=Object.values(preset.sections).flatMap(s=>((s&&s.items)||[]).map(i=>i.group)).filter(Boolean);
    assert.deepEqual([...plannedGroups].sort(),[...compiledGroups].sort(),`${slug}: fit/alternative classifications changed in compilation`);

@@ -22,7 +22,9 @@
 </div>
 <script id="workflow-library" type="application/json">{{ hugo.Data.modules | jsonify | safeJS }}</script>
 {{ $starterProfiles := dict }}
-{{ range $slug, $profile := hugo.Data.presets }}{{ if ne $slug "258webco" }}{{ $starterProfiles = merge $starterProfiles (dict $slug $profile) }}{{ end }}{{ end }}
+{{/* Encode each source as a JSON string: Hugo's map serialization sorts page keys. Parsing
+     the original JSON in the planner preserves authored navigation order and safely escapes HTML. */}}
+{{ range $slug, $profile := hugo.Data.presets }}{{ if ne $slug "258webco" }}{{ $starterProfiles = merge $starterProfiles (dict $slug (readFile (printf "data/presets/%s.json" $slug))) }}{{ end }}{{ end }}
 <script id="workflow-starters" type="application/json">{{ $starterProfiles | jsonify | safeJS }}</script>
 {{ $js := resources.Get "js/workflow.js" | minify | fingerprint }}
 <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
