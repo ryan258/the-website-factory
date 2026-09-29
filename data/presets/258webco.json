@@ -11,7 +11,7 @@
   "pages": {
     "home": {
       "title": "Home",
-      "description": "Fast, accessible websites for small businesses. Live in weeks, not months.",
+      "description": "Fast, accessible websites for small businesses.",
       "sections": [
         {
           "module": "hero",
@@ -108,7 +108,7 @@
     "hero": {
       "label": "Fast websites for small businesses",
       "title": "Websites built fast. Websites that run fast.",
-      "intro": "We design and build small-business websites in weeks, then prove the speed with the page you are reading.",
+      "intro": "We design and build small-business websites, then prove the speed with the page you are reading.",
       "action": {
         "label": "Start a project",
         "url": "/contact/"
