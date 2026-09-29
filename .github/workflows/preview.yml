@@ -74,4 +74,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # The Wrangler that scripts/check_contact.sh tests; keep the two in step. The action's own default is older.
+          wranglerVersion: "4.136.2"
           command: pages deploy ${{ env.OUTPUT }} --project-name=258webco --branch=preview-${{ inputs.target }}

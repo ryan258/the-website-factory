@@ -47,7 +47,7 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: 'npm'
@@ -118,7 +118,7 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: 'npm'
@@ -171,4 +171,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # The Wrangler that scripts/check_contact.sh tests; keep the two in step. The action's own default is older.
+          wranglerVersion: "4.136.2"
           command: pages deploy public --project-name=258webco
