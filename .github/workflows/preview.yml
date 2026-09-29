@@ -30,7 +30,7 @@ jobs:
       deployments: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
