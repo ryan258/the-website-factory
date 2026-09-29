@@ -206,6 +206,8 @@ Add a case study by copying an existing `content/work/*.md` file and updating it
 The Python checks need no package installation, except `test_ai.py` (the `anthropic` SDK from `requirements-dev.txt`). They fail with a nonzero exit code for build warnings, missing links/assets, duplicate metadata, unexpected robots/noindex state, incorrect H1 counts, or oversized compressed CSS/JS bundles.
 
 ```sh
+python3 scripts/doctor.py     # is this machine set up? one fix per problem
+npm run verify                 # the fast CI gates on a clean copy (what a commit would contain, no ignored files); browser checks stay in CI
 python3 scripts/build.py
 python3 scripts/check_site.py
 python3 scripts/test_factory.py

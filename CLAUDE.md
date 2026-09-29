@@ -60,6 +60,7 @@ pip install -r requirements-dev.txt   # once: anthropic SDK (for tests) and ruff
 npm test            # all unit and contract tests
 npm run lint
 python3 scripts/claims.py --strict
+npm run verify     # the fast gates on a clean copy, as CI sees them (catches tests that need ignored files)
 ```
 
 For template, style, or page changes, also run the browser checks (`npm ci` first; set

@@ -67,29 +67,9 @@ jobs:
           rm -rf public
           python3 scripts/build.py
 
-      - name: Verify Static & Unit Quality Gates
-        run: |
-          python3 scripts/check_site.py public
-          python3 scripts/test_factory.py
-          python3 scripts/test_starter.py
-          python3 scripts/test_from_plan.py
-          python3 scripts/test_enquiries.py
-          python3 scripts/test_schemas.py
-          python3 scripts/test_claims.py
-          python3 scripts/schemas.py --check
-          python3 scripts/claims.py --strict
-          python3 scripts/test_ai.py
-          python3 scripts/test_mcp.py
-          python3 scripts/test_evals.py
-          python3 scripts/test_handover.py
-          python3 scripts/test_library.py
-          python3 scripts/test_links.py
-          python3 scripts/contrast.py
-          node scripts/visual_check.cjs --self-test
-          node scripts/test_contact_endpoint.mjs
-
-      - name: Lint Python and JavaScript
-        run: npm run -s lint
+      # The list of gates lives in scripts/verify.py so a local `npm run verify` and CI cannot drift.
+      - name: Verify Static, Unit & Lint Quality Gates
+        run: python3 scripts/verify.py --here
 
       - name: Verify Enabled Form & Pages Local KV Integration Gate
         run: sh scripts/check_contact.sh
