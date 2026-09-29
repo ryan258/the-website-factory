@@ -286,6 +286,23 @@ class FromPlanTests(unittest.TestCase):
         _, preset = convert_plan_to_preset(plan, self.registry)
         self.assertEqual([i['group'] for i in preset['sections']['home-fit-2']['items']], ['fit', 'alternative'])
 
+    def test_structured_section_targets_are_resolved_like_plain_ones(self):
+        # A new-style section carries its whole content block, and its button destination used to be
+        # copied in unchecked: "#faq" failed with a schema-pattern message and a page the plan lacks
+        # was accepted, to be caught only by a later validation.
+        hero = json.loads((ROOT / 'data/presets/consultant.json').read_text())['sections']['hero']
+        def compiled(target):
+            plan = {"name": "Target Co", "pages": [
+                {"name": "Home", "slug": "home", "sections": [dict(kind="hero", title=hero['title'], body=hero['intro'],
+                    cta="Go", target=target, contentVersion=1, content=hero)]},
+                {"name": "Contact", "slug": "contact", "sections": []}]}
+            return convert_plan_to_preset(plan, self.registry)[1]['sections']['home-hero-1']['action']['url']
+        self.assertEqual(compiled('#faq'), '/#faq', 'a bare anchor means that anchor on the section\'s own page')
+        self.assertEqual(compiled(''), hero['action']['url'], 'an empty target keeps the content\'s own destination')
+        for bad, message in (('https://elsewhere.example/', 'not a usable address'), ('/nowhere/', 'has no page for')):
+            with self.subTest(target=bad), self.assertRaisesRegex(ValueError, message):
+                compiled(bad)
+
     def test_legacy_backups_without_page_keys_still_compile(self):
         # Exports written before the planner carried page keys, structured items, anchors, and the
         # brief builder's service list. They record which starter they came from, so those are

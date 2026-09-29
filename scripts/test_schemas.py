@@ -166,6 +166,20 @@ class JsonReportTests(unittest.TestCase):
             errors = check_site.check(Path(tmp), noindex=False)
             self.assertFalse(any('no usable enquiry path' in e for e in errors), errors)
 
+    def test_indexable_build_accepts_an_enabled_form_however_the_flag_is_written(self):
+        # Hugo minifies data-enabled="true" to data-enabled=true; the gate must see the form either way.
+        head = ('<!doctype html><title>T</title><meta name="description" content="d">'
+                '<link rel="canonical" href="https://real.example/"><h1>Hi</h1>')
+        for flag in ('data-enabled=true', 'data-enabled="true"', "data-enabled='true'"):
+            with self.subTest(flag=flag), tempfile.TemporaryDirectory() as tmp:
+                (Path(tmp) / 'index.html').write_text(head + f'<form name=x {flag}></form>')
+                errors = check_site.check(Path(tmp), noindex=False)
+                self.assertFalse(any('no usable enquiry path' in e for e in errors), errors)
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / 'index.html').write_text(head + '<form name=x data-enabled=false></form>')
+            self.assertTrue(any('no usable enquiry path' in e for e in check_site.check(Path(tmp), noindex=False)),
+                            'a disabled form is still not an enquiry path')
+
     def test_malformed_input_returns_diagnostics_instead_of_crashing(self):
         # validate_preset(None) raised AttributeError and a numeric image raised TypeError inside
         # Path(); a stack trace tells a caller nothing about which field was wrong.

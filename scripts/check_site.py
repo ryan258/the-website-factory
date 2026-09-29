@@ -68,9 +68,11 @@ def check(output, noindex=None):
     elif pages.get(error_page.resolve()) and pages[error_page.resolve()].meta.get('robots')!='noindex':
         errors.append('404.html: the error page must be noindex whatever the release indexing setting')
     if not noindex:
+        # Hugo's minifier drops the quotes ("data-enabled=true"), so accept both spellings; matching only
+        # the quoted one reported "no usable enquiry path" for every build whose form was switched on.
         has_active_form = any(
-            '<form' in file.read_text() and 'data-enabled="true"' in file.read_text()
-            for file in pages.keys()
+            '<form' in text and re.search(r'data-enabled=["\']?true\b', text)
+            for text in (file.read_text() for file in pages)
         )
         has_alternative_contact = any(
             ref.startswith(('mailto:', 'tel:')) and not contact_link_error(unquote(ref))

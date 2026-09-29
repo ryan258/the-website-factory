@@ -15,7 +15,7 @@ FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md
 # checkout), so they cannot pass in a one-preset client copy. The copy's npm test runs checks that fit a client site.
 MASTER_ONLY_TESTS = ('test_factory.py', 'test_starter.py', 'test_from_plan.py', 'test_schemas.py', 'test_claims.py',
                      'test_ai.py', 'test_mcp.py', 'test_evals.py', 'test_handover.py', 'test_library.py', 'test_enquiries.py',
-                     'test_links.py', 'test_doctor.py', 'verify.py')
+                     'test_links.py', 'test_doctor.py', 'test_plan_fidelity.py', 'check_planner_fidelity.cjs', 'verify.py')
 CLIENT_TEST = ('python3 scripts/factory.py && python3 scripts/check_site.py && python3 scripts/claims.py '
                '&& python3 scripts/contrast.py && node scripts/test_contact_endpoint.mjs')
 
@@ -122,10 +122,13 @@ form works. Agree who monitors enquiries, and how often, before launch.
 """)
 
 
-def create(destination, name, preset="agency", palette=None, fonts=None):
-    if preset not in available_presets():
+def create(destination, name, preset="agency", palette=None, fonts=None, *, profile=None):
+    """Apply the final profile once, before pruning any source pages, images, or fonts."""
+    if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', preset):
+        raise ValueError('Preset identifier must contain lowercase letters, digits, and hyphens.')
+    if profile is None and preset not in available_presets():
         raise ValueError(f"Unknown business preset. Choose one of: {', '.join(available_presets())}.")
-    errors = validate(ROOT)
+    errors = validate(ROOT, extra_presets={preset: profile} if profile is not None else None)
     if errors:
         raise ValueError("Invalid master: " + "; ".join(errors))
     destination = Path(destination).expanduser().absolute()
@@ -166,7 +169,9 @@ def create(destination, name, preset="agency", palette=None, fonts=None):
             if count != 1:
                 raise ValueError(f'Expected exactly one top-level {key} in data/site.yaml.')
         config.write_text(text)
-        profile_defaults = json.loads((ROOT / 'data/presets' / f'{preset}.json').read_text())
+        profile_defaults = profile if profile is not None else json.loads((ROOT / 'data/presets' / f'{preset}.json').read_text())
+        if profile is not None:
+            (destination / 'data/presets' / f'{preset}.json').write_text(json.dumps(profile, indent=2, ensure_ascii=False) + '\n')
         apply_preset(destination, preset, name)
         selected_palette = palette or profile_defaults.get('palette')
         selected_fonts = fonts or profile_defaults.get('font_pairing')

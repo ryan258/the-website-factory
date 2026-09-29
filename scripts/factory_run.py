@@ -26,9 +26,6 @@ import factory  # noqa: E402
 import from_plan  # noqa: E402
 import new_site  # noqa: E402
 
-# The copy starts from this preset, then its pages are replaced by the compiled plan.
-BASE = 'consultant'
-
 def placeholders(value, path='preset'):
     if isinstance(value, str):
         if from_plan.TBC in value:
@@ -61,11 +58,9 @@ def run(plan, destination, name=None, plan_file='plan.json'):
     errors = factory.validate(ROOT, extra_presets={slug: preset})
     if errors:
         raise ValueError('The compiled preset is not valid:\n  ' + '\n  '.join(errors))
-    dest = new_site.create(destination, name, BASE)
+    dest = new_site.create(destination, name, slug, profile=preset)
     # A copy that fails before it is complete is removed, so the same destination can be retried.
     try:
-        (dest / 'data/presets' / f'{slug}.json').write_text(json.dumps(preset, indent=2, ensure_ascii=False) + '\n')
-        factory.apply_preset(dest, slug, name)
         errors = factory.validate(dest)
         if errors:
             raise ValueError('The new copy did not validate:\n  ' + '\n  '.join(errors))

@@ -115,16 +115,16 @@ class AITests(unittest.TestCase):
             self.assertTrue((dest / 'public/cakes/index.html').is_file())
             reviewed = (dest / 'docs/plan-review.md').read_text()
             self.assertIn('opening hours', reviewed)
-            self.assertEqual(factory_run.BASE, 'consultant')
+            self.assertNotIn('consultant', (dest / 'data/factory.json').read_text())
             self.assertFalse((ROOT / 'data/presets/rise-crumb-bakery.json').exists(), 'the master must not change')
 
 class FailedRunTest(unittest.TestCase):
     def test_failed_copy_is_removed_so_it_can_be_retried(self):
         plan = json.loads(RECORDED)
-        original = factory_run.factory.apply_preset
+        original = factory_run.new_site.apply_preset
         def broken(*args, **kwargs):
             raise ValueError('disk trouble')
-        factory_run.factory.apply_preset = broken
+        factory_run.new_site.apply_preset = broken
         try:
             with tempfile.TemporaryDirectory() as tmp:
                 dest = Path(tmp) / 'site'
@@ -132,7 +132,7 @@ class FailedRunTest(unittest.TestCase):
                     factory_run.run(plan, dest)
                 self.assertFalse(dest.exists(), 'a half-made copy must not block a retry')
         finally:
-            factory_run.factory.apply_preset = original
+            factory_run.new_site.apply_preset = original
 
 if __name__ == '__main__':
     unittest.main()

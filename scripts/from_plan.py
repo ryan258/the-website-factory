@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Convert a website project plan from the planner into a validated renderer preset."""
 import argparse
+from copy import deepcopy
 import json
 from pathlib import Path
 import re
@@ -32,6 +33,42 @@ def slugify(value):
     return slug or 'page'
 
 MAX_PARSED_ITEMS = 8
+
+def legacy_body(content):
+    """Exact old planner serialization; matching titles alone does not prove unedited copy."""
+    parts = [content[k] for k in ('intro', 'body') if content.get(k)]
+    if isinstance(content.get('items'), list):
+        lines = []
+        for item in content['items']:
+            title = item.get('title') or item.get('phase') or item.get('label') or ''
+            text = item.get('text') or item.get('description') or item.get('value') or ''
+            line = ': '.join(x for x in (title, text) if x)
+            line += f' → {item["url"]}' if item.get('url') else ''
+            if line:
+                lines.append(line)
+        parts.append('\n'.join(lines))
+    if content.get('aside'):
+        parts.append(content['aside'])
+    parts.extend(f'Example note: {content[k]}' for k in ('note', 'notice') if content.get(k))
+    return ('\n\n'.join(parts) or 'Draft copy needed. Use confirmed facts and keep unknowns explicit.')[:12000]
+
+def content_shape(value, path, depth=0):
+    """Planner content consists of bounded text, lists, and objects, never executable values."""
+    if depth > 8:
+        raise ValueError(f'{path}: content nesting exceeds 8 levels')
+    if isinstance(value, str) and len(value) <= 12000:
+        return
+    if isinstance(value, list) and len(value) <= 40:
+        for i, item in enumerate(value):
+            content_shape(item, f'{path}[{i}]', depth + 1)
+        return
+    if isinstance(value, dict) and len(value) <= 80:
+        for key, item in value.items():
+            if key in ('__proto__', 'prototype', 'constructor'):
+                raise ValueError(f'{path}: unsupported content key {key!r}')
+            content_shape(item, f'{path}.{key}', depth + 1)
+        return
+    raise ValueError(f'{path}: expected bounded text, list, or object')
 
 def parse_items(text, default_title="Detail", where=''):
     # Strip list markers ("- ", "* ", "• ", "1. ", "2) ") only, so "24/7 support" keeps its digits.
@@ -130,6 +167,8 @@ def plan_project(project_data, registry):
         shape['additionalProperties'] = True
     schema['properties'].pop('facts', None)
     schema['properties'].pop('unknowns', None)
+    schema['properties'].update({k: {'type': 'string'} for k in ('label', 'tone', 'palette', 'font_pairing', 'scope')})
+    section['properties'].update({k: {'type': 'string'} for k in ('target', 'anchor', 'notice', 'a11y')})
     kind = section['properties']['kind']
     kind.pop('enum', None)
     kind['type'] = 'string'
@@ -138,12 +177,28 @@ def plan_project(project_data, registry):
         projects = project_data['projects']
         if not isinstance(projects, list) or not projects:
             raise ValueError('The plan backup has no projects.')
+        if len(projects) != 1:
+            raise ValueError('Export exactly one project to compile; this backup contains multiple projects.')
         project_data = projects[0]
     project = ({key: item for key, item in project_data.items() if item is not None}
                if isinstance(project_data, dict) else project_data)
     errors = schemas.validate(project, schema)
     if errors:
         raise ValueError('\n'.join(errors))
+    for pi, pg in enumerate(project.get('pages', [])):
+        for si, sec in enumerate(pg.get('sections', [])):
+            path = f'$.pages[{pi}].sections[{si}]'
+            if 'contentVersion' in sec and (type(sec['contentVersion']) is not int or sec['contentVersion'] != 1):
+                raise ValueError(f'{path}.contentVersion: unsupported content version')
+            for key, kind_type in (('content', dict), ('items', list), ('services', list)):
+                if key in sec:
+                    if not isinstance(sec[key], kind_type):
+                        raise ValueError(f'{path}.{key}: expected {kind_type.__name__}')
+                    content_shape(sec[key], f'{path}.{key}')
+            if 'items' in sec and not all(isinstance(x, dict) for x in sec['items']):
+                raise ValueError(f'{path}.items: expected item objects')
+            if 'services' in sec and not all(isinstance(x, str) for x in sec['services']):
+                raise ValueError(f'{path}.services: expected service names')
     return project
 
 def convert_plan_to_preset(project_data, registry):
@@ -160,12 +215,16 @@ def convert_plan_to_preset(project_data, registry):
     
     preset = {
         "name": preset_name,
-        "label": project.get('business', preset_name).strip() or "Digital studio",
+        "label": project.get('label', project.get('business', preset_name)).strip() or "Digital studio",
         "tone": project.get('tone', 'yellow'),
         "description": project.get('goal', project.get('scope', 'A high-performance small-business website.')).strip(),
         "pages": {},
         "sections": {}
     }
+    for key in ('palette', 'font_pairing'):
+        if key in project:
+            preset[key] = project[key]
+    content_schema = schemas.generated()['preset.schema.json']
 
     # Normalize pages
     raw_pages = project.get('pages', [])
@@ -267,6 +326,36 @@ def convert_plan_to_preset(project_data, registry):
                 spec['anchor'] = anchor
             page_sections.append(spec)
 
+            # New planner sections carry every renderer field. The familiar copy/action controls
+            # overlay only the field they edit; item text and secondary actions have their own
+            # controls. Never flatten this structure or reconstruct it from the current starter.
+            if 'content' in s:
+                content_block = deepcopy(s['content'])
+                if 'title' in s:
+                    content_block['title'] = s['title']
+                body_field = next((k for k in ('intro', 'body') if k in content_block), None)
+                if body_field and 'body' in s:
+                    content_block[body_field] = s['body']
+                if 'action' in content_block or s.get('cta') or s.get('target'):
+                    content_block.setdefault('action', {})
+                    if not isinstance(content_block['action'], dict):
+                        raise ValueError(f'{p_title} / {kind}: content.action must be an object')
+                    if 'cta' in s:
+                        content_block['action']['label'] = s['cta']
+                    if 'target' in s:
+                        # Resolved as for a plain section: a bare #anchor means that anchor on this page, an
+                        # empty target keeps the content's own destination, and an address the plan has no
+                        # page for (or an outside site) stops here with a readable message.
+                        content_block['action']['url'] = action_url(s['target'], ordered_slugs,
+                                                                     content_block['action'].get('url', ''),
+                                                                     f'{p_title} / {kind}', p_slug)
+                errors = schemas.validate(content_block, content_schema['$defs'][f'content-{kind}'],
+                                          content_schema, f'{p_title} / {kind} / content')
+                if errors:
+                    raise ValueError('\n'.join(errors))
+                preset['sections'][content_key] = content_block
+                continue
+
             # Build content block adhering to registry schema
             req_fields = mod_meta.get('required', [])
             item_req = mod_meta.get('item_required', [])
@@ -294,16 +383,17 @@ def convert_plan_to_preset(project_data, registry):
                 if source_items is None:
                     # A backup from before the planner carried items holds only the prose those
                     # items were rendered into, mixed in with the section intro and notes. When
-                    # every starter item title is still present, the body is unedited starter copy,
+                    # the whole body is identical, the body is unedited starter copy,
                     # so the structure it came from is recovered instead of re-parsed out of prose.
                     known = starter_content.get((p_slug, kind), {}).get('items') or []
-                    titles = [str(x.get('title', '')).strip() for x in known if isinstance(x, dict)]
                     body_text = s.get('body') or ''
-                    if titles and all(title and title in body_text for title in titles):
+                    if known and body_text == legacy_body(starter_content.get((p_slug, kind), {})):
                         source_items = known
                 if source_items is not None:
-                    items = [{"title": str(it.get('title') or f'Item {TBC.lower()}'), "text": str(it.get('text') or TBC),
-                              **{k: str(it[k]) for k in item_req if it.get(k)}} for it in source_items]
+                    items = deepcopy(source_items)
+                    for item in items:
+                        item.setdefault('title', f'Item {TBC.lower()}')
+                        item.setdefault('text', TBC)
                 else:
                     items = parse_items(s.get('body'), default_title=kind.capitalize(), where=f'{p_title} / {kind}')
                 
@@ -315,12 +405,17 @@ def convert_plan_to_preset(project_data, registry):
                                 if isinstance(x, dict)}
                 # Fill special item requirements
                 for it in items:
+                    if not all(isinstance(it.get(k), str) for k in ('title', 'text')):
+                        raise ValueError(f'{p_title} / {kind}: item title and text must be strings')
+                    for field in ('image', 'imageAlt', 'url'):
+                        if field in it and not isinstance(it[field], str):
+                            raise ValueError(f'{p_title} / {kind}: item {field} must be text')
                     for field, choices in mod_meta.get('item_choices', {}).items():
                         # A classification such as included/excluded is a business decision,
                         # so it is never guessed.
                         if it.get(field) not in choices:
                             known = from_starter.get(it['title'], {}).get(field)
-                            if known in choices:
+                            if field not in it and known in choices:
                                 it[field] = known
                                 continue
                             raise ValueError(f'{p_title} / {kind}: item "{it["title"]}" needs {field} set to one of: '
