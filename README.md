@@ -12,7 +12,7 @@ The construction preset adapts reusable page patterns from the sibling `jones-co
 
 **Available now:** 31 module families with 62 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, nine business presets, six contrast-checked palettes, five self-hosted font pairings, guided client setup, AI and agent tools, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. Most business presets start with Home, Services, About, and Contact; the new construction example adds work, a local project brief, and Privacy; the live `258webco` preset has Home, Services, Contact, and Privacy.
 
-**Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/`. Choose **Start with a complete site** to load a preset's pages, sections, and draft copy directly into the editor; remove anything the site does not need before filling in client details. The default is the compact local-service composition. Choose **Start with a blank plan** only when no existing starter fits. Plans can still be reviewed and compiled into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, construction, consultant, local-service, clinic, restaurant, and non-profit compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
+**Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/`. Choose **Start with a complete site** to load a preset's pages, sections, and draft copy directly into the editor; remove anything the site does not need before filling in client details. The default is the compact local-service composition. Choose **Start with a blank plan** only when no existing starter fits. Starters carry complete versioned section structures, stable anchors, item fields, secondary actions, and theme choices; dedicated input controls preserve structured items from being overwritten by paragraph proposals. Plans can still be reviewed and compiled into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, construction, consultant, local-service, clinic, restaurant, and non-profit compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
 See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical, paid uses: monthly care plans, local-business builds, rescue work, and AI-assisted production. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
 
@@ -89,6 +89,8 @@ Client copies must start without inherited approvals, historical performance gua
 | Focused copy, omission, and failure-path checks | `scripts/test_factory.py` |
 | Planner-to-preset compilation engine | `scripts/from_plan.py` |
 | Planner compilation regression tests | `scripts/test_from_plan.py` |
+| Planner semantic fidelity and single-pass client copy tests | `scripts/test_plan_fidelity.py` |
+| Planner browser-to-compiler round-trip and fidelity checks | `scripts/check_planner_fidelity.cjs` |
 | Cloudflare contact endpoint test harness | `scripts/check_contact.sh` |
 | Contact endpoint failure paths (no account needed) | `scripts/test_contact_endpoint.mjs` |
 | Read or export stored enquiries (read-only, via wrangler) | `scripts/enquiries.py` |
@@ -213,6 +215,7 @@ python3 scripts/check_site.py
 python3 scripts/test_factory.py
 python3 scripts/test_starter.py
 python3 scripts/test_from_plan.py
+python3 scripts/test_plan_fidelity.py
 python3 scripts/test_enquiries.py
 python3 scripts/test_schemas.py    # schemas and --json reports
 python3 scripts/test_claims.py
@@ -241,13 +244,14 @@ npm ci
 npx playwright install chromium
 ```
 
-The browser checks serve the built output themselves on a free local port, with the same security headers as `static/_headers`, so a blocked inline style or script fails the check. Build first (`python3 scripts/build.py`, plus `--workshop` for the last three):
+The browser checks serve the built output themselves on a free local port, with the same security headers as `static/_headers`, so a blocked inline style or script fails the check. Build first (`python3 scripts/build.py`, plus `--workshop` for the last four):
 
 ```sh
 npm run check:browser
 node scripts/check_workshop.cjs
 node scripts/check_components.cjs
 node scripts/check_workflow.cjs
+node scripts/check_planner_fidelity.cjs   # or npm run check:planner-fidelity
 ```
 
 Set `PREVIEW_URL` to check an already-running server instead. Lighthouse needs a server of its own; serve **production output**, not a development server:
@@ -257,7 +261,7 @@ python3 -m http.server 14722 --bind 127.0.0.1 --directory public
 npm run audit -- http://127.0.0.1:14722/   # in another terminal
 ```
 
-CI runs all four browser checks on every push and pull request.
+CI runs all browser checks on every push and pull request.
 
 The standard browser and Lighthouse commands discover every generated `index.html`, including renamed/new case studies and the contact receipt page, and return nonzero on failure. Browser checks cover axe WCAG A/AA, one H1, `noindex`, light/dark modes, and widths 320/600/900/1200. Lighthouse checks Performance >=95, Accessibility 100, LCP <1.5 s, CLS <0.05, and Home <150 KB / <=10 requests. `CHECK_PATHS` or `AUDIT_PATHS` can limit a run, e.g. `CHECK_PATHS='["/","/pricing/"]'`. Use `SITE_OUTPUT` for an alternate build directory and `CHROME_PATH` for an existing Chrome binary. Reports are written under this project's ignored `reports/` directory, independent of the caller's working directory.
 

@@ -3,7 +3,42 @@
 One file for all acceptance evidence. **Current** is what is true today. **History** keeps
 earlier records unchanged, for reference; their numbers are not current results.
 
-## Current — 2026-09-26
+## Current — 2026-09-29
+
+Targeted verification of planner starter fidelity, end-to-end round-trip preservation, single-pass client copy scaffolding, and site output checking for minified form flags.
+
+| Check | Result |
+| --- | --- |
+| Planner browser fidelity audit (`scripts/check_planner_fidelity.cjs`) | Pass (8 complete starter exports; edited item, paragraph, proposal undo, secondary actions, missing-copy review, reload, import, scoped axe WCAG A/AA, responsive 320/1440px viewports, preview font loading) |
+| Plan semantic fidelity & client resources (`scripts/test_plan_fidelity.py`) | 5 pass (all starters preserve every renderer field, legacy edit protections, structured field preservation, single-pass profile application) |
+| Plan compiler tests (`scripts/test_from_plan.py`) | 24 pass (including structured section target resolution) |
+| Workflow behavior & persistence (`scripts/check_workflow.cjs`) | Pass (8 behavior groups; isolated fixtures only) |
+| Schema & site output checks (`scripts/test_schemas.py`) | 20 pass (including minified `data-enabled=true` form detection) |
+| AI drafting & brief-to-copy (`scripts/test_ai.py`) | 6 pass (Anthropic 1.8.0 SDK integration and single-pass profile scaffolding) |
+| Factory test suite (`scripts/test_factory.py`) | 20 pass (across all 9 presets) |
+| Lint suite (`npm run lint`) | Pass (ruff check scripts, node --check across all JS files) |
+
+Verification confirmed:
+1. `assets/js/workflow.js` & `layouts/_default/kit.html`: Versioned `content` objects (`contentVersion: 1`), dedicated field inputs for items/actions, uncorrupted prose round-trips, and stringified starter JSON preserving authored navigation order.
+2. `scripts/from_plan.py`: Nested structured item and content schema validation, bare `#anchor` resolution to section pages, and multi-project export rejection.
+3. `scripts/new_site.py` & `scripts/factory_run.py`: Single-pass client copy creation applying the compiled preset profile once prior to asset and page pruning (`profile` parameter), eliminating base preset sculpting indirection (`BASE = 'consultant'`).
+4. `scripts/check_site.py`: Form detection handles minified `data-enabled=true` without quotes.
+5. GitHub Workflows: Pinned CI runners to `ubuntu-24.04` in `.github/workflows/deploy.yml` and `preview.yml`.
+
+### Not verified
+
+- No manual screen-reader, zoom, or real-device review.
+- No approval of sample content, claims, service scope, contact details, or image rights by a real business.
+- No live form submission, hosting, deployment, or publication.
+
+---
+
+## History
+
+These records are kept as written at the time. Tools, test counts, and hosting have
+changed since (for example, forms moved from Netlify to Cloudflare Pages).
+
+### Factory acceptance — 2026-09-26
 
 Targeted verification of plan compiler schema validation, contact endpoint streamed body reading, and site output checking.
 
@@ -20,19 +55,6 @@ Verification confirmed:
 1. `functions/api/contact.js`: Streamed body byte counting capped at 64 KB returning standard `Blob` instances for multipart and form data parsing.
 2. `scripts/from_plan.py`: Input shape checking refactored onto `schemas.plan_schema` and `schemas.validate`, producing standard JSON path diagnostics (`$.path`) for malformed fields while retaining relaxed acceptance of planner backup exports.
 3. `scripts/check_site.py`: Single-pass URL parsing for home canonical URL prefix and netloc in stylesheet asset audits.
-
-### Not verified
-
-- No manual screen-reader, zoom, or real-device review.
-- No approval of sample content, claims, service scope, contact details, or image rights by a real business.
-- No live form submission, hosting, deployment, or publication.
-
----
-
-## History
-
-These records are kept as written at the time. Tools, test counts, and hosting have
-changed since (for example, forms moved from Netlify to Cloudflare Pages).
 
 ### Factory acceptance — 2026-09-24
 

@@ -26,13 +26,15 @@ Exported project plans from `/site-kit/` can be converted directly into validate
 python3 scripts/from_plan.py path/to/plan.json --name "my-preset" --write
 ```
 
-This compiles the planner JSON into `data/presets/<name>.json`, normalizes the page hierarchy (ensuring `home` first and `contact` last), injects mandatory hero headers and services, maps sections to schema contracts in `data/modules.json`, and validates the output against `scripts/factory.py` in a scratch copy, so a preview or a failed compile never changes `data/presets/`. `--write` refuses to replace an existing preset unless you add `--force`.
+This compiles the planner JSON into `data/presets/<name>.json`, normalizes the page hierarchy (keeping `home` first and preserving the remaining planned order), injects mandatory hero headers and services, maps sections to schema contracts in `data/modules.json`, and validates the output against `scripts/factory.py` in memory, so a preview or a failed compile never changes `data/presets/`. `--write` refuses to replace an existing preset unless you add `--force`.
 
-The compiler never invents facts. Anything the plan leaves out (prices, dates, places, service copy) is written as `To confirm with the client.`, and the command lists every section that still contains it. Replace each one with confirmed copy before client review.
+The compiler never invents facts. Missing copy in a plain plan is marked `To be confirmed`. Structured starter fields are validated as supplied; missing business classifications or service choices stop compilation for correction. Replace each one with confirmed copy before client review.
 
 - The compiler validates input structures against the plan JSON schema (`scripts/schemas.py`), reporting standard JSON path errors (e.g. `$.pages[0].sections: expected array`) for malformed fields while gracefully accepting planner backup exports.
 - Sections may use the planner's names ("Introduction", "Services", "FAQ", …) or module keys (`hero`, `services`, `faq`). An unknown section type, or two pages that would share one address, stops the compile with an error instead of being dropped.
-- The compiler never invents business facts. Any required field the plan leaves empty (prices, times, places, services) is filled with **"To be confirmed"**, and the command prints how many there are. Replace each one before publishing.
+- New starter exports carry versioned section `content` objects, stable page keys and anchors, and theme choices. Edit item copy, image alternatives, secondary actions, and other details in their individual fields; the main Section copy control changes only the introduction or body paragraph. Compilation preserves all carried renderer fields. A required field left empty stops compilation.
+- Older backups remain accepted. Structured item fields are retained, and original starter items are recovered from prose only when the complete prose matches the starter exactly. Edited legacy prose is parsed as edited text or rejected if ambiguous; it is never replaced merely because the item titles still match. Legacy backups cannot recover optional fields that were never exported.
+- Export one project at a time for compilation. Multiple-project backups are rejected instead of silently choosing the first project.
 - `--write` refuses to replace an existing preset. Choose another `--name`, or add `--force` to replace it on purpose.
 - The written preset can start a client copy straight away: `python3 scripts/new_site.py ../client --name "Client" --preset <name>`.
 
