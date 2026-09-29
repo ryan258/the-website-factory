@@ -110,7 +110,7 @@ def action_url(target, page_slugs, fallback, where, page):
         raise ValueError(f'{where}: action destination {target!r} is not a usable address. Use a page '
                          'path like /services/, a page anchor like /services/#pricing or #pricing, '
                          'mailto:, or tel:. Links to other websites are not supported in buttons.')
-    page = re.split(r'[#?]', target, 1)[0]
+    page = re.split(r'[#?]', target, maxsplit=1)[0]
     slug = page.strip('/').split('/')[0]
     if slug and slug not in page_slugs:
         raise ValueError(f'{where}: action destination {target!r} points at /{slug}/, which this plan has '

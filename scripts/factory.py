@@ -208,7 +208,7 @@ def internal_links(value):
             # matches a page that actually exists.
             for raw in [node] + re.findall(r'\]\(([^)\s]+)\)', node) + re.findall(r'["\'](/[^"\'\s]*)["\']', node):
                 if raw.startswith('/'):
-                    found.add(re.split(r'[#?]', raw, 1)[0])
+                    found.add(re.split(r'[#?]', raw, maxsplit=1)[0])
     walk(value)
     return found
 
