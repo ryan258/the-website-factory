@@ -27,7 +27,7 @@ concurrency:
 jobs:
   verify:
     name: Verify Quality Gates
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Checkout Repository
@@ -91,7 +91,7 @@ jobs:
     name: Publish Production Release (Owner Authorized)
     needs: verify
     if: github.event_name == 'workflow_dispatch' && inputs.confirm_release == true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     # A newer release waits for the running one instead of racing it to Cloudflare.
     concurrency:
