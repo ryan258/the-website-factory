@@ -71,6 +71,16 @@ class SmokeTests(unittest.TestCase):
         self.assertEqual(code, 1, 'a noindex page is wrong for production')
         self.assertIn('FAIL  search engines allowed in', out)
 
+    def test_a_preview_may_keep_the_placeholder_domain_but_production_may_not(self):
+        # preview.yml builds without the real base URL, so its canonical is example.invalid by design.
+        routes = healthy(indexable=False, form='false')
+        routes['/'] = (200, SECURE, page('https://example.invalid', '<meta name=robots content=noindex>'))
+        code, out = self.run_smoke(routes, (404, SECURE, ''), '--noindex', '--form', 'off')
+        self.assertEqual(code, 0, out)
+        code, out = self.run_smoke(routes, (404, SECURE, ''), '--form', 'off')
+        self.assertIn('FAIL  canonical is this site', out)
+        self.assertIn('FAIL  no placeholder domain', out)
+
     def test_the_stale_build_that_fell_back_to_the_home_page_is_caught(self):
         # What 258webco.com served on 2026-09-29: an old build, every address answers 200, no security
         # headers, no endpoint, the placeholder domain, and a contact form switched off.

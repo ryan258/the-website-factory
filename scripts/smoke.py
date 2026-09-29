@@ -40,10 +40,13 @@ def check_site(base, noindex=False, form='any', endpoint=True):
     check(base.startswith('https://') or host in ('127.0.0.1', 'localhost'), 'served over https', base)
     status, headers, home = fetch(base + '/')
     check(status == 200, 'home page answers 200', str(status))
-    canonical = re.search(r'rel=["\']?canonical["\']?[^>]*href=["\']?([^\s"\'>]+)', home)
-    check(canonical and canonical.group(1) == base + '/', 'canonical is this site\'s real address',
-          canonical.group(1) if canonical else 'no canonical link')
-    check('example.invalid' not in home and 'to be confirmed' not in home.lower(), 'no placeholder domain or "To be confirmed"')
+    if not noindex:
+        # A preview is built without the real domain on purpose, and scripts/check_site.py enforces these
+        # two rules only for indexable builds, so a preview is not held to them either.
+        canonical = re.search(r'rel=["\']?canonical["\']?[^>]*href=["\']?([^\s"\'>]+)', home)
+        check(canonical and canonical.group(1) == base + '/', 'canonical is this site\'s real address',
+              canonical.group(1) if canonical else 'no canonical link')
+        check('example.invalid' not in home and 'to be confirmed' not in home.lower(), 'no placeholder domain or "To be confirmed"')
     robots = robots_meta(home) + ' ' + headers.get('x-robots-tag', '')
     check(('noindex' in robots) == noindex, 'search engines ' + ('kept out (preview)' if noindex else 'allowed in'), robots.strip() or 'no robots directive')
     missing = [name for name in HEADERS if name not in headers]
