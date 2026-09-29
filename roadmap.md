@@ -128,3 +128,4 @@
 - **No Runtime CMS or Database Requirements:** The factory remains strictly static Hugo; content and composition are managed via version-controlled Markdown, YAML, and JSON.
 - **No Client-Side Framework Overhead:** Components must use standard HTML5 semantic elements and modern CSS. JavaScript is reserved for progressive enhancements (such as form submission feedback) and is never required for core navigation or reading.
 - **No Fabricated Performance or Legal Claims:** Default presets, sample case studies, pricing tables, and testimonials are explicitly labeled as fictional. Client copies do not inherit historical test scores or delivery guarantees.
+beep
