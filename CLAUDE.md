@@ -2,7 +2,7 @@
 
 ## Git: work directly on `main`
 
-- Commit and push straight to `main`.
+- Do **not** commit or push unless Ryan asks. When he does, commit and push straight to `main`.
 - Do **not** create branches.
 - Do **not** open pull requests.
 - Only do either of those when Ryan asks for it specifically.
