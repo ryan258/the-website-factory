@@ -92,10 +92,11 @@ def main(argv=None):
         print(f'Live run: {len(briefs)} paid API call(s).', file=sys.stderr)
     scores, rows = [], []
     for brief in briefs:
+        usage = {}
         expect = json.loads(brief.with_suffix('.expect.json').read_text())
         if args.live:
             import draft_plan
-            plan = draft_plan.request(brief.read_text(), registry)
+            plan = draft_plan.request(brief.read_text(), registry, usage=usage)
             if args.record:
                 RECORDED.mkdir(exist_ok=True)
                 (RECORDED / f'{brief.stem}.json').write_text(json.dumps(plan, indent=2, ensure_ascii=False) + '\n')
@@ -108,7 +109,7 @@ def main(argv=None):
         results = grade(plan, expect, registry)
         score = sum(ok for ok, _ in results.values()) / 8
         scores.append(score)
-        rows.append(dict(brief=brief.stem, score=score, checks={k: dict(passed=ok, detail=d) for k, (ok, d) in results.items()}))
+        rows.append(dict(brief=brief.stem, score=score, usage=usage or None, checks={k: dict(passed=ok, detail=d) for k, (ok, d) in results.items()}))
         print(f'{brief.stem}: {score:.2f}')
         for check, (ok, detail) in results.items():
             print(f'  {"pass" if ok else "FAIL"}  {check}: {detail}')

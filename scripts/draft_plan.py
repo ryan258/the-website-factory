@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from from_plan import PLANNER_LABELS, TBC  # noqa: E402
 from schemas import plan_schema, validate  # noqa: E402
 
-MODEL = 'claude-opus-5'
+MODEL = 'claude-opus-5-5'
 # Planner limits (assets/js/workflow.js valid()): a draft beyond them could not be imported.
 MAX_PAGES, MAX_SECTIONS, MAX_TEXT = 30, 40, 12000
 
@@ -56,8 +56,11 @@ def catalog(registry):
             lines.append(f"- {key}: {module['purpose']} ({', '.join(module['variants'])}).{guide}")
     return '\n'.join(lines)
 
-def request(brief, registry, model=MODEL, effort='high'):
-    """Send the brief; return the parsed plan dict. Raises SystemExit with a plain message on failure."""
+def request(brief, registry, model=MODEL, effort='high', usage=None):
+    """Send the brief; return the parsed plan dict. Raises SystemExit with a plain message on failure.
+
+    Pass a dict as `usage` to learn what the call cost: it receives the token counts and which model
+    answered. `served_by` differs from `requested` when a declined request fell back to another model."""
     try:
         import anthropic
     except ImportError:
@@ -86,6 +89,11 @@ def request(brief, registry, model=MODEL, effort='high'):
         raise SystemExit(f'The API returned an error ({error.status_code}): {error.message}')
     except anthropic.APIConnectionError:
         raise SystemExit('Could not reach the API. Check the network connection.')
+    if usage is not None:
+        used = response.usage
+        usage.update(requested=model, served_by=response.model, input_tokens=used.input_tokens,
+                     output_tokens=used.output_tokens, cache_read_tokens=used.cache_read_input_tokens or 0,
+                     cache_write_tokens=used.cache_creation_input_tokens or 0)
     if response.stop_reason == 'refusal':
         raise SystemExit('The model declined this brief. Review the brief and try again.')
     if response.stop_reason == 'max_tokens':
@@ -125,9 +133,9 @@ def to_planner(plan, registry, source='brief'):
         updated=now, checks=[False, False, False], pages=pages)
     return {'version': 1, 'projects': [project]}
 
-def draft(brief, registry=None, model=MODEL, effort='high', source='brief'):
+def draft(brief, registry=None, model=MODEL, effort='high', source='brief', usage=None):
     registry = registry or json.loads((ROOT / 'data/modules.json').read_text())
-    return to_planner(request(brief, registry, model, effort), registry, source)
+    return to_planner(request(brief, registry, model, effort, usage), registry, source)
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -139,7 +147,9 @@ def main(argv=None):
     brief = Path(args.brief).read_text().strip()
     if not brief:
         parser.error('The brief is empty.')
-    result = draft(brief, model=args.model, effort=args.effort, source=Path(args.brief).name)
+    usage = {}
+    result = draft(brief, model=args.model, effort=args.effort, source=Path(args.brief).name, usage=usage)
+    print(f'Model {usage["served_by"]}: {usage["input_tokens"]} input, {usage["output_tokens"]} output tokens.', file=sys.stderr)
     text = json.dumps(result, indent=2, ensure_ascii=False) + '\n'
     if args.output:
         Path(args.output).write_text(text)

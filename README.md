@@ -132,7 +132,7 @@ These tools let an AI assistant, or a person, go from a client brief to a checke
 | Handover report | `python3 scripts/handover.py --build` |
 | Screenshot comparison | `node scripts/visual_check.cjs --update`, then `node scripts/visual_check.cjs` |
 
-- **Claude API:** `draft_plan.py` uses `claude-opus-5` with structured output that must match `schemas/plan.schema.json`. Install the SDK with `pip install -r requirements-dev.txt`. Set `ANTHROPIC_API_KEY`, or log in with `ant auth login`. A declined request retries on Anthropic's recommended fallback model (`fallbacks: "default"`).
+- **Claude API:** `draft_plan.py` uses `claude-opus-5-5` with structured output that must match `schemas/plan.schema.json`. Install the SDK with `pip install -r requirements-dev.txt`. Set `ANTHROPIC_API_KEY`, or log in with `ant auth login`. A declined request retries on Anthropic's recommended fallback model (`fallbacks: "default"`). Each run prints the token counts and the model that answered; `eval_plans.py --live` saves them in its report.
 - **MCP:** Claude Code loads `scripts/mcp_server.py` from `.mcp.json`. Tools: `list_modules`, `list_presets`, `get_preset`, `get_schema`, `validate_preset`, `check_claims`, `compile_plan`, `build_site`, `check_site`, `create_client_site`, and `draft_plan`. The tool descriptions name any side effect. None of them commit, deploy, or turn on a form.
 - **Approving claims:** once the business confirms a claim, add its text to the preset's `approved_claims`. Client copies start with none.
 - **Schemas:** after editing `data/modules.json` or `data/tones.json`, run `python3 scripts/schemas.py`. CI fails when the schema files are out of date.

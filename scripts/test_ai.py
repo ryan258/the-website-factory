@@ -59,11 +59,21 @@ class AITests(unittest.TestCase):
         FakeAPI.requests.clear()
         FakeAPI.reply = message(RECORDED)
 
+    def test_usage_reports_tokens_and_the_model_that_answered(self):
+        usage = {}
+        draft_plan.draft('A bakery brief.', usage=usage)
+        self.assertEqual((usage['input_tokens'], usage['output_tokens'], usage['cache_read_tokens']), (10, 10, 0))
+        self.assertEqual(usage['served_by'], usage['requested'])
+        FakeAPI.reply = dict(message(RECORDED), model='claude-opus-4-8')
+        draft_plan.draft('A bakery brief.', usage=usage)
+        self.assertEqual((usage['requested'], usage['served_by']), (draft_plan.MODEL, 'claude-opus-4-8'),
+                         'a fallback must be visible, not silent')
+
     def test_request_uses_structured_output_and_fallbacks(self):
         result = draft_plan.draft('A bakery brief.', source='bakery.md')
         sent = FakeAPI.requests[0]
         body = sent['body']
-        self.assertEqual(body['model'], 'claude-opus-5')
+        self.assertEqual(body['model'], 'claude-opus-5-5')
         self.assertEqual(body['fallbacks'], 'default')
         self.assertIn('server-side-fallback-2026-07-01', sent['headers'].get('anthropic-beta', ''))
         self.assertEqual(body['output_config']['format']['type'], 'json_schema')
