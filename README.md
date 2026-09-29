@@ -209,6 +209,7 @@ The Python checks need no package installation, except `test_ai.py` (the `anthro
 
 ```sh
 python3 scripts/doctor.py     # is this machine set up? one fix per problem
+python3 scripts/smoke.py URL --form on   # after a deploy: read-only checks that the live site is the release you meant (sends no form)
 npm run verify                 # the fast CI gates on a clean copy (what a commit would contain, no ignored files); browser checks stay in CI
 python3 scripts/build.py
 python3 scripts/check_site.py

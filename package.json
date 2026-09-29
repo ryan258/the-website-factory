@@ -14,7 +14,7 @@
     "test:factory": "python3 scripts/test_factory.py",
     "test:integration": "sh scripts/check_contact.sh",
     "from-plan": "python3 scripts/from_plan.py",
-    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_plan_fidelity.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py && python3 scripts/test_enquiries.py && python3 scripts/test_schemas.py && python3 scripts/test_claims.py && python3 scripts/test_ai.py && python3 scripts/test_mcp.py && python3 scripts/test_evals.py && python3 scripts/test_handover.py && node scripts/visual_check.cjs --self-test && python3 scripts/test_library.py && python3 scripts/test_links.py && python3 scripts/test_doctor.py",
+    "test": "node scripts/test_contact_endpoint.mjs && python3 scripts/test_from_plan.py && python3 scripts/test_plan_fidelity.py && python3 scripts/test_starter.py && python3 scripts/test_factory.py && python3 scripts/test_enquiries.py && python3 scripts/test_schemas.py && python3 scripts/test_claims.py && python3 scripts/test_ai.py && python3 scripts/test_mcp.py && python3 scripts/test_evals.py && python3 scripts/test_handover.py && node scripts/visual_check.cjs --self-test && python3 scripts/test_library.py && python3 scripts/test_links.py && python3 scripts/test_doctor.py && python3 scripts/test_smoke.py",
     "test:enquiries": "python3 scripts/test_enquiries.py",
     "lint": "ruff check scripts && for f in assets/js/*.js functions/*.js functions/api/*.js scripts/*.cjs scripts/*.mjs; do node --check \"$f\" || exit 1; done",
     "schemas": "python3 scripts/schemas.py",
@@ -27,7 +27,8 @@
     "visual:update": "node scripts/visual_check.cjs --update",
     "contrast": "python3 scripts/contrast.py",
     "doctor": "python3 scripts/doctor.py",
-    "verify": "python3 scripts/verify.py"
+    "verify": "python3 scripts/verify.py",
+    "smoke": "python3 scripts/smoke.py"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
