@@ -41,12 +41,15 @@ def json_from(output, opener):
 
 def enquiries():
     keys = json_from(wrangler('list', '--prefix', 'enquiry:'), '[')
-    found = []
+    found, failed = [], []
     for key in keys:
         try:
             found.append(json_from(wrangler('get', key['name']), '{'))
-        except SystemExit as error:
-            print(f"Skipped {key['name']}: {error}", file=sys.stderr)
+        except (SystemExit, ValueError, KeyError) as error:
+            failed.append(key.get('name', '?'))
+            print(f"Could not read {key.get('name', '?')}: {error}", file=sys.stderr)
+    if failed:
+        raise SystemExit(f'Incomplete enquiry read: {len(failed)} of {len(keys)} records failed. No export was written; retry after resolving the read failure.')
     return sorted(found, key=lambda e: e.get('received', ''), reverse=True)
 
 def main(argv=None):

@@ -352,6 +352,29 @@ check('a multipart submission is still read', async () => {
   assert.equal(ENQUIRY.written.length, 1);
 });
 
+check('Function JSON, HTML errors and redirects carry their own security headers', async () => {
+  for (const response of [await post({}), await post({}, {json:false}), await post({...ENABLED, ENQUIRY:store()}, {json:false})]) {
+    assert.match(response.headers.get('content-security-policy'), /frame-ancestors 'none'/);
+    assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+  }
+  assert.equal((await (await post({})).json()).code, 'INTAKE_DISABLED');
+});
+
+check('stored acknowledgement does not wait for background notification', async () => {
+  let release;
+  const pending=new Promise(resolve=>{release=resolve;});
+  const background=[];
+  const response=await withFetch(()=>pending,()=>onRequestPost({
+    request:new Request('https://example.invalid/api/contact',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded',accept:'application/json'},body:VALID}),
+    env:{...ENABLED,...HOOK,ENQUIRY:store()},waitUntil:promise=>background.push(promise),
+  }));
+  assert.equal(response.status,200);
+  assert.equal(background.length,1);
+  release(new Response('ok'));
+  await Promise.all(background);
+});
+
 let failures = 0;
 for (const [name, fn] of cases) {
   try { await fn(); } catch (error) { failures++; console.error(`FAIL: ${name}\n  ${error.message}`); }

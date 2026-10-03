@@ -5,16 +5,18 @@ const LIMITS = {name: 120, email: 254, company: 160, 'project-type': 80, budget:
 const OPTIONAL = new Set(['company']);
 const ALLOWED_FIELDS = new Set(['name', 'email', 'company', 'project-type', 'budget', 'message', 'website']);
 const MAX_BODY_BYTES = 65536;
-const reply = (status, body) => new Response(JSON.stringify(body), {status, headers: {'content-type': 'application/json', 'cache-control': 'no-store'}});
+const SECURITY = {'content-security-policy': "default-src 'self'; script-src 'none'; style-src 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'", 'x-content-type-options': 'nosniff', 'x-frame-options': 'DENY', 'referrer-policy': 'strict-origin-when-cross-origin', 'permissions-policy': 'camera=(), microphone=(), geolocation=()', 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'x-robots-tag': 'noindex, nofollow'};
+const CODES = {400: 'INVALID_SUBMISSION', 403: 'WRONG_ORIGIN', 405: 'METHOD_NOT_ALLOWED', 413: 'PAYLOAD_TOO_LARGE', 415: 'UNSUPPORTED_CONTENT_TYPE', 429: 'RATE_LIMITED', 502: 'DELIVERY_UNCONFIRMED', 503: 'INTAKE_DISABLED'};
+const reply = (status, body) => new Response(JSON.stringify(body), {status, headers: {...SECURITY, 'content-type': 'application/json', 'cache-control': 'no-store'}});
 const escapeHTML = text => String(text).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 // A visitor without JavaScript sees this instead of raw JSON. No inline style or script, so
-// the strict CSP in static/_headers still applies.
+// each Function response carries its own explicit CSP; static _headers does not apply.
 const errorPage = (status, message) => new Response(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex"><title>Your enquiry was not sent</title></head>
 <body><main><h1>Your enquiry was not sent</h1><p>${escapeHTML(message)}</p>
 <p><a href="/contact/">Go back to the contact form</a></p></main></body></html>
-`, {status, headers: {'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store'}});
+`, {status, headers: {...SECURITY, 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store'}});
 // Chat tools read webhook text as markup: <!channel> or @here would ping a whole team.
 const chatSafe = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/@/g, '@\u200b');
 // Rate-limit keys hold a hash, never the raw address. Set RATE_LIMIT_SALT as a secret so the
@@ -41,18 +43,19 @@ const readCapped = async request => {
   return new Blob(chunks);
 };
 
-export async function onRequestPost({request, env}) {
+export async function onRequestPost({request, env, waitUntil}) {
   if (request.method !== 'POST') {
-    return new Response(JSON.stringify({error: 'Method Not Allowed'}), {
+    return new Response(JSON.stringify({error: 'Method Not Allowed', code: 'METHOD_NOT_ALLOWED'}), {
       status: 405,
-      headers: {'allow': 'POST', 'content-type': 'application/json', 'cache-control': 'no-store'},
+      headers: {...SECURITY, 'allow': 'POST', 'content-type': 'application/json', 'cache-control': 'no-store'},
     });
   }
   // A form posted without JavaScript expects a page, not JSON.
   const wantsPage = !(request.headers.get('accept') || '').includes('application/json');
   const done = (status, body) => {
+    if (status >= 400) body = {...body, code: CODES[status] || 'REQUEST_FAILED'};
     if (!wantsPage) return reply(status, body);
-    return status < 400 ? Response.redirect(new URL('/contact/received/', request.url), 303) : errorPage(status, body.error);
+    return status < 400 ? new Response(null, {status: 303, headers: {...SECURITY, 'cache-control': 'no-store', location: new URL('/contact/received/', request.url).href}}) : errorPage(status, body.error);
   };
 
   const contentType = (request.headers.get('content-type') || '').toLowerCase();
@@ -139,22 +142,20 @@ export async function onRequestPost({request, env}) {
   // Webhook notification: best effort once a copy is stored, and the only delivery path
   // when no store is bound. Pages Functions cannot bind send_email, so there is no email path.
   if (env.NOTIFICATION_WEBHOOK) {
-    let webhookOk = false;
-    try {
-      const res = await fetch(env.NOTIFICATION_WEBHOOK, {
-        method: 'POST',
-        signal: AbortSignal.timeout(10000),
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({
-          text: chatSafe(`New website enquiry from ${enquiry.name} (${enquiry.email}):\n${enquiry.message}`),
-          enquiry,
-        }),
-      });
-      webhookOk = res && res.ok;
-    } catch {
-      webhookOk = false;
-    }
-    if (!webhookOk && !stored) {
+    const notify = async () => {
+      try {
+        const response = await fetch(env.NOTIFICATION_WEBHOOK, {
+          method: 'POST', signal: AbortSignal.timeout(10000),
+          headers: {'content-type': 'application/json'},
+          body: JSON.stringify({text: chatSafe(`New website enquiry from ${enquiry.name} (${enquiry.email}):\n${enquiry.message}`), enquiry}),
+        });
+        return !!response?.ok;
+      } catch { return false; }
+    };
+    if (stored && typeof waitUntil === 'function') {
+      // The durable receipt already exists; notification must not delay acknowledgement.
+      waitUntil(notify().then(ok => { if (!ok) console.warn('Enquiry notification failed after durable storage.'); }));
+    } else if (!await notify() && !stored) {
       return done(502, {error: 'Delivery could not be confirmed.'});
     }
   }
@@ -165,8 +166,8 @@ export async function onRequest(context) {
   if (context.request.method === 'POST') {
     return onRequestPost(context);
   }
-  return new Response(JSON.stringify({error: 'Method Not Allowed'}), {
+  return new Response(JSON.stringify({error: 'Method Not Allowed', code: 'METHOD_NOT_ALLOWED'}), {
     status: 405,
-    headers: {'allow': 'POST', 'content-type': 'application/json', 'cache-control': 'no-store'},
+    headers: {...SECURITY, 'allow': 'POST', 'content-type': 'application/json', 'cache-control': 'no-store'},
   });
 }
