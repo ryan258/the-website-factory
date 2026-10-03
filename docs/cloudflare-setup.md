@@ -300,7 +300,7 @@ A push to `main` runs the checks only. It never deploys.
    the form and the endpoint on together, checks they agree, and fails if they do not.
    Leave it unticked to publish with the form off.
 
-**You should see:** both jobs green. Then do the live test enquiry from step 8.
+**You should see:** all jobs green (including the final release identity check confirming `factory-release.json` matches the deployed site). Then do the live test enquiry from step 8.
 
 To share a draft without touching the live site, run **Actions → Preview Deployment →
 Run workflow** and pick `site` or `workshop`. It publishes to
@@ -313,7 +313,7 @@ Cloudflare Access to `*.258webco.pages.dev` if the workshop must stay private.
 ## What to do when you change the site later
 
 1. Edit content and settings.
-2. `python3 scripts/build.py` and look at it locally.
+2. `./wf check` (or `python3 scripts/build.py && python3 scripts/check_site.py`) and look at it locally.
 3. When happy, push to `main`, then run the workflow as in **Deploying from GitHub**.
 
 That is the whole loop. You never touch the Cloudflare dashboard again unless you are

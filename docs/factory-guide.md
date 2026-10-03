@@ -2,19 +2,19 @@
 
 Follow [the agency delivery cycle](agency-workflow.md) in the master. Start from a complete preset, remove pages and components that do not earn their place, then confirm the brief and scope for the smaller site. The agency storefront is the default build. Run `python3 scripts/build.py --workshop --serve --port 1314` for internal planning at `http://127.0.0.1:1314/site-kit/`; workshop output goes to `public-workshop`.
 
-The master includes nine business compositions (`agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`), a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
+The master includes twelve compositions: nine business presets (`agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`) and three creator starters (`creator-portfolio`, `creator-writer`, `creator-audio`), a project workspace at `/site-kit/`, a visual catalog at `/site-kit/catalog/`, and an interactive Living Style Guide at `/site-kit/style-guide/`. The catalog and style guide render the same components as the client sites. They are internal production surfaces. Review the selected client pages with the client.
 
 In `/site-kit/`, **Start with a complete site** loads a preset's page plan, selected components, copy, calls to action, and accessibility guidance into the workspace. It opens directly in **Shape pages and copy**; remove unnecessary pages and sections first. The working title is optional, the brief can wait, and starter copy stays in draft. **Start with a blank plan** remains available for unusual projects that do not fit an existing composition.
 
 ## Start a separate copy
 
-Run `python3 scripts/new_site.py --guided` to answer lettered questions instead of typing options.
+Run `python3 scripts/new_site.py --guided` (or `./wf new`) to answer lettered questions instead of typing options.
 
 ```sh
 python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor
 ```
 
-Choose `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, or `258webco`. The construction example starts with the earthworks palette and editorial font pairing; override either with `--palette` or `--fonts`. Other presets accept any name from `data/palettes.json` or `data/fonts.json`. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
+Choose `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`, `creator-portfolio`, `creator-writer`, or `creator-audio`. The construction example starts with the earthworks palette and editorial font pairing; override either with `--palette` or `--fonts`. Other presets accept any name from `data/palettes.json` or `data/fonts.json`. The destination must not exist. Copies omit the workshop, unused presets, pages outside the selected composition, unrelated project images, generated output, dependencies, Git history, and historical acceptance evidence. Every copy starts with disabled delivery, `noindex`, an invalid example domain, and sample content.
 
 The `construction` preset is a fictional example based on the shape of the Jones Construction site. It includes linked service-detail pages, linked project stories, process, coverage, FAQ, and contact pages, plus an `/estimate/` page with a local project brief. The brief stays in the current browser tab; visitors can copy or download it, or open an email draft after the owner replaces the example email. It does not submit or store answers. Sample construction images and copy remain clearly identified as illustrative.
 
@@ -77,6 +77,14 @@ The workshop deliberately demonstrates testimonial, statistic, and pricing layou
 Client contact pages retain the existing accessible form. Its service choices come from the selected preset's `services` section, so the form and the Services page can never disagree; budget choices come from `data/contact.yaml`. Keep budgets in step with any prices you publish. A preview never sends a message. The endpoint accepts a submission only when the deployment declares its own storage and sets `ENQUIRY_ENABLED = "true"`, and it acknowledges receipt only after the durable write succeeds; a client copy is scaffolded with neither, so it cannot write into another site's enquiry store. A Cloudflare Pages Function (`functions/api/contact.js`) provides durable enquiry storage in KV with 90-day retention and IP rate limiting, documented in `docs/cloudflare-setup.md`, and actual receipt remains an external acceptance step.
 
 ## Review and verify
+ 
+```sh
+./wf check          # Build, generated output checks, strict claims
+./wf status         # Source freshness and changed content review fields
+./wf approve --by Ryan # Record owner content review approval
+```
+
+Low-level commands remain available:
 
 ```sh
 python3 scripts/factory.py
@@ -92,4 +100,4 @@ node scripts/check_workshop.cjs && node scripts/check_components.cjs && node scr
 
 Use the targeted browser checks documented in the README for changed routes. Check narrow screens, keyboard use, both color modes, and a no-JavaScript visit. Performance reports and automated accessibility results apply only to the measured output, never every future composition.
 
-For a client meeting, open the master workshop, choose a business composition, and use the catalog to discuss which sections earn a place. Business demo previews are intentionally contact-disabled; the master header identifies the factory and provides a route back to the catalog. Client copies use their own branding. See [roadmap.md](../roadmap.md) for milestone status and [acceptance.md](acceptance.md) for measured verification limits.
+For a client meeting, open the master workshop, choose a business composition, and use the catalog to discuss which sections earn a place. Business demo previews are intentionally contact-disabled; the master header identifies the factory and provides a route back to the catalog. Client copies use their own branding. See [roadmap.md](../roadmap.md) for milestone status, [operator-guide.md](operator-guide.md) for daily operations, and [acceptance.md](acceptance.md) for measured verification limits.

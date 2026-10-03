@@ -3,7 +3,39 @@
 One file for all acceptance evidence. **Current** is what is true today. **History** keeps
 earlier records unchanged, for reference; their numbers are not current results.
 
-## Current — 2026-09-29
+## Current — 2026-10-03 review verification passed
+
+The owner ran the following command locally. Run `20261003T230404161102Z`
+completed all 21 commands with exit code 0; the agent inspected the saved results
+and browser summaries without rerunning tests or builds. The project review
+corrections and creator workflow additions remain uncommitted.
+
+```sh
+python3 scripts/verify_review.py
+```
+
+| Check group | Result |
+| --- | --- |
+| 14 Python test scripts | Pass: review fixes, shared scaffold, plan compiler, plan fidelity, schemas, claims, MCP, handover, factory, starter, enquiries, smoke, doctor and AI fixtures |
+| Contact endpoint tests | Pass |
+| Generated schema consistency and lint | Pass |
+| Site and workshop builds | Pass, including generated-output checks |
+| Planner workflow browser checks | Pass: 8 behavior groups using isolated fixtures |
+| Planner browser fidelity | Pass: 11 complete starter exports, edited content, proposal/undo, missing-copy review, reload/import, scoped axe, responsive checks and preview font loading |
+
+Local evidence is retained under
+`reports/review-verification/20261003T230404161102Z/`, including `results.json`
+and per-command logs. The earlier reported failures are resolved in this run.
+Only the acceptance/remediation documentation was updated after this passing run.
+
+This verifies the default review command, not its optional `--full` extension or
+every acceptance target. Live deployment/intake, paid-model usefulness, Windows
+execution and assistive-technology acceptance remain separate evidence. No stage,
+commit, push, deployment or form enablement was performed.
+See [the remediation record](remediation-2026-10-03.md) for changed contracts and
+remaining enhancements. Earlier acceptance evidence below applies to earlier source.
+
+## History — 2026-09-29
 
 Targeted verification of planner starter fidelity, end-to-end round-trip preservation, single-pass client copy scaffolding, and site output checking for minified form flags.
 

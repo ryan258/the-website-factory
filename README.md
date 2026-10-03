@@ -1,6 +1,47 @@
 # The Website Factory
 
+Start with [the operator guide](docs/operator-guide.md). The October review changes
+are implemented locally and have passed review verification (all 21 default gates clean); the detailed status is
+in [the remediation record](docs/remediation-2026-10-03.md).
+
+```sh
+./wf status       # current source, build freshness and changed review fields
+./wf new          # guided creation, with lettered choices
+./wf open         # build and serve the saved source locally
+./wf backup       # source archive under reports/backups/
+```
+
+All helper scripts now require **Python 3.11+** for shared TOML parsing. The optional
+contractor adapter also needs `python3 -m pip install -r requirements-vertical.txt`
+in the interpreter that runs the launcher. No installation or live integration is
+implicit in these commands.
+
+
 A web agency storefront backed by an internal website production system. Clients buy a website shaped around their business; reusable components, presets, and checks help us deliver it consistently.
+
+## Shared scaffold ownership
+
+`the-website-factory/scripts/scaffold_core.py` owns source-copy validation,
+exclusions and provenance for all three masters. Each vertical still owns its
+content, page selection and client neutralization. From the factory checkout:
+
+```sh
+python3 scripts/vertical_site.py contractor --destination /path/to/new-site --name "Example Contractor" --slug example-contractor --specialty septic
+python3 scripts/vertical_site.py restaurant --destination /path/to/new-site --name "Example Restaurant" --slug example-restaurant --preset diner
+```
+
+The destination parent must exist; an existing destination is never overwritten.
+These commands require the sibling `jones-construction` or `hot-eats` checkout.
+Their direct `scripts/sculpt.py` commands remain available. The generic
+`new_site.py` preset workflow also uses the same copy implementation.
+
+Every generated client receives its own `scripts/scaffold_core.py` and
+`scripts/scaffold-origin.json` (contract version and SHA-256). A generated site
+can create another copy without the Projects folder or the factory installed.
+It is a frozen copy: future factory edits do not silently alter delivered sites.
+Approvals, credentials and connected delivery are never granted by this receipt;
+the existing vertical reset checks still apply. No template layouts or vertical
+module libraries were removed by this consolidation.
 
 ## Direction and current state
 
@@ -10,7 +51,7 @@ The operating cycle is **choose a complete starter → chisel pages and componen
 
 The construction preset adapts reusable page patterns from the sibling `jones-construction` project: a photo-led trade homepage, linked service-detail and project-story pages, practical coverage information, and a browser-only project brief. Its business identity, project stories, contacts, and images are fictional examples; Jones-specific approvals and integrations are not copied into client sites.
 
-**Available now:** 31 module families with 62 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, nine business presets, six contrast-checked palettes, five self-hosted font pairings, guided client setup, AI and agent tools, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. Most business presets start with Home, Services, About, and Contact; the new construction example adds work, a local project brief, and Privacy; the live `258webco` preset has Home, Services, Contact, and Privacy.
+**Available now:** 31 module families with 62 variants, a low-fidelity project workspace at `/site-kit/`, a component reference at `/site-kit/catalog/`, an interactive Living Style Guide at `/site-kit/style-guide/`, twelve presets (nine business compositions plus three creator starters: `creator-portfolio`, `creator-writer`, `creator-audio`), six contrast-checked palettes, five self-hosted font pairings, guided client setup, AI and agent tools, validated page composition, and a client-copy command that selects the preset and excludes the workshop. The fictional agency reference has the brief's five pages (Home, Services, Work, Pricing, Contact), four case studies, and a disabled contact form. Most business presets start with Home, Services, About, and Contact; the new construction example adds work, a local project brief, and Privacy; the live `258webco` preset has Home, Services, Contact, and Privacy.
 
 **Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/`. Choose **Start with a complete site** to load a preset's pages, sections, and draft copy directly into the editor; remove anything the site does not need before filling in client details. The default is the compact local-service composition. Choose **Start with a blank plan** only when no existing starter fits. Starters carry complete versioned section structures, stable anchors, item fields, secondary actions, and theme choices; dedicated input controls preserve structured items from being overwritten by paragraph proposals. Plans can still be reviewed and compiled into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, construction, consultant, local-service, clinic, restaurant, and non-profit compositions. Open a catalog row to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
@@ -39,7 +80,7 @@ The library includes these section families:
 | Menus and sessions | Readable item lists, price or scope tables, event agendas, and session cards |
 | Practical help | Business-approved policies, definitions, and support routes |
 
-All 30 families are selectable in the low-fidelity planner. New practical components include copy and accessibility guidance, plus blank planning sections; reference examples never become approved client copy automatically. See [the component expansion guide](docs/component-library.md).
+All 31 families are selectable in the low-fidelity planner. New practical components include copy and accessibility guidance, plus blank planning sections; reference examples never become approved client copy automatically. See [the component expansion guide](docs/component-library.md).
 
 Every module has a stable identifier, a clear purpose, documented content inputs, supported variants, dependencies, and an example. Required content is validated before a build; optional copy is omitted when absent. Sample testimonials, credentials, prices, coverage, and results remain clearly fictional until replaced with supported business facts.
 
@@ -80,6 +121,7 @@ Client copies must start without inherited approvals, historical performance gua
 
 | Purpose | File |
 | --- | --- |
+| Unified operator launcher | `wf`, `scripts/wf.py` |
 | Selected preset and workshop inclusion | `data/factory.json` |
 | Module names, variants, required content, dependencies | `data/modules.json` |
 | Ordered pages, sections, and editorial copy | `data/presets/<preset>.json` |
@@ -102,12 +144,17 @@ Client copies must start without inherited approvals, historical performance gua
 | Expanded workshop, keyboard, and no-JavaScript checks | `scripts/check_workshop.cjs` |
 | Practical component contract checks | `scripts/check_components.cjs` |
 | Planning workspace behavior and persistence checks | `scripts/check_workflow.cjs` |
+| Factory operator guide | `docs/operator-guide.md` |
 | Agency delivery workflow guide | `docs/agency-workflow.md` |
 | Practical component library guide | `docs/component-library.md` |
+| October review remediation and verification record | `docs/remediation-2026-10-03.md` |
 | Acceptance evidence, current and historical | `docs/acceptance.md` |
 | Strategic direction, milestone status, and planned evolution | `roadmap.md` |
 | JSON Schemas for presets and AI plans (generated) | `schemas/`, `scripts/schemas.py` |
 | Claims to confirm (prices, counts, ratings, absolutes) | `scripts/claims.py` |
+| Shared scaffold core and provenance receipt | `scripts/scaffold_core.py` |
+| Sibling output locking service | `scripts/output_lock.py` |
+| Site state, freshness, and content review verification | `scripts/site_state.py` |
 | AI brief-to-plan drafting (Claude API) | `scripts/draft_plan.py` |
 | One command: brief to checked client copy | `scripts/factory_run.py` |
 | MCP server for agents (registered in `.mcp.json`) | `scripts/mcp_server.py` |
@@ -141,7 +188,7 @@ These tools let an AI assistant, or a person, go from a client brief to a checke
 
 ## Build and preview
 
-Requires Python 3.9+ for helper scripts, **Hugo Extended 0.166.0**, and **Dart Sass 1.104.1**. Node is optional and used only for browser/Lighthouse checks.
+Requires Python 3.11+ for helper scripts, **Hugo Extended 0.166.0**, and **Dart Sass 1.104.1**. Node is optional and used only for browser/Lighthouse checks.
 
 1. Install the pinned Hugo Extended binary from [official releases](https://github.com/gohugoio/hugo/releases/tag/v0.166.0) and place `hugo` on PATH.
 2. Install the pinned standalone Dart Sass from [official releases](https://github.com/sass/dart-sass/releases/tag/1.104.1), or run the installer below. Automatic setup supports macOS/Linux arm64/x64 and verifies the release's SHA-256 digest. Windows users should put the standalone `sass` command on PATH.

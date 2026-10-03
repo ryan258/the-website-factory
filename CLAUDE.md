@@ -18,7 +18,7 @@
 
 ## What this project is
 
-A Hugo static-site factory. One master holds 30 section modules; presets choose pages and
+A Hugo static-site factory. One master holds 31 section modules; presets choose pages and
 sections for a business. The live site is the `258webco` preset (258 Web Co.).
 
 | What | Where |
