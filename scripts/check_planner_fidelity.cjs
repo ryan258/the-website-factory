@@ -24,10 +24,14 @@ const KEY='website-factory-projects-v1';
   };
   for(const [slug,original] of Object.entries(source)){
    await page.locator('#starter-preset').selectOption(slug);await page.locator('[data-action=start-starter]').click();
+   const expand=page.getByRole('button',{name:'Show all section fields',exact:true});if(await expand.count())await expand.click();
    const buffer=await download(),project=JSON.parse(buffer).projects[0],compiled=compile(buffer);
    assert.deepEqual(project.pages.map(p=>p.slug),Object.keys(original.pages),`${slug}: starter page order`);
    assert.deepEqual(Object.keys(compiled.pages),Object.keys(original.pages),`${slug}: compiled page order`);
-   for(const key of ['label','tone','palette','font_pairing'])assert.equal(compiled[key],original[key],`${slug}: ${key}`);
+   for(const key of ['label','tone','palette','font_pairing','site_type','contact_mode']){
+    assert.equal(project[key],original[key],`${slug}: exported ${key}`);
+    assert.equal(compiled[key],original[key],`${slug}: compiled ${key}`);
+   }
    for(const [key,definition] of Object.entries(original.pages)){
     assert.equal(compiled.pages[key].description,definition.description,`${slug}/${key}: description`);
     assert.equal(compiled.pages[key].sections.length,definition.sections.length);

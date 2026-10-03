@@ -18,6 +18,7 @@ const KEY='website-factory-projects-v1';
  await page.getByLabel('New project name',{exact:true}).fill('Regression fixture');await page.getByRole('button',{name:'Start project',exact:true}).click();
  await page.getByLabel('What does the business do?',{exact:true}).fill('Example service');await page.getByRole('button',{name:'2. Page plan',exact:true}).click();
  await page.getByLabel('Purpose: what does this page help the visitor do?',{exact:true}).fill('Understand the service');await page.getByRole('button',{name:'Shape this page',exact:true}).click();
+ await page.getByRole('button',{name:'Show all section fields',exact:true}).click();
  await page.getByLabel('Main page heading',{exact:true}).fill('<img src=x onerror=alert(1)>');await page.getByLabel('Section copy',{exact:true}).fill('Persistent copy');
  await page.getByLabel('Section to add',{exact:true}).selectOption('Services');await page.getByRole('button',{name:'Add section',exact:true}).click();
  await page.getByRole('button',{name:'Move Services section 2 up',exact:true}).click();

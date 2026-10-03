@@ -141,12 +141,18 @@ def action_url(target, page_slugs, fallback, where, page):
         return fallback
     if target.startswith(('mailto:', 'tel:')):
         return target
+    if target.startswith('https://'):
+        from urllib.parse import urlsplit
+        parsed = urlsplit(target)
+        if parsed.hostname and not parsed.username and not parsed.password and not any(c.isspace() for c in target):
+            return target
+        raise ValueError(f'{where}: use an HTTPS destination without credentials or whitespace.')
     if target.startswith('#'):
         return ('/' if page == 'home' else f'/{page}/') + target
     if not target.startswith('/'):
         raise ValueError(f'{where}: action destination {target!r} is not a usable address. Use a page '
                          'path like /services/, a page anchor like /services/#pricing or #pricing, '
-                         'mailto:, or tel:. Links to other websites are not supported in buttons.')
+                         'https://, mailto:, or tel:.')
     page = re.split(r'[#?]', target, maxsplit=1)[0]
     slug = page.strip('/').split('/')[0]
     if slug and slug not in page_slugs:
@@ -221,7 +227,7 @@ def convert_plan_to_preset(project_data, registry):
         "pages": {},
         "sections": {}
     }
-    for key in ('palette', 'font_pairing'):
+    for key in ('palette', 'font_pairing', 'site_type', 'contact_mode'):
         if key in project:
             preset[key] = project[key]
     content_schema = schemas.generated()['preset.schema.json']
@@ -251,7 +257,8 @@ def convert_plan_to_preset(project_data, registry):
             'purpose': 'Clear promise and high-converting introduction.',
             'sections': [{'kind': 'hero', 'title': preset_name, 'body': preset['description']}]
         }
-    if 'contact' not in page_map:
+    contact_mode = preset.get('contact_mode', 'off' if preset.get('site_type') == 'creator' else 'inquiry')
+    if contact_mode == 'inquiry' and 'contact' not in page_map:
         page_map['contact'] = {
             'name': 'Contact',
             'purpose': 'Direct enquiry path for new client projects.',
@@ -267,7 +274,7 @@ def convert_plan_to_preset(project_data, registry):
         for pg in page_map.values()
         for s in pg.get('sections', [])
     )
-    if not has_services:
+    if not has_services and contact_mode == 'inquiry':
         page_map['home'].setdefault('sections', []).append({
             'kind': 'services',
             'variant': 'cards',

@@ -16,7 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def planner_export(slug):
     source = json.loads((ROOT / 'data/presets' / f'{slug}.json').read_text())
-    project = {key: deepcopy(source[key]) for key in ('name', 'label', 'tone', 'palette', 'font_pairing') if key in source}
+    # Match the metadata carried by workflow.js createStarter, including creator modes.
+    project = {key: deepcopy(source[key]) for key in
+               ('name', 'label', 'tone', 'palette', 'font_pairing', 'site_type', 'contact_mode') if key in source}
     project.update(goal=source.get('description', ''), starterPreset=slug, pages=[])
     for key, page in source['pages'].items():
         sections = []
@@ -46,8 +48,9 @@ class PlanFidelityTests(unittest.TestCase):
                 slug, preset = from_plan.convert_plan_to_preset(project, self.registry)
                 self.assertEqual(project, before, 'compilation must not mutate the backup')
                 self.assertEqual(factory.validate(ROOT, extra_presets={slug: preset}), [])
-                for key in ('name', 'label', 'tone', 'description', 'palette', 'font_pairing'):
-                    self.assertEqual(preset.get(key), source.get(key))
+                for key in ('name', 'label', 'tone', 'description', 'palette', 'font_pairing', 'site_type', 'contact_mode'):
+                    self.assertEqual(preset.get(key), source.get(key), key)
+                self.assertEqual(list(preset['pages']), list(source['pages']), 'page order and membership')
                 for key, page in source['pages'].items():
                     output = preset['pages'][key]
                     self.assertEqual(output['description'], page['description'])

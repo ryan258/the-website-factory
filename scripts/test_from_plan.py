@@ -218,9 +218,8 @@ class FromPlanTests(unittest.TestCase):
         slug, preset = convert_plan_to_preset(plan('#story'), self.registry)
         self.assertEqual(preset['sections']['pricing-cta-3']['action']['url'], '/pricing/#story')
         self.assertEqual([e for e in validate(ROOT, extra_presets={slug: preset}) if e.startswith(slug)], [])
-        # The compiler used to pass other websites through, then validation refused them.
-        with self.assertRaisesRegex(ValueError, 'other websites'):
-            convert_plan_to_preset(plan('https://example.com/book'), self.registry)
+        _, external = convert_plan_to_preset(plan('https://example.com/book'), self.registry)
+        self.assertEqual(external['sections']['pricing-cta-3']['action']['url'], 'https://example.com/book')
 
     def test_malformed_plan_names_the_field(self):
         cases = [
@@ -299,7 +298,7 @@ class FromPlanTests(unittest.TestCase):
             return convert_plan_to_preset(plan, self.registry)[1]['sections']['home-hero-1']['action']['url']
         self.assertEqual(compiled('#faq'), '/#faq', 'a bare anchor means that anchor on the section\'s own page')
         self.assertEqual(compiled(''), hero['action']['url'], 'an empty target keeps the content\'s own destination')
-        for bad, message in (('https://elsewhere.example/', 'not a usable address'), ('/nowhere/', 'has no page for')):
+        for bad, message in (('http://elsewhere.example/', 'not a usable address'), ('/nowhere/', 'has no page for')):
             with self.subTest(target=bad), self.assertRaisesRegex(ValueError, message):
                 compiled(bad)
 
