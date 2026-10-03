@@ -4,6 +4,14 @@
      no content file to carry front matter, so its own wording is set here; the page body is
      layouts/404.html. */}}
 {{ $description := .Description | default hugo.Data.site.description }}
+{{/* Composition metadata lives in the preset. Detail pages retain front matter. */}}
+{{ if or .IsHome (eq .Kind "section") }}
+  {{ $profile := index hugo.Data.presets (.Params.preset | default hugo.Data.factory.preset) }}
+  {{ with index $profile.pages (cond .IsHome "home" .Section) }}
+    {{ $title = printf "%s — %s" (.seo_title | default .title) hugo.Data.site.name }}
+    {{ $description = .description }}
+  {{ end }}
+{{ end }}
 {{ if eq .Kind "404" }}{{ $description = "That address does not exist on this site. Use the main pages to find what you need." }}{{ end }}
 {{ $social := partial "social-image.html" . }}
 <meta charset="utf-8">

@@ -22,6 +22,7 @@
       "type": "string"
     },
     "tone": {
+      "type": "string",
       "enum": [
         "yellow",
         "clay",
@@ -30,6 +31,7 @@
       ]
     },
     "palette": {
+      "type": "string",
       "enum": [
         "studio",
         "forest",
@@ -40,6 +42,7 @@
       ]
     },
     "font_pairing": {
+      "type": "string",
       "enum": [
         "modern",
         "editorial",
@@ -48,11 +51,24 @@
         "readable"
       ]
     },
+    "site_type": {
+      "enum": [
+        "business",
+        "creator"
+      ]
+    },
+    "contact_mode": {
+      "enum": [
+        "inquiry",
+        "email",
+        "link",
+        "off"
+      ]
+    },
     "pages": {
       "type": "object",
       "required": [
-        "home",
-        "contact"
+        "home"
       ],
       "patternProperties": {
         "^[a-z][a-z0-9-]*$": {
@@ -82,6 +98,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "module": {
+                    "type": "string",
                     "enum": [
                       "hero",
                       "services",
@@ -763,8 +780,8 @@
     },
     "link": {
       "type": "string",
-      "pattern": "^(/|mailto:|tel:)",
-      "description": "A local page path (optionally /page/#anchor), mailto:, or tel: link"
+      "pattern": "^(/|https://|mailto:|tel:)",
+      "description": "A local path, credential-free HTTPS destination, mailto:, or tel: link"
     },
     "content-hero": {
       "type": "object",
@@ -2747,5 +2764,28 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "site_type": {
+            "const": "business"
+          },
+          "contact_mode": {
+            "const": "inquiry"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "pages": {
+            "required": [
+              "contact"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }

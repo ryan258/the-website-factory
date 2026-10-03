@@ -1,0 +1,57 @@
+{
+  "name": "Example Portfolio",
+  "label": "Creator starter · Fictional example",
+  "tone": "sage",
+  "site_type": "creator",
+  "contact_mode": "off",
+  "description": "Explore selected creative work.",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Example Portfolio: a fictional creator starter awaiting confirmed content.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "centered",
+          "content": "hero"
+        },
+        {
+          "module": "resources",
+          "variant": "cards",
+          "content": "collection",
+          "anchor": "collection"
+        },
+        {
+          "module": "about",
+          "variant": "editorial",
+          "content": "about"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "hero": {
+      "title": "Example Portfolio",
+      "intro": "Explore selected creative work.",
+      "action": {
+        "label": "Explore the collection",
+        "url": "/#collection"
+      }
+    },
+    "collection": {
+      "title": "Selected work",
+      "items": [
+        {
+          "title": "To be confirmed: title",
+          "text": "To be confirmed: description and publication rights.",
+          "url": "/#collection"
+        }
+      ]
+    },
+    "about": {
+      "title": "About the creator",
+      "intro": "To be confirmed: introduction.",
+      "body": "To be confirmed: background and a preferred way to connect."
+    }
+  }
+}

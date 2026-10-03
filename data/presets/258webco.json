@@ -117,7 +117,7 @@
         "label": "See our services",
         "url": "/services/"
       },
-      "note": "Custom web development \u00b7 Modern engineering",
+      "note": "Custom web development · Modern engineering",
       "art": "factory"
     },
     "services": {
@@ -203,23 +203,6 @@
         }
       ]
     },
-    "team": {
-      "label": "The people",
-      "title": "Know who you\u2019re working with.",
-      "items": [
-        {
-          "title": "Alex Morgan",
-          "text": "Sample profile \u00b7 Strategy and client conversations",
-          "initials": "AM"
-        },
-        {
-          "title": "Sam Rivera",
-          "text": "Sample profile \u00b7 Design and delivery",
-          "initials": "SR"
-        }
-      ],
-      "notice": "Dedicated engineers and designers focused on small business performance."
-    },
     "faq": {
       "label": "Before we begin",
       "title": "Six common questions.",
@@ -250,40 +233,6 @@
         }
       ]
     },
-    "areas": {
-      "label": "Close to home",
-      "title": "Where the work happens.",
-      "items": [
-        {
-          "title": "Local projects",
-          "text": "Describe the towns or neighborhoods you actually serve."
-        },
-        {
-          "title": "Further afield",
-          "text": "Explain any travel limits and how a visitor can check their location."
-        },
-        {
-          "title": "Remote conversations",
-          "text": "Describe which parts of the process can happen remotely."
-        }
-      ],
-      "notice": "Demonstration coverage. Confirm actual service areas before publication."
-    },
-    "testimonials": {
-      "label": "Client voices",
-      "title": "Make room for real feedback.",
-      "items": [
-        {
-          "title": "Founder, Design Studio",
-          "text": "\u201cWe knew what was happening, what was needed from us, and what came next.\u201d"
-        },
-        {
-          "title": "Managing Director",
-          "text": "\u201cThe finished site finally felt like the business we had built.\u201d"
-        }
-      ],
-      "notice": "Illustrative quotations, not endorsements. Replace with approved, attributable feedback or omit this module."
-    },
     "stats": {
       "label": "Proof, not adjectives",
       "title": "Check this page yourself.",
@@ -301,11 +250,11 @@
           "text": "0 KB"
         }
       ],
-      "notice": "Open your browser\u2019s developer tools and look at the Network tab. Every file on this page comes from this site."
+      "notice": "Open your browser’s developer tools and look at the Network tab. Every file on this page comes from this site."
     },
     "cta": {
       "label": "Your next chapter",
-      "title": "Let\u2019s make something useful.",
+      "title": "Let’s make something useful.",
       "intro": "A short conversation is a good place to begin.",
       "action": {
         "label": "Talk about your project",
@@ -319,7 +268,7 @@
       "items": [
         {
           "title": "Based in",
-          "text": "Chicago, IL \u00b7 Remote nationwide"
+          "text": "Chicago, IL · Remote nationwide"
         },
         {
           "title": "A useful first message",
@@ -327,22 +276,6 @@
         }
       ],
       "notice": "Direct founder communication. You talk with the person who builds your site."
-    },
-    "resources": {
-      "label": "Useful starting points",
-      "title": "A little preparation goes a long way.",
-      "items": [
-        {
-          "title": "Before your first conversation",
-          "text": "Gather your goals, priorities, and the questions you need answered.",
-          "url": "/contact/"
-        },
-        {
-          "title": "Find the right scope",
-          "text": "Understand the service options before deciding what you need.",
-          "url": "/services/"
-        }
-      ]
     },
     "intro-services": {
       "label": "A digital studio",
@@ -352,12 +285,12 @@
         "label": "Get in touch",
         "url": "/contact/"
       },
-      "note": "Handcrafted websites \u00b7 Built to perform",
+      "note": "Handcrafted websites · Built to perform",
       "art": "factory"
     },
     "intro-contact": {
       "label": "A digital studio",
-      "title": "Let\u2019s start a conversation.",
+      "title": "Let’s start a conversation.",
       "intro": "Tell us about your project. We reply by email.",
       "action": {
         "label": "Get in touch",

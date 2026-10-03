@@ -39,6 +39,8 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         errors.append(Issue(message, code, path, hint))
     try:
         config = read(root / 'data/factory.json')
+        if not isinstance(config, dict):
+            return [Issue('data/factory.json: expected object', 'CONFIG_SHAPE_INVALID', '', 'use an object with preset and workshop')]
         if workshop is not None:
             config['workshop'] = workshop
         registry = read(root / 'data/modules.json')
@@ -51,6 +53,15 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         font_pairings = read(root / 'data/fonts.json')
     except (OSError, ValueError) as error:
         return [str(error)]
+    # Shape errors must stop before semantic rules index nested objects or hash keys.
+    from schemas import preset_schema, validate as validate_shape
+    shape = preset_schema(registry, tones, palettes, font_pairings)
+    for slug, profile in profiles.items():
+        for problem in validate_shape(profile, shape):
+            if ': expected ' in problem:
+                fail(f'{slug}: {problem}', 'PRESET_SHAPE_INVALID', '', 'repair the named field before semantic validation')
+    if errors:
+        return errors
     if config.get('preset') not in profiles:
         fail('data/factory.json: unknown selected preset', 'PRESET_UNKNOWN', '/preset', 'set "preset" to a file name in data/presets/')
     if type(config.get('workshop')) is not bool:
@@ -69,6 +80,11 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
             return None if at is None else at + ''.join(f'/{part}' for part in parts)
         if not isinstance(content, dict):
             fail(f'{label}: content must be an object', 'CONTENT_TYPE_INVALID', loc(), 'this section needs a content object'); return
+        types = [e for e in validate_shape(content, shape['$defs'][f'content-{module}'], shape) if ': expected ' in e]
+        if types:
+            for problem in types:
+                fail(f'{label}: {problem}', 'CONTENT_TYPE_INVALID', loc(), 'repair the named content type')
+            return
         for field in registry[module]['required']:
             if not content.get(field): fail(f'{label}: missing required field {field}', 'CONTENT_FIELD_MISSING', loc(field), f'add "{field}" to this content')
         for field in ('title','intro','body','notice','label','aside','note','image','imageAlt'):
@@ -130,8 +146,10 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
                             if problem: fail(f'{label}: {problem}', 'CONTENT_CONTACT_LINK_INVALID', here, 'use one valid email address, or a phone number of 7-15 digits')
                             continue
                         parsed=urlsplit(val)
+                        if parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password and not any(c.isspace() for c in val):
+                            continue
                         if parsed.scheme or parsed.netloc or not val.startswith('/') or '..' in parsed.path.split('/') or parsed.query or (parsed.fragment and not ANCHOR.fullmatch(parsed.fragment)):
-                            fail(f'{label}: module links must be local page paths, mailto:, or tel: {val}', 'CONTENT_LINK_INVALID', here, 'use a path such as /services/, or a mailto: or tel: link'); continue
+                            fail(f'{label}: module links must be local page paths, https:, mailto:, or tel: {val}', 'CONTENT_LINK_INVALID', here, 'use a local path or a credential-free HTTPS, mailto: or tel: address'); continue
                         parts=parsed.path.strip('/').split('/')
                         page=parts[0] or 'home'
                         if profile and page not in profile['pages']:
@@ -151,6 +169,9 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
         links(content, ())
     for slug, profile in profiles.items():
         if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', slug): fail(f'Invalid preset identifier {slug}', 'PRESET_KEY_INVALID', None, 'use lowercase letters, digits, and hyphens')
+        for field, choices in [('site_type', ('business', 'creator')), ('contact_mode', ('inquiry', 'email', 'link', 'off'))]:
+            if field in profile and profile[field] not in choices:
+                fail(f'{slug}: unsupported {field}', 'PRESET_MODE_INVALID', f'/{field}', 'choose one of: ' + ', '.join(choices))
         approved=profile.get('approved_claims',[])
         if not isinstance(approved,list) or not all(isinstance(a,str) and a.strip() for a in approved):
             fail(f'{slug}: approved_claims must be a list of text', 'PRESET_CLAIMS_INVALID', '/approved_claims', 'use a list of the exact texts the business confirmed')
@@ -161,10 +182,14 @@ def validate(root=ROOT, workshop=None, extra_presets=None):
             fail(f"{slug}: unknown font pairing; choose one of {', '.join(font_pairings)}", 'PRESET_FONT_PAIRING_UNKNOWN', '/font_pairing', f'choose one of: {", ".join(font_pairings)}')
         if not isinstance(profile.get('pages'),dict) or not isinstance(profile.get('sections'),dict):
             fail(f'{slug}: pages and sections must be objects', 'PRESET_SHAPE_INVALID', '', 'a preset needs a "pages" object and a "sections" object'); continue
-        if not all(k in profile['pages'] for k in ('home','contact')): fail(f'{slug}: home and contact are required', 'PRESET_REQUIRED_PAGE_MISSING', '/pages', 'add the missing "home" and "contact" pages')
+        creator = profile.get('site_type', 'business') == 'creator'
+        contact_mode = profile.get('contact_mode', 'off' if creator else 'inquiry')
+        required_pages = ('home', 'contact') if contact_mode == 'inquiry' else ('home',)
+        if not all(k in profile['pages'] for k in required_pages):
+            fail(f'{slug}: required pages: {", ".join(required_pages)}', 'PRESET_REQUIRED_PAGE_MISSING', '/pages', 'add the missing required pages')
         # The contact form offers the services module's own items as project types, whatever
         # content key it references. Without one there is nothing to offer, so fail here.
-        if 'contact' in profile['pages'] and not any(s.get('module')=='services'
+        if contact_mode == 'inquiry' and not any(s.get('module')=='services'
                 for page in profile['pages'].values() if isinstance(page,dict)
                 for s in (page.get('sections') or []) if isinstance(s,dict)):
             fail(f'{slug}: a services module is required somewhere; the contact form offers its items as project types', 'PRESET_SERVICES_MISSING', '/pages', 'add a "services" section to one page')
@@ -351,6 +376,7 @@ def apply_preset(destination, slug, name):
     profile['name']=name
     # Approvals belong to the business that confirmed them; a copy starts with none.
     profile.pop('approved_claims',None)
+    profile.pop('claim_evidence',None)
     for preset in (root/'data/presets').glob('*.json'):
         if preset!=source: preset.unlink()
     selected={s['content'] for page in profile['pages'].values() for s in page['sections']}
@@ -383,8 +409,14 @@ def apply_preset(destination, slug, name):
     text=replace_block(text,'social',dict(heading=name,caption='Fictional preview · Content awaiting review'))
     accent = read(root/'data/tones.json')[profile['tone']]
     text=re.sub(r'^  accent:.*$', '  accent: '+json.dumps(accent),text,flags=re.M)
-    if 'estimate' in profile['pages']:
+    primary = next((profile['sections'][s['content']].get('action') for s in profile['pages']['home']['sections']
+                    if profile['sections'][s['content']].get('action')), None)
+    if primary:
+        text=replace_block(text,'primary_cta',primary)
+    elif 'estimate' in profile['pages']:
         text=replace_block(text,'primary_cta',dict(label='Build a project brief',url='/estimate/'))
+    else:
+        text=replace_block(text,'primary_cta',dict(label='Explore',url='/'))
     site.write_text(text)
     # Asset references live in the preset *and* in the detail pages that survived pruning, whose
     # front matter names its own artwork. Scanning only the preset deleted images that a retained

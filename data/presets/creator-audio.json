@@ -1,0 +1,57 @@
+{
+  "name": "Example Audio Project",
+  "label": "Creator starter · Fictional example",
+  "tone": "clay",
+  "site_type": "creator",
+  "contact_mode": "off",
+  "description": "Listen to a creative audio project.",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Example Audio Project: a fictional creator starter awaiting confirmed content.",
+      "sections": [
+        {
+          "module": "hero",
+          "variant": "centered",
+          "content": "hero"
+        },
+        {
+          "module": "resources",
+          "variant": "cards",
+          "content": "collection",
+          "anchor": "collection"
+        },
+        {
+          "module": "about",
+          "variant": "editorial",
+          "content": "about"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "hero": {
+      "title": "Example Audio Project",
+      "intro": "Listen to a creative audio project.",
+      "action": {
+        "label": "Explore the collection",
+        "url": "/#collection"
+      }
+    },
+    "collection": {
+      "title": "Episodes",
+      "items": [
+        {
+          "title": "To be confirmed: title",
+          "text": "To be confirmed: description and publication rights.",
+          "url": "/#collection"
+        }
+      ]
+    },
+    "about": {
+      "title": "About the creator",
+      "intro": "To be confirmed: introduction.",
+      "body": "To be confirmed: background and a preferred way to connect."
+    }
+  }
+}

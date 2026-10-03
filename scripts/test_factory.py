@@ -212,18 +212,37 @@ class FactoryTests(unittest.TestCase):
     def test_concurrent_build_raises_locked_error(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp=Path(tmp);source=tmp/'source';source.mkdir();(source/'a.html').write_text('a')
-            dest=tmp/'output';dest.mkdir()
-            import fcntl
-            lock_path = dest / '.factory-build.lock'
-            lock_file = open(lock_path, 'a')
-            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-            try:
+            dest=tmp/'output'
+            from output_lock import locked_output
+            with locked_output(dest):
                 with self.assertRaises(ValueError) as caught:
                     build.publish_output(source, dest)
                 self.assertIn('locked by another build process', str(caught.exception))
-            finally:
-                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
-                lock_file.close()
+                self.assertFalse(dest.exists(), 'locking must not create generated output')
+            build.publish_output(source, dest)
+            self.assertEqual((dest/'a.html').read_text(), 'a', 'the lock must be released')
+
+    def test_planner_budget_is_bounded_and_workshop_only(self):
+        import base64
+        import random
+        payload = base64.b64encode(random.Random(0).randbytes(16000)).decode()
+        cases = [('workflow.hash.js', True, 12000, False),
+                 ('workflow.hash.js', True, 21000, True),
+                 ('workflow.hash.js', False, 12000, True),
+                 ('contact.hash.js', True, 12000, True)]
+        for name, workshop, length, rejected in cases:
+            with self.subTest(name=name, workshop=workshop, length=length), tempfile.TemporaryDirectory() as tmp:
+                output = Path(tmp)
+                (output/'index.html').write_text('<h1>Budget fixture</h1>')
+                (output/'js').mkdir()
+                (output/'js'/name).write_text(f'const fixture="{payload[:length]}";')
+                if workshop:
+                    (output/'site-kit').mkdir()
+                    (output/'site-kit/index.html').write_text('<h1>Workshop fixture</h1>')
+                errors = check_site.check(output, noindex=True, contact_required=False)
+                budget_errors = [e for e in errors if 'compressed bundle exceeds' in e]
+                self.assertEqual(bool(budget_errors), rejected, budget_errors)
+
     def test_output_reconciliation_refuses_unowned_targets(self):
         with tempfile.TemporaryDirectory() as tmp:
             source=Path(tmp)/'source';source.mkdir();(source/'index.html').write_text('new')

@@ -9,8 +9,9 @@
 {{ $targets := dict "/contact/" "#preview-contact" }}
 {{ if index $profile.pages "estimate" }}{{ $targets = merge $targets (dict "/estimate/" "#preview-brief") }}{{ end }}
 {{ range $i, $section := $composition.sections }}{{ $targets = merge $targets (dict (printf "/%s/" $section.module) (printf "#%s" ($section.anchor | default (printf "%s-%d" $section.module $i)))) }}{{ end }}
+{{ range $composition.sections }}{{ with .anchor }}{{ $targets = merge $targets (dict (printf "/#%s" .) (printf "#%s" .)) }}{{ end }}{{ end }}
 <div class="composition{{ if $preview }} tone-{{ $profile.tone }}{{ end }}" data-preset="{{ $slug }}">
-{{ if $preview }}<div class="preview-bar"><div class="container"><a href="{{ "site-kit/" | relURL }}">← All compositions</a><span>{{ $profile.name }} · Fictional business</span><a href="#preview-contact">Contact preview</a></div></div>{{ end }}
+{{ if $preview }}<div class="preview-bar"><div class="container"><a href="{{ "site-kit/" | relURL }}">← All compositions</a><span>{{ $profile.name }} · Fictional example</span>{{ with $profile.sections.contact }}<a href="#preview-contact">Contact preview</a>{{ end }}</div></div>{{ end }}
 {{ range $i, $section := $composition.sections }}
   {{ partial "factory/module.html" (dict "page" $ "module" $section.module "variant" $section.variant "data" (index $profile.sections $section.content) "id" ($section.anchor | default (printf "%s-%d" $section.module $i)) "hero" (eq $i 0) "preview" $preview "targets" $targets) }}
 {{ end }}
@@ -22,7 +23,8 @@
       {{ end }}
     {{ end }}
   {{ end }}
-  {{ partial "factory/module.html" (dict "page" . "module" "contact" "variant" "panel" "data" $profile.sections.contact "id" "preview-contact" "preview" true) }}
+  {{ with $profile.sections.contact }}{{ partial "factory/module.html" (dict "page" $ "module" "contact" "variant" "panel" "data" . "id" "preview-contact" "preview" true) }}{{ end }}
 {{ end }}
-{{ if and (eq $key "contact") (not $preview) }}<section class="section"><div class="container factory-form"><h2>Tell us about your project</h2>{{ partial "contact-form.html" . }}</div></section>{{ end }}
+{{ $contactMode := $profile.contact_mode | default (cond (eq $profile.site_type "creator") "off" "inquiry") }}
+{{ if and (eq $key "contact") (not $preview) (eq $contactMode "inquiry") }}<section class="section"><div class="container factory-form"><h2>Tell us about your project</h2>{{ partial "contact-form.html" . }}</div></section>{{ end }}
 </div>
