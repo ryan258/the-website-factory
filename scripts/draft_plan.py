@@ -56,11 +56,15 @@ def catalog(registry):
             lines.append(f"- {key}: {module['purpose']} ({', '.join(module['variants'])}).{guide}")
     return '\n'.join(lines)
 
-def request(brief, registry, model=MODEL, effort='high', usage=None):
+def request(brief, registry, model=MODEL, effort='high', usage=None, max_tokens=16000):
     """Send the brief; return the parsed plan dict. Raises SystemExit with a plain message on failure.
 
     Pass a dict as `usage` to learn what the call cost: it receives the token counts and which model
     answered. `served_by` differs from `requested` when a declined request fell back to another model."""
+    if not isinstance(max_tokens, int) or not 1024 <= max_tokens <= 32000:
+        raise ValueError('max_tokens must be between 1024 and 32000.')
+    if not brief.strip():
+        raise ValueError('The brief is empty. No API call was made.')
     try:
         import anthropic
     except ImportError:
@@ -72,7 +76,7 @@ def request(brief, registry, model=MODEL, effort='high', usage=None):
     try:
         response = client.beta.messages.create(
             model=model,
-            max_tokens=16000,
+            max_tokens=max_tokens,
             betas=['server-side-fallback-2026-07-01'],
             # A declined request is retried server-side on Anthropic's recommended fallback model.
             fallbacks='default',
@@ -94,11 +98,17 @@ def request(brief, registry, model=MODEL, effort='high', usage=None):
         usage.update(requested=model, served_by=response.model, input_tokens=used.input_tokens,
                      output_tokens=used.output_tokens, cache_read_tokens=used.cache_read_input_tokens or 0,
                      cache_write_tokens=used.cache_creation_input_tokens or 0)
+    text = next((block.text for block in response.content if block.type == 'text'), '')
+    recovery = ROOT / 'reports/drafts' / f'{uuid.uuid4()}.raw.json'
+    recovery.parent.mkdir(parents=True, exist_ok=True)
+    recovery.write_text(text)
+    if usage is not None:
+        usage['recovery_file'] = str(recovery)
+    print(f'Original draft saved: {recovery}', file=sys.stderr)
     if response.stop_reason == 'refusal':
         raise SystemExit('The model declined this brief. Review the brief and try again.')
     if response.stop_reason == 'max_tokens':
         raise SystemExit('The draft was cut off before it finished. Try a shorter brief.')
-    text = next((block.text for block in response.content if block.type == 'text'), '')
     try:
         plan = json.loads(text)
     except ValueError:
@@ -110,12 +120,18 @@ def request(brief, registry, model=MODEL, effort='high', usage=None):
 
 def to_planner(plan, registry, source='brief'):
     """Convert the model's plan into a planner backup the workshop can import."""
-    clip = lambda value: str(value or '')[:MAX_TEXT]
+    if len(plan['pages']) > MAX_PAGES or any(len(p['sections']) > MAX_SECTIONS for p in plan['pages']):
+        raise ValueError('Draft exceeds planner page/section limits; no content was discarded.')
+    def clip(value):
+        value = str(value or '')
+        if len(value) > MAX_TEXT:
+            raise ValueError('Draft text exceeds the planner limit; no content was discarded.')
+        return value
     label = lambda kind: PLANNER_LABELS.get(kind, registry[kind]['name'])
     pages = []
-    for page in plan['pages'][:MAX_PAGES]:
+    for page in plan['pages']:
         sections = []
-        for s in page['sections'][:MAX_SECTIONS]:
+        for s in page['sections']:
             section = dict(id=str(uuid.uuid4()), kind=label(s['kind']), title=clip(s['title']), body=clip(s['body']),
                            cta=clip(s['cta']), target='', a11y='', state='draft')
             if s.get('variant') in registry[s['kind']]['variants']:
@@ -133,9 +149,9 @@ def to_planner(plan, registry, source='brief'):
         updated=now, checks=[False, False, False], pages=pages)
     return {'version': 1, 'projects': [project]}
 
-def draft(brief, registry=None, model=MODEL, effort='high', source='brief', usage=None):
+def draft(brief, registry=None, model=MODEL, effort='high', source='brief', usage=None, max_tokens=16000):
     registry = registry or json.loads((ROOT / 'data/modules.json').read_text())
-    return to_planner(request(brief, registry, model, effort, usage), registry, source)
+    return to_planner(request(brief, registry, model, effort, usage, max_tokens), registry, source)
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -143,12 +159,13 @@ def main(argv=None):
     parser.add_argument('-o', '--output', help='Where to write the plan (default: print it)')
     parser.add_argument('--model', default=MODEL)
     parser.add_argument('--effort', default='high', choices=['low', 'medium', 'high', 'xhigh', 'max'])
+    parser.add_argument('--max-tokens', type=int, default=16000, help='Output token budget, 1024–32000')
     args = parser.parse_args(argv)
     brief = Path(args.brief).read_text().strip()
     if not brief:
         parser.error('The brief is empty.')
     usage = {}
-    result = draft(brief, model=args.model, effort=args.effort, source=Path(args.brief).name, usage=usage)
+    result = draft(brief, model=args.model, effort=args.effort, source=Path(args.brief).name, usage=usage, max_tokens=args.max_tokens)
     print(f'Model {usage["served_by"]}: {usage["input_tokens"]} input, {usage["output_tokens"]} output tokens.', file=sys.stderr)
     text = json.dumps(result, indent=2, ensure_ascii=False) + '\n'
     if args.output:

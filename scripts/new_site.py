@@ -6,17 +6,19 @@ from pathlib import Path
 import re
 import shutil
 from factory import apply_fonts, apply_palette, apply_preset, validate
+from scaffold_core import copy_sources
 
 ROOT = Path(__file__).resolve().parents[1]
-FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts')
+FOLDERS = ('assets', 'content', 'data', 'functions', 'layouts', 'static', 'scripts', 'schemas')
 FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md', 'package.json', 'package-lock.json',
-         '.mcp.json', 'requirements-dev.txt', 'ruff.toml')
+         '.mcp.json', 'requirements-dev.txt', 'ruff.toml', 'wf')
 # These test or gate the master itself (every preset, the scaffold, the eval fixtures, a git
 # checkout), so they cannot pass in a one-preset client copy. The copy's npm test runs checks that fit a client site.
 MASTER_ONLY_TESTS = ('test_factory.py', 'test_starter.py', 'test_from_plan.py', 'test_schemas.py', 'test_claims.py',
                      'test_ai.py', 'test_mcp.py', 'test_evals.py', 'test_handover.py', 'test_library.py', 'test_enquiries.py',
-                     'test_links.py', 'test_doctor.py', 'test_smoke.py', 'test_plan_fidelity.py', 'check_planner_fidelity.cjs', 'verify.py')
-CLIENT_TEST = ('python3 scripts/factory.py && python3 scripts/check_site.py && python3 scripts/claims.py '
+                     'test_links.py', 'test_doctor.py', 'test_smoke.py', 'test_plan_fidelity.py', 'test_scaffold_core.py',
+                     'test_review_fixes.py', 'check_planner_fidelity.cjs', 'verify.py', 'verify_review.py')
+CLIENT_TEST = ('python3 scripts/factory.py && python3 scripts/check_site.py && python3 scripts/claims.py --strict '
                '&& python3 scripts/contrast.py && node scripts/test_contact_endpoint.mjs')
 
 def client_package(destination):
@@ -139,22 +141,13 @@ def create(destination, name, preset="agency", palette=None, fonts=None, *, prof
         raise ValueError('Choose a destination outside the source project.')
     if not destination.parent.is_dir():
         raise ValueError('Destination parent must already exist.')
-    for folder in FOLDERS:
-        for path in (ROOT / folder).rglob('*'):
-            if path.is_symlink():
-                raise ValueError(f'Source symlinks are not copied: {path.relative_to(ROOT)}')
-    for filename in FILES:
-        if (ROOT / filename).is_symlink():
-            raise ValueError(f'Source symlinks are not copied: {filename}')
-    destination.mkdir()  # Exclusive creation: existing files/directories/symlinks fail.
+    copy_sources(ROOT, destination, FOLDERS, FILES)
     try:
-        for folder in FOLDERS:
-            shutil.copytree(ROOT / folder, destination / folder, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store"))
-        for filename in FILES:
-            shutil.copy2(ROOT / filename, destination / filename)
         (destination / 'docs').mkdir()
         for test in MASTER_ONLY_TESTS:
             (destination / 'scripts' / test).unlink(missing_ok=True)
+        # Specialist masters are selected only from the central checkout.
+        (destination / 'scripts/vertical_site.py').unlink(missing_ok=True)
         shutil.rmtree(destination / 'scripts/fixtures', ignore_errors=True)  # recorded planner exports for the master's tests
         client_package(destination)
         shutil.copy2(ROOT / 'docs/starter-guide.md', destination / 'docs/starter-guide.md')
@@ -173,14 +166,15 @@ def create(destination, name, preset="agency", palette=None, fonts=None, *, prof
         if profile is not None:
             (destination / 'data/presets' / f'{preset}.json').write_text(json.dumps(profile, indent=2, ensure_ascii=False) + '\n')
         apply_preset(destination, preset, name)
+        (destination / 'data/content-review.json').unlink(missing_ok=True)
         selected_palette = palette or profile_defaults.get('palette')
         selected_fonts = fonts or profile_defaults.get('font_pairing')
         if selected_palette:
             apply_palette(destination, selected_palette)
         if selected_fonts:
             apply_fonts(destination, selected_fonts)
-        readme = destination / 'README.md'
-        readme.write_text(f'> Client draft: {name}. Preset: `{preset}`. This copy excludes the master workshop and other presets. The factory reference below documents the shared system; see `docs/factory-guide.md` for editing this copy.\n\n' + readme.read_text())
+        from client_docs import write
+        write(destination, name, preset)
         # Each new instance starts private and disabled, irrespective of source settings.
         conf = destination / 'hugo.toml'
         text = conf.read_text()
@@ -190,7 +184,10 @@ def create(destination, name, preset="agency", palette=None, fonts=None, *, prof
         text = re.sub(r"^\s*formAction\s*=.*$", "  formAction = ''", text, flags=re.M)
         conf.write_text(text)
         (destination / 'docs/acceptance.md').write_text('# New instance: not yet verified\n\nNo source-project performance or accessibility results apply to this instance. Run the local checks and review all sample content before publication. No deployment or form delivery has been performed.\n\nWhen the site is ready for review, replace this file with a fresh report:\n\n    python3 scripts/handover.py --build --output docs/acceptance.md\n')
-    except Exception:
+        final_errors = validate(destination)
+        if final_errors:
+            raise ValueError('Client configuration is invalid: ' + '; '.join(final_errors))
+    except BaseException:
         shutil.rmtree(destination)
         raise
     return destination

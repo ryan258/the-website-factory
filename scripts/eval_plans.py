@@ -81,6 +81,7 @@ def main(argv=None):
     parser.add_argument('--record', action='store_true', help='With --live, save drafts to evals/recorded/')
     parser.add_argument('--only', help='Run one brief by name')
     parser.add_argument('--min-score', type=float, default=0.0, help='Exit 1 if the average score is below this (0-1)')
+    parser.add_argument('--require-complete', action='store_true', help='Fail if any selected brief lacks an offline recording')
     args = parser.parse_args(argv)
     if args.record and not args.live:
         parser.error('--record needs --live.')
@@ -90,7 +91,7 @@ def main(argv=None):
         parser.error('No briefs found.')
     if args.live:
         print(f'Live run: {len(briefs)} paid API call(s).', file=sys.stderr)
-    scores, rows = [], []
+    scores, rows, missing = [], [], []
     for brief in briefs:
         usage = {}
         expect = json.loads(brief.with_suffix('.expect.json').read_text())
@@ -103,6 +104,7 @@ def main(argv=None):
         else:
             saved = RECORDED / f'{brief.stem}.json'
             if not saved.is_file():
+                missing.append(brief.stem)
                 print(f'{brief.stem}: no saved draft (run with --live --record once)', file=sys.stderr)
                 continue
             plan = json.loads(saved.read_text())
@@ -119,9 +121,12 @@ def main(argv=None):
     out = ROOT / 'reports/evals'
     out.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
-    (out / f'{stamp}.json').write_text(json.dumps(dict(live=args.live, average=average, results=rows), indent=2) + '\n')
+    (out / f'{stamp}.json').write_text(json.dumps(dict(live=args.live, average=average, results=rows,
+                                                     requested=len(briefs), evaluated=len(scores), missing=missing,
+                                                     complete=not missing), indent=2) + '\n')
+    print(f'Coverage: {len(scores)}/{len(briefs)} selected briefs; ' + ('complete.' if not missing else 'partial, missing: ' + ', '.join(missing)))
     print(f'Average {average:.2f} over {len(scores)} brief(s). Report: reports/evals/{stamp}.json')
-    return 1 if average < args.min_score else 0
+    return 1 if average < args.min_score or (args.require_complete and missing) else 0
 
 if __name__ == '__main__':
     sys.exit(main())

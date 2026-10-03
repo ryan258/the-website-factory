@@ -86,6 +86,7 @@ jobs:
           node scripts/check_workshop.cjs
           node scripts/check_components.cjs
           node scripts/check_workflow.cjs
+          node scripts/check_planner_fidelity.cjs
 
   deploy:
     name: Publish Production Release (Owner Authorized)
@@ -174,3 +175,6 @@ jobs:
           # The Wrangler that scripts/check_contact.sh tests; keep the two in step. The action's own default is older.
           wranglerVersion: "4.136.2"
           command: pages deploy public --project-name=258webco
+
+      - name: Confirm Deployed Release Identity
+        run: python3 scripts/smoke.py https://258webco.com --expected-release-file public/factory-release.json

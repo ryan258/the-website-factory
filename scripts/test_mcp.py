@@ -72,6 +72,19 @@ class MCPTests(unittest.TestCase):
         self.assertTrue(result['isError'])
         codes = {e['code'] for e in result['structuredContent']['errors']}
         self.assertIn('MODULE_VARIANT_UNKNOWN', codes)
+        self.assertIn('SCHEMA_VALUE_INVALID', codes)
+        variant_error = next(e for e in result['structuredContent']['errors'] if e['code'] == 'MODULE_VARIANT_UNKNOWN')
+        self.assertEqual(variant_error['path'], '/pages/home/sections/0/variant')
+        self.assertIn('choose one of:', variant_error['hint'])
+
+        preset['pages']['home']['sections'][0]['variant'] = []
+        malformed = self.session.call('validate_preset', preset=preset)
+        self.assertTrue(malformed['isError'])
+        errors = malformed['structuredContent']['errors']
+        self.assertTrue(any(e['code'] == 'SCHEMA_TYPE_INVALID'
+                            and e.get('path') == '/pages/home/sections/0/variant' for e in errors))
+        self.assertNotIn('MODULE_VARIANT_UNKNOWN', {e['code'] for e in errors})
+        self.assertEqual(self.session.send('ping')['result'], {})
 
     def test_validate_preset_refuses_a_bad_slug(self):
         preset = json.loads((ROOT / 'data/presets/agency.json').read_text())

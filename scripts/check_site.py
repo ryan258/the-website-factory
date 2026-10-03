@@ -2,7 +2,6 @@
 """Check generated HTML, metadata, local references, and compressed asset budgets."""
 import argparse
 import gzip
-import os
 import re
 from html.parser import HTMLParser
 from pathlib import Path
@@ -15,8 +14,9 @@ from factory import contact_link_error  # noqa: E402
 
 def noindex_expected():
     """Search-engine visibility is a deliberate release setting, not a template edit."""
-    found = re.search(r'(?m)^\s*noindex\s*=\s*(\w+)', (ROOT/'hugo.toml').read_text())
-    return os.environ.get('HUGO_PARAMS_NOINDEX', found.group(1) if found else 'true').lower() not in ('false', '0', 'no')
+    from site_state import settings
+    return settings(ROOT)['noindex']
+
 class Page(HTMLParser):
     def __init__(self):
         super().__init__(); self.h1=0; self.title=''; self.in_title=False; self.meta={}; self.canonical=''; self.refs=[]; self.ids=[]; self.loads=[]; self.fonts=[]; self.media=[]
@@ -48,9 +48,12 @@ def _unique(references):
         seen[ref]=seen.get(ref,False) or anchored
     return list(seen.items())
 
-def check(output, noindex=None):
+def check(output, noindex=None, contact_required=None):
     output = Path(output).resolve()
     noindex = noindex_expected() if noindex is None else noindex
+    if contact_required is None:
+        from site_state import settings
+        contact_required = settings(ROOT)['contact_mode'] == 'inquiry'
     errors=[]; pages={}
     for file in output.rglob('*.html'):
         p=Page();p.feed(file.read_text());pages[file.resolve()]=p
@@ -67,7 +70,7 @@ def check(output, noindex=None):
         errors.append('No 404.html in the build root; unknown routes would fall back to the home page instead of an error')
     elif pages.get(error_page.resolve()) and pages[error_page.resolve()].meta.get('robots')!='noindex':
         errors.append('404.html: the error page must be noindex whatever the release indexing setting')
-    if not noindex:
+    if not noindex and contact_required:
         # Hugo's minifier drops the quotes ("data-enabled=true"), so accept both spellings; matching only
         # the quoted one reported "no usable enquiry path" for every build whose form was switched on.
         has_active_form = any(
@@ -75,7 +78,7 @@ def check(output, noindex=None):
             for text in (file.read_text() for file in pages)
         )
         has_alternative_contact = any(
-            ref.startswith(('mailto:', 'tel:')) and not contact_link_error(unquote(ref))
+            ref.startswith(('mailto:', 'tel:')) and 'example.invalid' not in ref and not contact_link_error(unquote(ref))
             for p in pages.values()
             for ref in p.refs
         )
@@ -154,9 +157,10 @@ def check(output, noindex=None):
                 target=(sheet.parent/path).resolve()
             if not target.exists():errors.append(f'{sheet.relative_to(output)}: missing {ref}')
     for directory,extension,budget in [('css','css',20000),('js','js',5000)]:
-        # The internal editor has a separate budget; public-site bundles retain their limits.
+        # The internal editor's structured fields, undo/redo and file saving have a
+        # 15 KB gzip budget. Public-site bundles retain their 5 KB limit.
         for asset in (output/directory).glob('*.'+extension):
-            limit = 10000 if directory == 'js' and asset.name.startswith('workflow.') and (output/'site-kit/index.html').exists() else budget
+            limit = 15000 if directory == 'js' and asset.name.startswith('workflow.') and (output/'site-kit/index.html').exists() else budget
             if len(gzip.compress(asset.read_bytes())) >= limit:
                 errors.append(f'{directory}/{asset.name}: compressed bundle exceeds {limit} bytes')
     return errors

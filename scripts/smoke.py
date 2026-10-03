@@ -9,6 +9,8 @@ Sends GET requests only. It never submits the contact form. Exit 1 if any check 
 be switched on; --no-endpoint skips the /api/contact check for a site that uses an outside form service.
 """
 import argparse
+import json
+from pathlib import Path
 import re
 import sys
 import urllib.error
@@ -31,11 +33,18 @@ def robots_meta(html):
     found = re.search(r'<meta[^>]+name=["\']?robots["\']?[^>]*content=["\']?([^"\'>]*)', html)
     return found.group(1) if found else ''
 
-def check_site(base, noindex=False, form='any', endpoint=True):
+def check_site(base, noindex=False, form='any', endpoint=True, expected_release=None):
     """A list of (ok, what, detail). Every request is a GET."""
     results = []
     def check(ok, what, detail=''):
         results.append((bool(ok), what, detail))
+    if expected_release:
+        status, _, release = fetch(base + '/factory-release.json')
+        try:
+            actual = json.loads(release).get('release_id')
+        except (ValueError, AttributeError):
+            actual = None
+        check(status == 200 and actual == expected_release, 'deployed release matches the intended artifact', actual or 'missing release ID')
     host = urlsplit(base).hostname
     check(base.startswith('https://') or host in ('127.0.0.1', 'localhost'), 'served over https', base)
     status, headers, home = fetch(base + '/')
@@ -81,8 +90,14 @@ def main(argv=None):
     parser.add_argument('--noindex', action='store_true', help='Expect a preview that keeps search engines out')
     parser.add_argument('--form', choices=('on', 'off', 'any'), default='any', help='Expected state of the contact form')
     parser.add_argument('--no-endpoint', action='store_true', help='Skip the /api/contact check')
+    parser.add_argument('--expected-release-file', type=Path, help='Compare the deployed public ID with this local factory-release.json')
     args = parser.parse_args(argv)
-    results = check_site(args.url.rstrip('/'), noindex=args.noindex, form=args.form, endpoint=not args.no_endpoint)
+    try:
+        expected = json.loads(args.expected_release_file.read_text())['release_id'] if args.expected_release_file else None
+        results = check_site(args.url.rstrip('/'), noindex=args.noindex, form=args.form, endpoint=not args.no_endpoint, expected_release=expected)
+    except (OSError, ValueError, KeyError) as error:
+        print(f'Smoke check could not complete: {error}', file=sys.stderr)
+        return 1
     for ok, what, detail in results:
         print(f'{"ok  " if ok else "FAIL"}  {what}' + ('' if ok or not detail else f' -- {detail}'))
     failed = sum(not ok for ok, _, _ in results)

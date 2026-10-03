@@ -35,8 +35,8 @@ def preset_schema(registry, tones, palettes, font_pairings):
     shared = {'text': {'type': 'string', 'minLength': 1},
               'action': {'type': 'object', 'required': ['label', 'url'],
                          'properties': {'label': text, 'url': {'$ref': '#/$defs/link'}}},
-              'link': {'type': 'string', 'pattern': '^(/|mailto:|tel:)',
-                       'description': 'A local page path (optionally /page/#anchor), mailto:, or tel: link'}}
+              'link': {'type': 'string', 'pattern': '^(/|https://|mailto:|tel:)',
+                       'description': 'A local path, credential-free HTTPS destination, mailto:, or tel: link'}}
     item = {'type': 'object', 'required': ['title', 'text'],
             'properties': {'title': text, 'text': text, 'url': {'$ref': '#/$defs/link'},
                            'image': {'type': 'string'}, 'imageAlt': {'type': 'string'}}}
@@ -60,7 +60,7 @@ def preset_schema(registry, tones, palettes, font_pairings):
                                      'required': module['required'], 'properties': props}
     section = {
         'type': 'object', 'required': ['module', 'variant', 'content'], 'additionalProperties': False,
-        'properties': {'module': {'enum': list(registry)}, 'variant': {'type': 'string'},
+        'properties': {'module': {'type': 'string', 'enum': list(registry)}, 'variant': {'type': 'string'},
                        'content': {'type': 'string', 'description': 'Key in this preset\'s "sections" object'},
                        'anchor': {'type': 'string', 'pattern': '^[a-z][a-z0-9-]*$',
                                   'description': 'Stable id for this section, so links can use /page/#anchor'}},
@@ -79,16 +79,20 @@ def preset_schema(registry, tones, palettes, font_pairings):
         'required': ['name', 'label', 'tone', 'pages', 'sections'],
         'properties': {
             'name': text, 'label': text, 'description': {'type': 'string'},
-            'tone': {'enum': list(tones)},
-            'palette': {'enum': list(palettes)},
-            'font_pairing': {'enum': list(font_pairings)},
-            'pages': {'type': 'object', 'required': ['home', 'contact'],
+            'tone': {'type': 'string', 'enum': list(tones)},
+            'palette': {'type': 'string', 'enum': list(palettes)},
+            'font_pairing': {'type': 'string', 'enum': list(font_pairings)},
+            'site_type': {'enum': ['business', 'creator']},
+            'contact_mode': {'enum': ['inquiry', 'email', 'link', 'off']},
+            'pages': {'type': 'object', 'required': ['home'],
                       'patternProperties': {'^[a-z][a-z0-9-]*$': page}, 'additionalProperties': False},
             'sections': {'type': 'object', 'additionalProperties': {'type': 'object'}},
             'approved_claims': {'type': 'array', 'items': text,
                                 'description': 'Claims the business has confirmed; see scripts/claims.py'},
         },
         '$defs': {**shared, **content},
+        'allOf': [{'if': {'properties': {'site_type': {'const': 'business'}, 'contact_mode': {'const': 'inquiry'}}},
+                   'then': {'properties': {'pages': {'required': ['contact']}}}}],
     }
 
 def plan_schema(registry):

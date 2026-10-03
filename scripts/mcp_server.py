@@ -69,24 +69,23 @@ def get_schema(name):
 def validate_preset(preset, slug='candidate'):
     """Schema shape plus the full factory rules, without writing anything.
 
-    The semantic rules walk the preset freely, so they only run on something walkable: given a
-    string or None they raised instead of reporting, and a crash tells the caller nothing about
-    which field was wrong. A merely invalid preset still gets both sets of diagnostics."""
+    Type errors stop before semantic traversal, so malformed nested fields cannot
+    crash the stdio session. Other schema errors retain the factory's specific
+    diagnostic codes, field pointers, and repair hints alongside schema details."""
     # Errors are filtered by the slug prefix below, so a bad slug's own error would be dropped.
     if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9][a-z0-9-]*', slug):
         return report.result([f'Invalid preset identifier {slug!r}: use lowercase letters, digits, and hyphens.'])
     shape = schemas.validate(preset, schemas.generated()['preset.schema.json'])
-    walkable = (isinstance(preset, dict) and isinstance(preset.get('pages'), dict)
-                and isinstance(preset.get('sections'), dict))
-    if not walkable:
-        return report.result(shape or ['$: expected a preset object with "pages" and "sections"'])
+    if any(': expected ' in problem for problem in shape):
+        return report.result(shape)
     rules = factory.validate(ROOT, extra_presets={slug: preset})
     return report.result(shape + [e for e in rules if e.startswith(f'{slug}')])
 
 def check_claims(slug=None, preset=None):
     data = preset if preset is not None else preset_file(slug or json.loads((ROOT / 'data/factory.json').read_text())['preset'])
-    found = claims.find(data)
-    return {'ok': all(f['approved'] for f in found), 'findings': found}
+    found = claims.find(data, root=ROOT if preset is None else None)
+    return {'ok': all(f['approved'] for f in found), 'scope': 'preset-only' if preset is not None else 'site',
+            'findings': found, 'limitation': 'Pattern checks identify review candidates; they do not establish factual truth.'}
 
 def compile_plan(plan, name=None):
     slug, preset = from_plan.convert_plan_to_preset(plan, registry())
@@ -108,9 +107,15 @@ def create_client_site(destination, name, preset=None, plan=None):
         raise ValueError('Give exactly one of preset (a slug) or plan (a planner export).')
     if plan:
         dest, code = factory_run.run(plan, destination, name, 'mcp plan')
-        return {'ok': code == 0, 'destination': str(dest), 'review': (dest / 'docs/plan-review.md').read_text()}
+        return {'ok': code == 0, 'created': True, 'validated': True, 'built': code == 0, 'checked': code == 0,
+                'destination': str(dest), 'review': (dest / 'docs/plan-review.md').read_text()}
     dest = new_site.create(destination, name, preset)
-    return {'ok': True, 'destination': str(dest)}
+    import build
+    result = subprocess.run([sys.executable, str(dest / 'scripts/build.py'), '--json'],
+                            cwd=dest, env=build.environment(), capture_output=True, text=True)
+    return {'ok': result.returncode == 0, 'created': True, 'validated': True,
+            'built': result.returncode == 0, 'checked': result.returncode == 0,
+            'destination': str(dest), 'build_result': (result.stdout or result.stderr).strip()}
 
 def draft_plan(brief):
     import draft_plan as drafting
@@ -121,8 +126,8 @@ def schema(required=(), **props):
     return {'type': 'object', 'properties': props, 'required': list(required), 'additionalProperties': False}
 
 TOOLS = {
-    'list_modules': (list_modules, 'List the 30 section modules: purpose, variants, required content, and dependencies.', schema()),
-    'list_presets': (list_presets, 'List business presets and their pages; marks the one the live site uses.', schema()),
+    'list_modules': (list_modules, 'List all section modules: purpose, variants, required content, and dependencies.', schema()),
+    'list_presets': (list_presets, 'List available business and creator presets; marks the selected one in this project.', schema()),
     'get_preset': (get_preset, 'Read one preset (pages, sections, copy) by slug.', schema(['slug'], slug=TEXT)),
     'get_schema': (get_schema, 'Get the JSON Schema for a "preset" or an AI-drafted "plan".', schema(['name'], name={'enum': ['preset', 'plan']})),
     'validate_preset': (validate_preset, 'Validate a preset object against the schema and every factory rule. Writes nothing.',
@@ -131,7 +136,7 @@ TOOLS = {
                      'Pass a preset slug, or a preset object.', schema([], slug=TEXT, preset=OBJECT)),
     'compile_plan': (compile_plan, 'Compile a planner export into a preset and validate it. Writes nothing.',
                      schema(['plan'], plan=OBJECT, name=TEXT)),
-    'build_site': (build_site, 'Build and check the master site. Side effect: rewrites generated output in public/ (or public-workshop/).',
+    'build_site': (build_site, 'Build and check this project. Side effect: rewrites generated output in public/ (or public-workshop/).',
                    schema([], workshop=BOOL)),
     'check_site': (check_site, 'Check the last build: links, metadata, headings, robots, and size budgets.', schema([], workshop=BOOL)),
     'create_client_site': (create_client_site, 'Create a separate client copy outside the master from a preset slug or a planner export, '
@@ -146,13 +151,22 @@ TOOLS = {
 
 def handle(message):
     """Return the JSON-RPC response for one message, or None for a notification."""
-    method, params, ident = message.get('method'), message.get('params') or {}, message.get('id')
-    if ident is None:
-        return None
+    ident = message.get('id') if isinstance(message, dict) else None
+    if isinstance(ident, (dict, list, bool)):
+        ident = None
     def ok(result):
         return {'jsonrpc': '2.0', 'id': ident, 'result': result}
     def error(code, text):
         return {'jsonrpc': '2.0', 'id': ident, 'error': {'code': code, 'message': text}}
+    if (not isinstance(message, dict) or message.get('jsonrpc') != '2.0'
+            or not isinstance(message.get('method'), str)
+            or isinstance(message.get('id'), (dict, list, bool))):
+        return error(-32600, 'Invalid request')
+    if 'id' not in message:
+        return None
+    method, params = message['method'], message.get('params', {})
+    if not isinstance(params, dict):
+        return error(-32602, 'params must be an object')
     if method == 'initialize':
         asked = params.get('protocolVersion')
         return ok({'protocolVersion': asked if asked in PROTOCOL_VERSIONS else PROTOCOL_VERSIONS[0],
@@ -163,13 +177,17 @@ def handle(message):
     if method == 'ping':
         return ok({})
     if method == 'tools/list':
-        return ok({'tools': [{'name': n, 'description': d, 'inputSchema': s} for n, (_, d, s) in TOOLS.items()]})
+        return ok({'tools': [{'name': n, 'description': d, 'inputSchema': s,
+                             'annotations': {'readOnlyHint': n not in ('build_site', 'create_client_site', 'draft_plan'),
+                                             'destructiveHint': False,
+                                             'idempotentHint': n not in ('create_client_site', 'draft_plan'),
+                                             'openWorldHint': n == 'draft_plan'}} for n, (_, d, s) in TOOLS.items()]})
     if method == 'tools/call':
         name = params.get('name')
-        if name not in TOOLS:
+        if not isinstance(name, str) or name not in TOOLS:
             return error(-32602, f'Unknown tool: {name}')
         function, _, input_schema = TOOLS[name]
-        arguments = params.get('arguments') or {}
+        arguments = params.get('arguments', {})
         problems = schemas.validate(arguments, input_schema)
         if problems:
             return ok({'content': [{'type': 'text', 'text': 'Invalid arguments: ' + '; '.join(problems)}], 'isError': True})

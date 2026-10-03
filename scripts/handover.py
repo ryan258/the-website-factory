@@ -20,12 +20,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import check_site  # noqa: E402
-import claims  # noqa: E402
+import site_state  # noqa: E402
 import factory  # noqa: E402
 import from_plan  # noqa: E402
 
 MANUAL = [
-    'Keyboard-only and screen-reader walk-through of every page',
+    'Bounded keyboard and screen-reader checks of changed visitor journeys; retain unchanged evidence',
     'Real phone and tablet check, including 200% text size',
     'Every business fact, price, and claim confirmed by the owner in writing',
     'Image rights and alt text reviewed',
@@ -50,18 +50,17 @@ def report(root=ROOT, output_dir=None):
     output_dir = output_dir or root / 'public'
     config = json.loads((root / 'data/factory.json').read_text())
     preset = json.loads((root / 'data/presets' / f"{config['preset']}.json").read_text())
-    hugo = (root / 'hugo.toml').read_text()
-    wrangler = (root / 'wrangler.toml').read_text() if (root / 'wrangler.toml').is_file() else ''
     config_errors = factory.validate(root)
-    output_errors = check_site.check(output_dir) if output_dir.is_dir() else ['No build output found. Run with --build.']
-    found = claims.find(preset)
-    open_claims = [f for f in found if not f['approved']]
-    gaps = placeholders(preset)
-    noindex = setting(r'^\s*noindex\s*=\s*(\w+)', hugo, 'true')
-    form = setting(r'^\s*formEnabled\s*=\s*(\w+)', hugo, 'false')
-    intake = setting(r'''^ENQUIRY_ENABLED\s*=\s*['"](\w+)['"]''', wrangler, 'not set')
-    # ponytail: same quote-agnostic shortcut as build.py form_origin; not a TOML parser.
-    base = setting(r'''^baseURL\s*=\s*['"]([^'"]+)['"]''', hugo, '?')
+    receipt, evidence_errors = site_state.build_evidence(root, output_dir)
+    effective = receipt['settings'] if receipt else site_state.settings(root)
+    output_errors = check_site.check(output_dir, noindex=effective['noindex'], contact_required=effective['contact_mode'] == 'inquiry') if output_dir.is_dir() else ['No build output found. Run with --build.']
+    output_errors += evidence_errors
+    state = site_state.readiness(root, preset)
+    found, open_claims, gaps = state['findings'], state['open_claims'], state['placeholders']
+    noindex = str(effective['noindex']).lower()
+    form = str(effective['form_enabled']).lower()
+    intake = effective.get('intake_enabled', 'unrecorded')
+    base = effective['base_url']
     manifest_file = output_dir / '.factory-build.json'
     manifest_info = 'not found'
     if manifest_file.is_file():
@@ -85,6 +84,8 @@ def report(root=ROOT, output_dir=None):
         f'Generated {date.today().isoformat()} by `scripts/handover.py`. Preset `{config["preset"]}`.', '',
         f'- Revision: {git_info}',
         f'- Build manifest: {manifest_info}',
+        f"- Release ID: `{receipt['release_id'] if receipt else 'unrecorded'}`",
+        '- Claims scope: selected preset, shared site/contact data, and retained Markdown.',
         f'- Python: `{sys.version.split()[0]}`', '',
         f'**Automated status: {"ready for owner review" if ready else "not ready"}.** '
         'This report covers automated checks only; see "Still to check by hand".', '',
@@ -104,9 +105,9 @@ def report(root=ROOT, output_dir=None):
     lines += [f'| `{"/" if k == "home" else f"/{k}/"}` | {p["title"]} | {", ".join(s["module"] for s in p["sections"])} |'
               for k, p in preset['pages'].items()]
     lines += ['', '## Release settings', '',
-              f'- Base URL in `hugo.toml`: `{base}`' + (' (placeholder; set the real domain at release)' if 'example.invalid' in base else ''),
-              f'- Search engines: {"blocked (noindex)" if noindex != "false" else "allowed"} by default',
-              f'- Contact form: {"on" if form == "true" else "off"} by default; endpoint `ENQUIRY_ENABLED` = `{intake}`',
+              f'- Effective build base URL: `{base}`' + (' (placeholder; set the real domain at release)' if 'example.invalid' in base else ''),
+              f'- Search engines: {"blocked (noindex)" if noindex != "false" else "allowed"} in the recorded build',
+              f'- Contact form: {"on" if form == "true" else "off"} in the recorded build; endpoint `ENQUIRY_ENABLED` = `{intake}`',
               '', '## Still to check by hand', ''] + [f'- [ ] {m}' for m in MANUAL] + ['']
     return '\n'.join(lines), ready
 

@@ -32,8 +32,8 @@ def hugo_ok(text, want):
     return bool(found) and found.group(1) == want
 
 def check_python():
-    ok = sys.version_info >= (3, 9)
-    return ('ok' if ok else 'FIX', f'Python {platform.python_version()}', '' if ok else 'install Python 3.9 or newer')
+    ok = sys.version_info >= (3, 11)
+    return ('ok' if ok else 'FIX', f'Python {platform.python_version()}', '' if ok else 'install Python 3.11 or newer')
 
 def check_git():
     return ('ok', 'git', '') if shutil.which('git') else ('FIX', 'git', 'install git (the handover report and clean-tree check use it)')
@@ -87,6 +87,11 @@ def main():
         status, label, fix = check()
         print(f'{status:<5} {label}' + (f' -- {fix}' if fix else ''))
         problems += status == 'FIX'
+    vertical = ROOT / 'scripts/vertical_site.py'
+    if vertical.is_file():
+        import importlib.util
+        if importlib.util.find_spec('yaml') is None:
+            print('warn  Contractor vertical: install its optional dependency with python3 -m pip install -r requirements-vertical.txt')
     print('Ready to build.' if not problems else f'{problems} problem(s) block the build; fix them first.')
     return 1 if problems else 0
 

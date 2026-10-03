@@ -37,14 +37,14 @@ def placeholders(value, path='preset'):
         for i, item in enumerate(value):
             yield from placeholders(item, f'{path}[{i}]')
 
-def review(preset, plan_file):
+def review(preset, plan_file, root=None):
     lines = [f'# Plan review: {preset["name"]}', '',
              f'Drafted from `{plan_file}`. Nothing here is approved. Confirm every fact with the client.', '',
              f'## Placeholders to replace ("{from_plan.TBC}")', '']
     gaps = list(placeholders(preset))
     lines += [f'- `{path}`: {text}' for path, text in gaps] or ['- None.']
     lines += ['', '## Claims to confirm (scripts/claims.py)', '']
-    found = claims.find(preset)
+    found = claims.find(preset, root=root)
     lines += [f'- `{f["path"]}`: {f["reason"]} — "{f["match"]}"' for f in found] or ['- None found.']
     lines += ['', 'Edit `data/presets/*.json`, then run `python3 scripts/build.py` and `python3 scripts/claims.py`.', '']
     return '\n'.join(lines), len(gaps), len(found)
@@ -65,7 +65,7 @@ def run(plan, destination, name=None, plan_file='plan.json'):
         if errors:
             raise ValueError('The new copy did not validate:\n  ' + '\n  '.join(errors))
         (dest / 'docs/plan.json').write_text(json.dumps(plan, indent=2, ensure_ascii=False) + '\n')
-        text, gaps, found = review(preset, plan_file)
+        text, gaps, found = review(preset, plan_file, root=dest)
         (dest / 'docs/plan-review.md').write_text(text)
     except BaseException:
         shutil.rmtree(dest, ignore_errors=True)
@@ -88,13 +88,25 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if bool(args.brief) == bool(args.plan):
         parser.error('Give either a brief or --plan, not both.')
+    destination = Path(args.destination).expanduser().absolute()
+    if destination.exists() or destination.is_symlink() or not destination.parent.is_dir():
+        parser.error('Destination must not exist, and its parent must exist. No API call was made.')
+    if destination.resolve() == ROOT or ROOT in destination.resolve().parents:
+        parser.error('Choose a destination outside the factory. No API call was made.')
     if args.plan:
         plan_file = Path(args.plan).name
         plan = json.loads(Path(args.plan).read_text())
     else:
         import draft_plan
         plan_file = Path(args.brief).name
-        plan = draft_plan.draft(Path(args.brief).read_text(), source=plan_file)
+        if not shutil.which('hugo', path=build.environment()['PATH']) or not shutil.which('sass', path=build.environment()['PATH']):
+            parser.error('Hugo and Sass must be available before paying for a draft. Run scripts/doctor.py.')
+        # An exclusive recovery file survives any later scaffold or build failure.
+        recovery = destination.with_name(destination.name + '.draft.json')
+        with recovery.open('x', encoding='utf-8') as saved:
+            print('Drafting makes a paid API call. Recovery file: ' + str(recovery), file=sys.stderr)
+            plan = draft_plan.draft(Path(args.brief).read_text(), source=plan_file)
+            saved.write(json.dumps(plan, indent=2, ensure_ascii=False) + '\n')
     try:
         dest, code = run(plan, args.destination, args.name, plan_file)
     except (ValueError, FileExistsError) as error:
