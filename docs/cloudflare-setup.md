@@ -156,17 +156,17 @@ After deploying, check the live endpoint answers: a form submission should retur
 258webco.com's mail currently points at an unused Microsoft 365 mailbox. You are
 replacing it with Cloudflare Email Routing. Do these in order.
 
-> **Note on Cloudflare UI layout:** Under the domain sidebar for **258webco.com**, the
-> **Email** menu only lists DMARC and Security. Zone-level Email Routing is configured
-> under **DNS**: go to **DNS** → **Records**, then click the **Email Routing** sub-tab at the top.
+> **Where Email Routing lives:** Cloudflare's docs (checked 2026-10-14) put it under
+> **Compute → Email Service → Email Routing**. Pick the domain, then use the **Routing Rules** and
+> **Destination Addresses** tabs. Menus move, so if you do not see it, search the dashboard for
+> "Email Routing". An older layout put it under the domain's **DNS → Records → Email Routing**
+> sub-tab; the steps are the same. Not yet confirmed against this account's dashboard.
 
-1. Account level → **Email** → **Email Routing** → **Destination addresses** → add
-   `ryanleejwebdev@gmail.com`. Open Gmail and click Cloudflare's verification link.
-   Nothing works until you click it.
-2. In the left sidebar under **258webco.com**, click **DNS** → **Records**, then click
-   the **Email Routing** sub-tab at the top.
+1. **Destination Addresses** → add `ryanleejwebdev@gmail.com`. Open Gmail and click Cloudflare's
+   verification link. Rules stay off until you do.
+2. Open **Routing Rules** for **258webco.com**.
 3. Enable Email Routing and accept the DNS records it offers. This replaces the old Outlook MX record.
-4. Add a route: `ryan@258webco.com` → your Gmail. Add a **catch-all** → your Gmail too,
+4. Add a rule: `ryan@258webco.com` → your Gmail. Add a **catch-all** → your Gmail too,
    so nothing else bounces.
 5. Send a message to `ryan@258webco.com` from another account and confirm it arrives.
 
@@ -298,7 +298,8 @@ A push to `main` runs the checks only. It never deploys.
 3. Tick **Authorize production release**.
 4. Tick **Accept enquiries** to publish with the contact form on. The workflow switches
    the form and the endpoint on together, checks they agree, and fails if they do not.
-   Leave it unticked to publish with the form off.
+   Leave it ticked: an indexable release with the form off is refused by the build, because
+   visitors would see a disabled form and no other way to get in touch.
 
 **You should see:** all jobs green (including the final release identity check confirming `factory-release.json` matches the deployed site). Then do the live test enquiry from step 8.
 
