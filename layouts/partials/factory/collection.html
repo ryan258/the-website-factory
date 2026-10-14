@@ -1,0 +1,21 @@
+{{ $v := .variant }}{{ $d := .data }}{{ $ctx := . }}
+<div class="fm-collection">
+{{ if eq $v "table" }}
+<div class="table-scroll" tabindex="0" role="region" aria-label="{{ $d.title }}">
+<table><caption>{{ $d.title }}</caption><thead><tr><th scope="col">Item</th><th scope="col">Details</th><th scope="col">Description</th>{{ if eq .module "downloads" }}<th scope="col">Resource</th>{{ end }}</tr></thead><tbody>
+{{ range $d.items }}<tr><th scope="row">{{ .title }}</th><td>{{ .value }}</td><td>{{ .text }}</td>{{ if eq $ctx.module "downloads" }}<td>{{ partial "factory/collection-link.html" (dict "item" . "context" $ctx) }}</td>{{ end }}</tr>{{ end }}
+</tbody></table></div>
+{{ else if eq $v "definitions" }}
+<dl class="fm-collection-definitions">{{ range $d.items }}<div><dt>{{ .title }}</dt><dd>{{ with .value }}<strong>{{ . }}</strong>{{ end }}<p>{{ .text }}</p>{{ partial "factory/collection-link.html" (dict "item" . "context" $ctx) }}</dd></div>{{ end }}</dl>
+{{ else if eq $v "disclosures" }}
+<div class="fm-faq">{{ range $d.items }}<details><summary>{{ .title }}</summary><p>{{ .text }}</p>{{ partial "factory/collection-link.html" (dict "item" . "context" $ctx) }}</details>{{ end }}</div>
+{{ else }}
+{{ $ordered := in (slice "steps" "timeline") $v }}{{ $list := or $ordered (eq $v "checklist") }}
+{{ if $ordered }}<ol class="fm-collection-items fm-collection--{{ $v }}">{{ else if $list }}<ul class="fm-collection-items fm-collection--{{ $v }}">{{ else }}<div class="fm-collection-items fm-collection--{{ $v }}">{{ end }}
+{{ range $i, $item := $d.items }}{{ if $list }}<li class="fm-collection-item">{{ else }}<article class="fm-collection-item">{{ end }}
+{{ if $ordered }}<span class="fm-index" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span>{{ end }}
+<div><h3>{{ .title }}</h3>{{ with .when }}<p class="fm-collection-meta">{{ . }}</p>{{ end }}{{ with .value }}<p class="fm-collection-meta">{{ . }}</p>{{ end }}<p>{{ .text }}</p>{{ partial "factory/collection-link.html" (dict "item" . "context" $ctx) }}</div>
+{{ if $list }}</li>{{ else }}</article>{{ end }}{{ end }}
+{{ if $ordered }}</ol>{{ else if $list }}</ul>{{ else }}</div>{{ end }}
+{{ end }}
+</div>

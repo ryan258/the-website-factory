@@ -18,12 +18,16 @@
 <div class="fm-heading"><p class="eyebrow">{{ $d.label }}</p><h2>{{ $d.title }}</h2>{{ with $d.intro }}<p>{{ . }}</p>{{ end }}</div>
 {{ if in (slice "fit" "inclusions" "preparation" "hours" "visit" "menu" "events" "policies" "glossary" "support") $m }}
 {{ partial "factory/practical.html" . }}
+{{ else if in (slice "announcements" "booking" "delivery" "access" "eligibility" "downloads" "specifications" "updates") $m }}
+{{ partial "factory/collection.html" . }}
 {{ else if eq $m "project-brief" }}
 {{ partial "factory/project-brief.html" . }}
+{{ else if or (and (eq $m "pricing") (eq $v "table")) (and (eq $m "resources") (eq $v "directory")) (and (eq $m "testimonials") (eq $v "list")) }}
+{{ partial "factory/alternatives.html" . }}
 {{ else if eq $m "about" }}
 <div class="fm-about"><p class="fm-body">{{ $d.body }}</p><aside><span aria-hidden="true">↗</span><p>{{ $d.aside }}</p></aside></div>
 {{ else if eq $m "faq" }}
-<div class="fm-faq">{{ range $d.items }}{{ if eq $v "accordion" }}<details><summary>{{ .title }}</summary><p>{{ .text }}</p></details>{{ else }}<article><h3>{{ .title }}</h3><p>{{ .text }}</p></article>{{ end }}{{ end }}</div>
+<div class="fm-faq{{ if eq $v "columns" }} fm-faq-columns{{ end }}">{{ range $d.items }}{{ if eq $v "accordion" }}<details><summary>{{ .title }}</summary><p>{{ .text }}</p></details>{{ else }}<article><h3>{{ .title }}</h3><p>{{ .text }}</p></article>{{ end }}{{ end }}</div>
 {{ else if and (eq $m "comparison") (eq $v "table") }}
 <div class="table-scroll" tabindex="0" role="region" aria-label="Compare example scopes"><table><caption>Illustrative engagement options</caption><thead><tr><th scope="col">Option</th><th scope="col">Scope</th><th scope="col">Best suited to</th></tr></thead><tbody>{{ range $d.items }}<tr><th scope="row">{{ .title }}</th><td>{{ .scope }}</td><td>{{ .best }}</td></tr>{{ end }}</tbody></table></div>
 {{ else if and (eq $m "features") (eq $v "split") }}
@@ -35,9 +39,9 @@
 {{ else if eq $m "bento" }}
 <div class="fm-bento fm-bento--{{ $v }}">{{ range $item := $d.items }}<article class="fm-card fm-bento-card{{ with .span }} fm-bento--{{ . }}{{ end }}">{{ with .badge }}<span class="fm-badge">{{ . }}</span>{{ end }}<h3>{{ .title }}</h3><p>{{ .text }}</p></article>{{ end }}</div>
 {{ else }}
-{{ if eq $m "process" }}<ol class="fm-grid fm-list">{{ else if eq $m "timeline" }}<ol class="fm-grid fm-list fm-timeline-cards">{{ else }}<div class="fm-grid">{{ end }}
+{{ if and (eq $m "areas") (eq $v "list") }}<ul class="fm-grid fm-list">{{ else if eq $m "process" }}<ol class="fm-grid fm-list">{{ else if eq $m "timeline" }}<ol class="fm-grid fm-list fm-timeline-cards">{{ else }}<div class="fm-grid">{{ end }}
 {{ range $i, $item := $d.items }}
-{{ if or (eq $m "process") (eq $m "timeline") }}<li class="fm-card">{{ else }}<article class="fm-card{{ with $item.badge }} fm-card--featured{{ end }}">{{ end }}
+{{ if or (eq $m "process") (eq $m "timeline") (and (eq $m "areas") (eq $v "list")) }}<li class="fm-card">{{ else }}<article class="fm-card{{ with $item.badge }} fm-card--featured{{ end }}">{{ end }}
 {{ if eq $m "work" }}{{ with .image }}{{ $img := resources.Get . }}{{ if not $img }}{{ errorf "Missing module image: %s" . }}{{ else }}{{ $small := $img.Resize "560x webp q80" }}{{ $large := $img.Resize "1120x webp q80" }}<img src="{{ $small.RelPermalink }}" srcset="{{ $small.RelPermalink }} 560w, {{ $large.RelPermalink }} 1120w" sizes="(min-width: 900px) 540px, 100vw" width="{{ $small.Width }}" height="{{ $small.Height }}" alt="{{ $item.imageAlt | default (printf "Illustrative sample image for %s" $item.title) }}" loading="lazy" decoding="async">{{ end }}{{ end }}{{ end }}
 {{ if eq $m "team" }}<div class="fm-avatar" aria-hidden="true">{{ .initials }}</div>{{ end }}
 {{ if in (slice "services" "process" "resources" "features" "timeline") $m }}<span class="fm-index" aria-hidden="true">{{ with .phase }}{{ . }}{{ else }}{{ printf "%02d" (add $i 1) }}{{ end }}</span>{{ end }}
@@ -47,9 +51,9 @@
 {{ with .bullets }}<ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
 {{/* Workshop samples can point at pages the selected preset does not build; those stay unlinked. Presets themselves are link-checked by scripts/factory.py. */}}
 {{ with .url }}{{ if and (not (hasPrefix . "mailto:")) (not (hasPrefix . "tel:")) (or (hasPrefix . "https://") (and $.preview (index $.targets .)) (site.GetPage (urls.Parse .).Path)) }}<a class="text-link" href="{{ if and $.preview (index $.targets .) }}{{ index $.targets . }}{{ else }}{{ partial "url.html" . }}{{ end }}">{{ if eq $m "work" }}View {{ $item.title }}{{ else }}Explore {{ $item.title }}{{ end }} <span aria-hidden="true">↗</span></a>{{ end }}{{ end }}{{ end }}
-{{ if or (eq $m "process") (eq $m "timeline") }}</li>{{ else }}</article>{{ end }}
+{{ if or (eq $m "process") (eq $m "timeline") (and (eq $m "areas") (eq $v "list")) }}</li>{{ else }}</article>{{ end }}
 {{ end }}
-{{ if or (eq $m "process") (eq $m "timeline") }}</ol>{{ else }}</div>{{ end }}
+{{ if and (eq $m "areas") (eq $v "list") }}</ul>{{ else if or (eq $m "process") (eq $m "timeline") }}</ol>{{ else }}</div>{{ end }}
 {{ end }}
 {{ with $d.notice }}<p class="fm-notice">{{ . }}</p>{{ end }}
 {{ end }}

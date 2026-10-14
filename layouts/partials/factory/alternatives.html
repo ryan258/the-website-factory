@@ -1,0 +1,10 @@
+{{ $d := .data }}{{ $ctx := . }}
+{{ if eq .module "pricing" }}
+<div class="table-scroll" tabindex="0" role="region" aria-label="{{ $d.title }}"><table><caption>{{ $d.title }}</caption><thead><tr><th scope="col">Option</th><th scope="col">Price or scope</th><th scope="col">Includes</th></tr></thead><tbody>
+{{ range $d.items }}<tr><th scope="row">{{ .title }}{{ with .badge }}<p>{{ . }}</p>{{ end }}</th><td>{{ with .value }}<strong>{{ . }}</strong>{{ end }}<p>{{ .text }}</p></td><td>{{ with .bullets }}<ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}{{ with .scope }}<p>{{ . }}</p>{{ end }}{{ with .best }}<p>For: {{ . }}</p>{{ end }}{{ partial "factory/collection-link.html" (dict "item" . "context" $ctx) }}</td></tr>{{ end }}
+</tbody></table></div>
+{{ else if eq .module "resources" }}
+<dl class="fm-directory">{{ range $d.items }}<div><dt>{{ .title }}</dt><dd><p>{{ .text }}</p>{{ with .value }}<p>{{ . }}</p>{{ end }}{{ with .bullets }}<ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}{{ partial "factory/collection-link.html" (dict "item" . "context" $ctx) }}</dd></div>{{ end }}</dl>
+{{ else }}
+<div class="fm-quote-list">{{ range $d.items }}<figure><blockquote><p>{{ .text }}</p></blockquote><figcaption>{{ .title }}</figcaption></figure>{{ end }}</div>
+{{ end }}
