@@ -352,3 +352,53 @@ $preview-pale: #e3eee0;
 // Style guide links in the catalog header and index (formerly inline styles; see CSP).
 .kit-facts a.kit-facts__guide { color: inherit; text-decoration: underline; }
 .kit-index a.kit-index__guide { border-color: var(--accent); font-weight: 600; }
+
+// Native radio controls keep layout comparison available without JavaScript.
+.kit-view {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--line);
+}
+
+.kit-view legend {
+  padding-inline: 8px;
+  font-weight: 650;
+}
+
+.kit-view label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 8px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.kit-view input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--ink);
+}
+
+.kit-view p {
+  font-size: .85rem;
+  margin-top: 8px;
+}
+
+.kit-variants {
+  display: grid;
+  gap: 32px;
+}
+
+.kit-variants > .kit-variant {
+  min-width: 0;
+  margin: 0;
+}
+
+@media (min-width: 1200px) {
+  .kit-module__body:has(.kit-view--compare:checked) .kit-variants {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
