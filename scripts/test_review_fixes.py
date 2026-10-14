@@ -112,6 +112,16 @@ class ReviewFixTests(unittest.TestCase):
             self.assertIn('unapproved', result.stdout)
             self.assertFalse((root / 'public').exists())
 
+    def test_indexable_inquiry_build_refuses_a_disabled_form(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = new_site.create(Path(temporary) / 'client', 'Release Co', 'consultant')
+            result = subprocess.run([sys.executable, str(root / 'scripts/build.py'), '--json'],
+                                    env={**os.environ, 'HUGO_PARAMS_NOINDEX': 'false', 'HUGO_PARAMS_FORMENABLED': 'false'},
+                                    capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('contact form is off', result.stdout)
+            self.assertFalse((root / 'public').exists())
+
     def test_creator_contract_does_not_inject_services_or_contact(self):
         registry = json.loads((ROOT / 'data/modules.json').read_text())
         plan = dict(name='Creator', site_type='creator', contact_mode='off', pages=[

@@ -79,7 +79,7 @@ def validate_preset(preset, slug='candidate'):
     if any(': expected ' in problem for problem in shape):
         return report.result(shape)
     rules = factory.validate(ROOT, extra_presets={slug: preset})
-    return report.result(shape + [e for e in rules if e.startswith(f'{slug}')])
+    return report.result(shape + [e for e in rules if e.startswith((f'{slug}:', f'{slug}/'))])
 
 def check_claims(slug=None, preset=None):
     data = preset if preset is not None else preset_file(slug or json.loads((ROOT / 'data/factory.json').read_text())['preset'])

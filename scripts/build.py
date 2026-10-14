@@ -184,6 +184,8 @@ def main():
                 problems.append('Content review is missing or stale. Review changed fields with ./wf status; the owner records review with ./wf approve --by NAME.')
             if effective['workshop']:
                 problems.append('The internal workshop cannot be an indexable release.')
+            if effective['contact_mode'] == 'inquiry' and not effective['form_enabled']:
+                problems.append('The contact form is off, so a public release would show visitors a disabled form and no other way to get in touch. Turn the form on (owner-authorized), or choose contact_mode "email" or "link".')
             if (effective['contact_mode'] == 'inquiry' and effective['form_enabled']
                     and not effective['form_action'] and effective['intake_enabled'] != 'true'):
                 problems.append('The built-in form is on but wrangler.toml does not enable intake. Keep the form off or configure the owner-authorized deployment consistently.')

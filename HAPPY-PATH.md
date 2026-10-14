@@ -22,7 +22,7 @@ owner-only step (step 5).
 2. **Push to `main`.** The **Verify Quality Gates** job must pass.
 3. **Deploy** — in GitHub, open **Actions → CI Quality Gates & Pages Deployment → Run workflow**:
    - Tick **Authorize production release**.
-   - Tick **Accept enquiries** to switch the contact form on. This turns on both the form and the endpoint together. Leave it unticked to publish with the form switched off.
+   - Tick **Accept enquiries** to switch the contact form on. This turns on both the form and the endpoint together. An indexable release with the form off is refused by the build, because visitors would see a disabled form and no other way to get in touch.
 4. **Check the live site** — `python3 scripts/smoke.py https://258webco.com --form on`. It only reads (it never sends the form) and fails loudly if what is live is not the release you just built.
 5. **Attach the domain** (first release only) ([guide step 9](docs/cloudflare-setup.md#step-9--put-your-real-domain-on-it)).
 6. **Send a real test enquiry** and confirm it is stored:

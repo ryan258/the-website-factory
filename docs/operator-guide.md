@@ -91,10 +91,11 @@ the review and all inherited claim approvals.
 
 An indexable build requires current content review, no open detected claims and no
 unresolved placeholders. It also requires a real domain and a valid visitor path
-for inquiry mode. The internal workshop cannot become an indexable release.
-When the built-in form is rendered on, the deployment file must also enable
-intake; an external form destination uses its separate owner-configured path.
-Release authorization remains separate from content review.
+for inquiry mode (an indexable release with the form off is refused in inquiry mode,
+because visitors would see a disabled form and no contact path). The internal
+workshop cannot become an indexable release. When the built-in form is rendered on,
+the deployment file must also enable intake; an external form destination uses its
+separate owner-configured path. Release authorization remains separate from content review.
 
 `.factory-receipt.json` binds source hashes, settings, tool pins and output hashes.
 `factory-release.json` exposes only a version and opaque release ID. Cloudflare
