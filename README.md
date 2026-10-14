@@ -1,7 +1,7 @@
 # The Website Factory
 
 Start with [the operator guide](docs/operator-guide.md). The October review changes
-are implemented locally and have passed review verification (all 21 default gates clean); the detailed status is
+are committed (pushed to `main` on 2026-10-03; the live site has not been redeployed since) and passed review verification (all 21 default gates clean); the detailed status is
 in [the remediation record](docs/remediation-2026-10-03.md).
 
 ```sh
@@ -55,7 +55,7 @@ The construction preset adapts reusable page patterns from the sibling `jones-co
 
 **Internal planning:** run `python3 scripts/build.py --workshop --serve --port 1314` and open `/site-kit/`. Choose **Start with a complete site** to load a preset's pages, sections, and draft copy directly into the editor; remove anything the site does not need before filling in client details. The default is the compact local-service composition. Choose **Start with a blank plan** only when no existing starter fits. Starters carry complete versioned section structures, stable anchors, item fields, secondary actions, and theme choices; dedicated input controls preserve structured items from being overwritten by paragraph proposals. Plans can still be reviewed and compiled into presets via `python3 scripts/from_plan.py`. The reference catalog at `/site-kit/catalog/` compares the agency, contractor, construction, consultant, local-service, clinic, restaurant, and non-profit compositions. Open a catalog row and choose **Full width** or **Compare layouts** to inspect its live variants, or visit `/site-kit/style-guide/` for design tokens and UI component specimens. All examples are labeled as fictional. Delivery and publication require real business information and a separate owner decision.
 
-See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical, paid uses: monthly care plans, local-business builds, rescue work, and AI-assisted production. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction, milestone status, and planned evolution.
+See [the factory guide](docs/factory-guide.md) for composition editing, module contracts, and the client handover workflow. See [101 ways to use this](docs/101-ways-to-use-this-for-fun-and-profit.md) for practical, paid uses: monthly care plans, local-business builds, rescue work, and AI-assisted production. See [current acceptance](docs/acceptance.md) for measured verification and its limits. See [the roadmap](roadmap.md) for strategic direction and planned evolution, and [CHANGELOGS.md](CHANGELOGS.md) for completed milestone history.
 
 ## The kitchen-sink master
 
@@ -142,6 +142,8 @@ Client copies must start without inherited approvals, historical performance gua
 | Enquiry reader tests (stand-in wrangler, no account) | `scripts/test_enquiries.py` |
 | Accent tone colors (mirrored by Sass `$tones`) | `data/tones.json` |
 | Cloudflare setup and deployment runbook | `docs/cloudflare-setup.md` |
+| Agency process: client's own Cloudflare account, domain, email, handover outline | `docs/guide-to-hosting-on-cloudflare-on-the-cheap.md` |
+| Moving a client's domain from GoDaddy to Cloudflare | `docs/migrating-domains-from-godaddy-to-cloudflare.md` |
 | Contact form Pages Function endpoint | `functions/api/contact.js` |
 | Internal inventory and dotfile protection middleware | `functions/_middleware.js` |
 | Expanded workshop, keyboard, and no-JavaScript checks | `scripts/check_workshop.cjs` |
@@ -152,7 +154,8 @@ Client copies must start without inherited approvals, historical performance gua
 | Practical component library guide | `docs/component-library.md` |
 | October review remediation and verification record | `docs/remediation-2026-10-03.md` |
 | Acceptance evidence, current and historical | `docs/acceptance.md` |
-| Strategic direction, milestone status, and planned evolution | `roadmap.md` |
+| Strategic direction and planned evolution | `roadmap.md` |
+| Historical milestones and changelog | `CHANGELOGS.md` |
 | JSON Schemas for presets and AI plans (generated) | `schemas/`, `scripts/schemas.py` |
 | Claims to confirm (prices, counts, ratings, absolutes) | `scripts/claims.py` |
 | Shared scaffold core and provenance receipt | `scripts/scaffold_core.py` |

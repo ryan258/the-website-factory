@@ -4,7 +4,7 @@ Implementation now addresses the sixteen correction findings and adds a bounded
 set of creator workflow improvements. The owner's local verification run
 `20261003T230404161102Z` passed all 21 default review commands, including both
 builds and the two planner browser suites. The agent inspected the saved results
-without rerunning tests or builds. Changes remain uncommitted. No paid model call,
+without rerunning tests or builds. The changes were committed and pushed on 2026-10-03; the live site has not been redeployed since. No paid model call,
 live integration or deployment was performed by the remediation work.
 
 The original [project review](project-review-2026-10-03.md) remains the evidence for
