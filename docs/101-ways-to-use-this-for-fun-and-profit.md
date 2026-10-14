@@ -21,8 +21,8 @@ Plays marked ★ are the strongest earners. They solve a problem that costs the 
 
 ### What the factory has today
 
-- **31 section types** (called modules) with **62 layouts** (called variants). Listed in `data/modules.json`.
-- **9 presets** (ready-made starting plans): `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, and `258webco`.
+- **39 section types** (called modules) with **117 layouts** (called variants, three per module). Listed in `data/modules.json`.
+- **12 presets** (ready-made starting plans): nine business compositions (`agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`) plus three creator starters (`creator-portfolio`, `creator-writer`, `creator-audio`).
 - **6 color palettes**, each checked for readable contrast: `studio`, `forest`, `harbor`, `terracotta`, `plum`, `earthworks`.
 - **5 font pairings**, all self-hosted and free to use: `modern`, `editorial`, `warm`, `friendly`, `readable`.
 - **AI tools:** Claude can draft a page plan from a written brief. An MCP server (a way for an AI assistant to call the factory's tools) is in `.mcp.json`.
@@ -98,45 +98,53 @@ content/<page>/_index.md   → the browser title and search description
 
 To add a section, add one entry to the page's `sections` list and one block under `sections`. To remove a section, delete its entry. Copy a correct starting block from `data/examples.json` in the master (client copies do not include that file).
 
-### The 31 modules
+### The 39 modules
 
 | Module | Layouts | Must have | Each item also needs |
 | --- | --- | --- | --- |
 | `hero` | `split`, `centered`, `compact` | title, intro, action | — |
-| `services` | `cards`, `rows` | title, items | — |
-| `work` | `gallery`, `editorial` | title, items | needs a `work` page |
-| `process` | `steps`, `rows` | title, items | — |
-| `about` | `split`, `editorial` | title, intro, body | — |
-| `team` | `cards`, `rows` | title, items | — |
-| `faq` | `accordion`, `open` | title, items | — |
-| `pricing` | `cards`, `rows` | title, items, notice | — |
-| `areas` | `cards`, `rows` | title, items, notice | — |
-| `testimonials` | `quotes`, `featured` | title, items, notice | — |
-| `stats` | `strip`, `cards` | title, items, notice | — |
-| `cta` | `band`, `quiet` | title, intro, action | — |
-| `contact` | `panel`, `compact` | title, intro, items, notice | — |
-| `resources` | `cards`, `rows` | title, items | — |
-| `comparison` | `table`, `cards` | title, items, notice | `scope`, `best` |
-| `before-after` | `panels`, `stacked` | title, items, notice | — |
-| `features` | `grid`, `split` | title, items | — |
-| `logos` | `grid`, `inline` | title, items, notice | — |
-| `timeline` | `vertical`, `cards` | title, items | — |
-| `bento` | `mosaic`, `compact` | title, items | — |
-| `fit` | `split`, `stacked` | title, intro, items, notice | `group`: `fit` or `alternative` |
-| `inclusions` | `columns`, `stacked` | title, intro, items, notice | `group`: `included` or `excluded` |
-| `preparation` | `checklist`, `ordered` | title, intro, items, notice | — |
-| `hours` | `table`, `list` | title, intro, items, notice | — |
-| `visit` | `details`, `cards` | title, intro, items, notice | — |
-| `menu` | `table`, `cards` | title, intro, items, notice | `value` (price or scope) |
-| `events` | `agenda`, `cards` | title, intro, items, notice | `when`, `place` |
-| `policies` | `accordion`, `open` | title, intro, items, notice | — |
-| `glossary` | `definitions`, `disclosures` | title, intro, items, notice | — |
-| `support` | `routes`, `steps` | title, intro, items, notice | `url`, `link_label` |
-| `project-brief` | `wizard` | title, intro, services, notice | — |
+| `services` | `cards`, `rows`, `spotlight` | title, items | — |
+| `work` | `gallery`, `editorial`, `tiles` | title, items | needs a `work` page |
+| `process` | `steps`, `rows`, `timeline` | title, items | — |
+| `about` | `split`, `editorial`, `centered` | title, intro, body | — |
+| `team` | `cards`, `rows`, `compact` | title, items | — |
+| `faq` | `accordion`, `open`, `columns` | title, items | — |
+| `pricing` | `cards`, `rows`, `table` | title, items, notice | — |
+| `areas` | `cards`, `rows`, `list` | title, items, notice | — |
+| `testimonials` | `quotes`, `featured`, `list` | title, items, notice | — |
+| `stats` | `strip`, `cards`, `rows` | title, items, notice | — |
+| `cta` | `band`, `quiet`, `centered` | title, intro, action | — |
+| `contact` | `panel`, `compact`, `rows` | title, intro, items, notice | — |
+| `resources` | `cards`, `rows`, `directory` | title, items | — |
+| `comparison` | `table`, `cards`, `rows` | title, items, notice | — |
+| `before-after` | `panels`, `stacked`, `narrative` | title, items, notice | — |
+| `features` | `grid`, `split`, `rows` | title, items | — |
+| `logos` | `grid`, `inline`, `list` | title, items, notice | — |
+| `timeline` | `vertical`, `cards`, `rows` | title, items | — |
+| `bento` | `mosaic`, `compact`, `rows` | title, items | — |
+| `fit` | `split`, `stacked`, `disclosures` | title, intro, items, notice | `group`: `fit` or `alternative` |
+| `inclusions` | `columns`, `stacked`, `disclosures` | title, intro, items, notice | `group`: `included` or `excluded` |
+| `preparation` | `checklist`, `ordered`, `cards` | title, intro, items, notice | — |
+| `hours` | `table`, `list`, `cards` | title, intro, items, notice | — |
+| `visit` | `details`, `cards`, `rows` | title, intro, items, notice | — |
+| `menu` | `table`, `cards`, `list` | title, intro, items, notice | `value` (price or scope) |
+| `events` | `agenda`, `cards`, `rows` | title, intro, items, notice | `when`, `place` |
+| `policies` | `accordion`, `open`, `cards` | title, intro, items, notice | — |
+| `glossary` | `definitions`, `disclosures`, `cards` | title, intro, items, notice | — |
+| `support` | `routes`, `steps`, `rows` | title, intro, items, notice | `url`, `link_label` |
+| `project-brief` | `wizard`, `sidebar`, `compact` | title, intro, services, notice | — |
+| `announcements` | `cards`, `rows`, `spotlight` | title, intro, items, notice | — |
+| `booking` | `steps`, `cards`, `rows` | title, intro, items, notice | — |
+| `delivery` | `cards`, `definitions`, `table` | title, intro, items, notice | `value` (delivery term or condition) |
+| `access` | `cards`, `definitions`, `disclosures` | title, intro, items, notice | — |
+| `eligibility` | `cards`, `checklist`, `disclosures` | title, intro, items, notice | — |
+| `downloads` | `cards`, `rows`, `table` | title, intro, items, notice | `url`, `link_label`, `value` (format) |
+| `specifications` | `definitions`, `table`, `cards` | title, intro, items, notice | `value` (spec value / unit) |
+| `updates` | `timeline`, `cards`, `rows` | title, intro, items, notice | `when` (date label) |
 
 Every item needs a `title` and `text`. The `hero` and `work` modules can show local images with descriptive alternative text. The project brief stays in the current browser tab and only copies, downloads, or opens an email draft after an explicit visitor choice.
 
-### The 9 presets
+### The 12 presets
 
 | Preset | Pages | Home page stack |
 | --- | --- | --- |
@@ -149,6 +157,9 @@ Every item needs a `title` and `text`. The `hero` and `work` modules can show lo
 | `restaurant` | home, services, about, contact | `hero/split` → `services/cards` → `menu/cards` → `hours/table` → `cta/band` |
 | `nonprofit` | home, services, about, contact | `hero/split` → `services/cards` → `support/routes` → `timeline/vertical` → `cta/band` |
 | `258webco` | home, services, contact, privacy | `hero/split` → `stats/strip` → `services/cards` → `process/steps` → `cta/band` |
+| `creator-portfolio` | home | `hero/centered` → `resources/cards` → `about/editorial` |
+| `creator-writer` | home | `hero/centered` → `resources/cards` → `about/editorial` |
+| `creator-audio` | home | `hero/centered` → `resources/cards` → `about/editorial` |
 
 ### Rules the checks enforce
 

@@ -3,7 +3,23 @@
 One file for all acceptance evidence. **Current** is what is true today. **History** keeps
 earlier records unchanged, for reference; their numbers are not current results.
 
-## Current — 2026-10-03 review verification passed
+## Current — 2026-10-14 component expansion & three layouts per family verified
+
+The 39 component families (all 117 layouts, three per family) were verified across the suite:
+
+| Check | Result |
+| --- | --- |
+| Component library regression (`node scripts/check_components.cjs`) | Pass: 39 families / 117 layouts, both arrangements (`Full width` and `Compare layouts`) and themes (`light`/`dark`), three widths (320, 900, 1440), unique instance IDs, three independent brief forms, no-JS keyboard controls, saved planner layouts |
+| 117-layout compilation & preservation (`python3 scripts/test_three_layouts.py`) | Pass: all 39 families have three distinct compilable layouts preserving example content |
+| Component expansion & item contracts (`python3 scripts/test_component_expansion.py`) | Pass: all 24 added layouts compile and preserve content; structured item field requirements enforced |
+| Generated schema consistency (`python3 scripts/test_schemas.py`) | Pass: 20 tests; schemas are up to date and valid |
+| Contrast & library checks (`python3 scripts/test_library.py`) | Pass: 11 tests; site theme and 6 palettes reach 4.5:1 in light and dark mode |
+| MCP tool interfaces (`python3 scripts/test_mcp.py`) | Pass: 8 tests |
+| Factory core tests (`python3 scripts/test_factory.py`) | Pass: 21 tests |
+
+Evidence is recorded in `reports/component-expansion.json`. No Git submodules exist in this repository (`git submodule status` is clean, no `.gitmodules`).
+
+## History — 2026-10-03 review verification passed
 
 The owner ran the following command locally. Run `20261003T230404161102Z`
 completed all 21 commands with exit code 0; the agent inspected the saved results
