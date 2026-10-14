@@ -19,7 +19,8 @@
     "purpose": "Explain the work and who it helps.",
     "variants": [
       "cards",
-      "rows"
+      "rows",
+      "spotlight"
     ],
     "required": [
       "title",
@@ -32,7 +33,8 @@
     "purpose": "Show approved project imagery and context.",
     "variants": [
       "gallery",
-      "editorial"
+      "editorial",
+      "tiles"
     ],
     "required": [
       "title",
@@ -47,7 +49,8 @@
     "purpose": "Make the next steps easy to understand.",
     "variants": [
       "steps",
-      "rows"
+      "rows",
+      "timeline"
     ],
     "required": [
       "title",
@@ -60,7 +63,8 @@
     "purpose": "Introduce the business in its own words.",
     "variants": [
       "split",
-      "editorial"
+      "editorial",
+      "centered"
     ],
     "required": [
       "title",
@@ -74,7 +78,8 @@
     "purpose": "Show the accountable people behind the work.",
     "variants": [
       "cards",
-      "rows"
+      "rows",
+      "compact"
     ],
     "required": [
       "title",
@@ -87,7 +92,8 @@
     "purpose": "Answer real questions before the first conversation.",
     "variants": [
       "accordion",
-      "open"
+      "open",
+      "columns"
     ],
     "required": [
       "title",
@@ -100,7 +106,8 @@
     "purpose": "Explain what an engagement includes.",
     "variants": [
       "cards",
-      "rows"
+      "rows",
+      "table"
     ],
     "required": [
       "title",
@@ -114,7 +121,8 @@
     "purpose": "State confirmed coverage and travel boundaries.",
     "variants": [
       "cards",
-      "rows"
+      "rows",
+      "list"
     ],
     "required": [
       "title",
@@ -128,7 +136,8 @@
     "purpose": "Use attributed feedback only with permission.",
     "variants": [
       "quotes",
-      "featured"
+      "featured",
+      "list"
     ],
     "required": [
       "title",
@@ -142,7 +151,8 @@
     "purpose": "Give context for evidence-backed numbers.",
     "variants": [
       "strip",
-      "cards"
+      "cards",
+      "rows"
     ],
     "required": [
       "title",
@@ -156,7 +166,8 @@
     "purpose": "Offer one clear action at the right moment.",
     "variants": [
       "band",
-      "quiet"
+      "quiet",
+      "centered"
     ],
     "required": [
       "title",
@@ -170,7 +181,8 @@
     "purpose": "Explain contact options and delivery state.",
     "variants": [
       "panel",
-      "compact"
+      "compact",
+      "rows"
     ],
     "required": [
       "title",
@@ -185,7 +197,8 @@
     "purpose": "Help visitors prepare and make decisions.",
     "variants": [
       "cards",
-      "rows"
+      "rows",
+      "directory"
     ],
     "required": [
       "title",
@@ -198,7 +211,8 @@
     "purpose": "Make scope differences easy to scan.",
     "variants": [
       "table",
-      "cards"
+      "cards",
+      "rows"
     ],
     "required": [
       "title",
@@ -212,7 +226,8 @@
     "purpose": "Explain a transformation with visible context.",
     "variants": [
       "panels",
-      "stacked"
+      "stacked",
+      "narrative"
     ],
     "required": [
       "title",
@@ -226,7 +241,8 @@
     "purpose": "Highlight key capabilities and tangible visitor benefits.",
     "variants": [
       "grid",
-      "split"
+      "split",
+      "rows"
     ],
     "required": [
       "title",
@@ -239,7 +255,8 @@
     "purpose": "Display partner marks, accreditations, or press mentions.",
     "variants": [
       "grid",
-      "inline"
+      "inline",
+      "list"
     ],
     "required": [
       "title",
@@ -253,7 +270,8 @@
     "purpose": "Show progressive phases, project milestones, or history.",
     "variants": [
       "vertical",
-      "cards"
+      "cards",
+      "rows"
     ],
     "required": [
       "title",
@@ -266,7 +284,8 @@
     "purpose": "Group proof points, key metrics, and features in a visual cluster.",
     "variants": [
       "mosaic",
-      "compact"
+      "compact",
+      "rows"
     ],
     "required": [
       "title",
@@ -280,7 +299,8 @@
     "purpose": "Help visitors recognize whether the service matches their needs.",
     "variants": [
       "split",
-      "stacked"
+      "stacked",
+      "disclosures"
     ],
     "required": [
       "title",
@@ -307,7 +327,8 @@
     "purpose": "Prevent surprises by separating included work from separately agreed work.",
     "variants": [
       "columns",
-      "stacked"
+      "stacked",
+      "disclosures"
     ],
     "required": [
       "title",
@@ -334,7 +355,8 @@
     "purpose": "Help a visitor arrive prepared for a conversation or appointment.",
     "variants": [
       "checklist",
-      "ordered"
+      "ordered",
+      "cards"
     ],
     "required": [
       "title",
@@ -352,7 +374,8 @@
     "purpose": "Show the regular schedule and explain exceptions.",
     "variants": [
       "table",
-      "list"
+      "list",
+      "cards"
     ],
     "required": [
       "title",
@@ -370,7 +393,8 @@
     "purpose": "Answer practical arrival and access questions before someone travels.",
     "variants": [
       "details",
-      "cards"
+      "cards",
+      "rows"
     ],
     "required": [
       "title",
@@ -388,7 +412,8 @@
     "purpose": "Let visitors compare specific items and clearly stated prices or scope.",
     "variants": [
       "table",
-      "cards"
+      "cards",
+      "list"
     ],
     "required": [
       "title",
@@ -409,7 +434,8 @@
     "purpose": "Explain what is happening, when, where, and how to participate.",
     "variants": [
       "agenda",
-      "cards"
+      "cards",
+      "rows"
     ],
     "required": [
       "title",
@@ -431,7 +457,8 @@
     "purpose": "Make important service conditions easy to find before a commitment.",
     "variants": [
       "accordion",
-      "open"
+      "open",
+      "cards"
     ],
     "required": [
       "title",
@@ -449,7 +476,8 @@
     "purpose": "Explain unfamiliar words where visitors need them.",
     "variants": [
       "definitions",
-      "disclosures"
+      "disclosures",
+      "cards"
     ],
     "required": [
       "title",
@@ -467,7 +495,8 @@
     "purpose": "Route existing customers to the right help without forcing one contact method.",
     "variants": [
       "routes",
-      "steps"
+      "steps",
+      "rows"
     ],
     "required": [
       "title",
@@ -488,7 +517,9 @@
     "category": "Offers and contact",
     "purpose": "Help visitors organize project details locally and choose an explicit handoff.",
     "variants": [
-      "wizard"
+      "wizard",
+      "sidebar",
+      "compact"
     ],
     "required": [
       "title",
@@ -499,5 +530,171 @@
     "dependencies": [],
     "copy_guidance": "Ask only for details useful to an initial conversation. Explain whether answers stay local and what happens after each handoff.",
     "a11y_guidance": "Use labelled fields, visible progress, keyboard-operable steps, validation, and a clear completion state. Keep a no-JavaScript explanation."
+  },
+  "announcements": {
+    "name": "Announcements",
+    "category": "Updates and notices",
+    "purpose": "Explain a temporary change and the next useful action.",
+    "variants": [
+      "cards",
+      "rows",
+      "spotlight"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Confirm the affected service, effective dates, and who updates or removes the notice.",
+    "a11y_guidance": "Use explicit headings and dates; static notices must not interrupt with live-region alerts."
+  },
+  "booking": {
+    "name": "Booking and next steps",
+    "category": "Taking action",
+    "purpose": "Explain how to request, confirm, and prepare for an appointment.",
+    "variants": [
+      "steps",
+      "cards",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "State the real booking route, what constitutes confirmation, and how to request another contact method.",
+    "a11y_guidance": "Use an ordered list for sequential steps; give links meaningful labels. Do not imply that a request is a confirmed booking."
+  },
+  "delivery": {
+    "name": "Delivery and collection",
+    "category": "Visiting and availability",
+    "purpose": "Explain fulfilment options and what to check before arranging them.",
+    "variants": [
+      "cards",
+      "definitions",
+      "table"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Confirm coverage, collection location, timing, charges, and any conditions. Do not imply live tracking.",
+    "a11y_guidance": "Keep each option and its conditions together in text; give tables row and column headings.",
+    "item_required": [
+      "value"
+    ]
+  },
+  "access": {
+    "name": "Access and accommodations",
+    "category": "Visiting and availability",
+    "purpose": "Give concrete access information and a route to ask for an accommodation.",
+    "variants": [
+      "cards",
+      "definitions",
+      "disclosures"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Confirm specific entrance, seating, sensory, communication, and assistance arrangements with the owner. Avoid blanket accessibility claims.",
+    "a11y_guidance": "Keep written access details available without a map or phone call; label each disclosure clearly."
+  },
+  "eligibility": {
+    "name": "Eligibility and requirements",
+    "category": "Decision support",
+    "purpose": "Explain participation requirements and how to ask about exceptions.",
+    "variants": [
+      "cards",
+      "checklist",
+      "disclosures"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Use owner-confirmed criteria and required documents. Explain alternatives and the review route without deciding eligibility for the visitor.",
+    "a11y_guidance": "State requirements in plain words and use a real list; do not rely on symbols or color."
+  },
+  "downloads": {
+    "name": "Documents and downloads",
+    "category": "Trust and support",
+    "purpose": "Make supporting documents easy to identify before opening them.",
+    "variants": [
+      "cards",
+      "rows",
+      "table"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Name the destination, file format, size when known, and accessible alternative. Link only to a real resource and keep versions current.",
+    "a11y_guidance": "Give descriptive link labels and format information; provide an HTML alternative when a document needs it.",
+    "item_required": [
+      "url",
+      "link_label",
+      "value"
+    ]
+  },
+  "specifications": {
+    "name": "Specifications and details",
+    "category": "Decision support",
+    "purpose": "Present concrete attributes with units and relevant limitations.",
+    "variants": [
+      "definitions",
+      "table",
+      "cards"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Use confirmed measurements, units, compatibility, and scope. Explain conditions and where the definitive specification is maintained.",
+    "a11y_guidance": "Pair attribute names with values; use semantic definitions or tables and spell out units.",
+    "item_required": [
+      "value"
+    ]
+  },
+  "updates": {
+    "name": "Updates and changelog",
+    "category": "Updates and notices",
+    "purpose": "Show dated changes with enough context to understand their effect.",
+    "variants": [
+      "timeline",
+      "cards",
+      "rows"
+    ],
+    "required": [
+      "title",
+      "intro",
+      "items",
+      "notice"
+    ],
+    "dependencies": [],
+    "copy_guidance": "Use actual dates and distinguish completed changes from plans. Identify who maintains the record.",
+    "a11y_guidance": "Keep dates as readable text and order the entries consistently; avoid conveying status through color alone.",
+    "item_required": [
+      "when"
+    ]
   }
 }

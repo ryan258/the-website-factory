@@ -77,7 +77,15 @@
                     "events",
                     "policies",
                     "glossary",
-                    "support"
+                    "support",
+                    "announcements",
+                    "booking",
+                    "delivery",
+                    "access",
+                    "eligibility",
+                    "downloads",
+                    "specifications",
+                    "updates"
                   ]
                 },
                 "variant": {

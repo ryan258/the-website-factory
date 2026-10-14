@@ -130,7 +130,15 @@
                       "policies",
                       "glossary",
                       "support",
-                      "project-brief"
+                      "project-brief",
+                      "announcements",
+                      "booking",
+                      "delivery",
+                      "access",
+                      "eligibility",
+                      "downloads",
+                      "specifications",
+                      "updates"
                     ]
                   },
                   "variant": {
@@ -180,7 +188,8 @@
                         "variant": {
                           "enum": [
                             "cards",
-                            "rows"
+                            "rows",
+                            "spotlight"
                           ]
                         }
                       }
@@ -199,7 +208,8 @@
                         "variant": {
                           "enum": [
                             "gallery",
-                            "editorial"
+                            "editorial",
+                            "tiles"
                           ]
                         }
                       }
@@ -218,7 +228,8 @@
                         "variant": {
                           "enum": [
                             "steps",
-                            "rows"
+                            "rows",
+                            "timeline"
                           ]
                         }
                       }
@@ -237,7 +248,8 @@
                         "variant": {
                           "enum": [
                             "split",
-                            "editorial"
+                            "editorial",
+                            "centered"
                           ]
                         }
                       }
@@ -256,7 +268,8 @@
                         "variant": {
                           "enum": [
                             "cards",
-                            "rows"
+                            "rows",
+                            "compact"
                           ]
                         }
                       }
@@ -275,7 +288,8 @@
                         "variant": {
                           "enum": [
                             "accordion",
-                            "open"
+                            "open",
+                            "columns"
                           ]
                         }
                       }
@@ -294,7 +308,8 @@
                         "variant": {
                           "enum": [
                             "cards",
-                            "rows"
+                            "rows",
+                            "table"
                           ]
                         }
                       }
@@ -313,7 +328,8 @@
                         "variant": {
                           "enum": [
                             "cards",
-                            "rows"
+                            "rows",
+                            "list"
                           ]
                         }
                       }
@@ -332,7 +348,8 @@
                         "variant": {
                           "enum": [
                             "quotes",
-                            "featured"
+                            "featured",
+                            "list"
                           ]
                         }
                       }
@@ -351,7 +368,8 @@
                         "variant": {
                           "enum": [
                             "strip",
-                            "cards"
+                            "cards",
+                            "rows"
                           ]
                         }
                       }
@@ -370,7 +388,8 @@
                         "variant": {
                           "enum": [
                             "band",
-                            "quiet"
+                            "quiet",
+                            "centered"
                           ]
                         }
                       }
@@ -389,7 +408,8 @@
                         "variant": {
                           "enum": [
                             "panel",
-                            "compact"
+                            "compact",
+                            "rows"
                           ]
                         }
                       }
@@ -408,7 +428,8 @@
                         "variant": {
                           "enum": [
                             "cards",
-                            "rows"
+                            "rows",
+                            "directory"
                           ]
                         }
                       }
@@ -427,7 +448,8 @@
                         "variant": {
                           "enum": [
                             "table",
-                            "cards"
+                            "cards",
+                            "rows"
                           ]
                         }
                       }
@@ -446,7 +468,8 @@
                         "variant": {
                           "enum": [
                             "panels",
-                            "stacked"
+                            "stacked",
+                            "narrative"
                           ]
                         }
                       }
@@ -465,7 +488,8 @@
                         "variant": {
                           "enum": [
                             "grid",
-                            "split"
+                            "split",
+                            "rows"
                           ]
                         }
                       }
@@ -484,7 +508,8 @@
                         "variant": {
                           "enum": [
                             "grid",
-                            "inline"
+                            "inline",
+                            "list"
                           ]
                         }
                       }
@@ -503,7 +528,8 @@
                         "variant": {
                           "enum": [
                             "vertical",
-                            "cards"
+                            "cards",
+                            "rows"
                           ]
                         }
                       }
@@ -522,7 +548,8 @@
                         "variant": {
                           "enum": [
                             "mosaic",
-                            "compact"
+                            "compact",
+                            "rows"
                           ]
                         }
                       }
@@ -541,7 +568,8 @@
                         "variant": {
                           "enum": [
                             "split",
-                            "stacked"
+                            "stacked",
+                            "disclosures"
                           ]
                         }
                       }
@@ -560,7 +588,8 @@
                         "variant": {
                           "enum": [
                             "columns",
-                            "stacked"
+                            "stacked",
+                            "disclosures"
                           ]
                         }
                       }
@@ -579,7 +608,8 @@
                         "variant": {
                           "enum": [
                             "checklist",
-                            "ordered"
+                            "ordered",
+                            "cards"
                           ]
                         }
                       }
@@ -598,7 +628,8 @@
                         "variant": {
                           "enum": [
                             "table",
-                            "list"
+                            "list",
+                            "cards"
                           ]
                         }
                       }
@@ -617,7 +648,8 @@
                         "variant": {
                           "enum": [
                             "details",
-                            "cards"
+                            "cards",
+                            "rows"
                           ]
                         }
                       }
@@ -636,7 +668,8 @@
                         "variant": {
                           "enum": [
                             "table",
-                            "cards"
+                            "cards",
+                            "list"
                           ]
                         }
                       }
@@ -655,7 +688,8 @@
                         "variant": {
                           "enum": [
                             "agenda",
-                            "cards"
+                            "cards",
+                            "rows"
                           ]
                         }
                       }
@@ -674,7 +708,8 @@
                         "variant": {
                           "enum": [
                             "accordion",
-                            "open"
+                            "open",
+                            "cards"
                           ]
                         }
                       }
@@ -693,7 +728,8 @@
                         "variant": {
                           "enum": [
                             "definitions",
-                            "disclosures"
+                            "disclosures",
+                            "cards"
                           ]
                         }
                       }
@@ -712,7 +748,8 @@
                         "variant": {
                           "enum": [
                             "routes",
-                            "steps"
+                            "steps",
+                            "rows"
                           ]
                         }
                       }
@@ -730,7 +767,169 @@
                       "properties": {
                         "variant": {
                           "enum": [
-                            "wizard"
+                            "wizard",
+                            "sidebar",
+                            "compact"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "announcements"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "cards",
+                            "rows",
+                            "spotlight"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "booking"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "steps",
+                            "cards",
+                            "rows"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "delivery"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "cards",
+                            "definitions",
+                            "table"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "access"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "cards",
+                            "definitions",
+                            "disclosures"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "eligibility"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "cards",
+                            "checklist",
+                            "disclosures"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "downloads"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "cards",
+                            "rows",
+                            "table"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "specifications"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "definitions",
+                            "table",
+                            "cards"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "module": {
+                          "const": "updates"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "variant": {
+                          "enum": [
+                            "timeline",
+                            "cards",
+                            "rows"
                           ]
                         }
                       }
@@ -2760,6 +2959,563 @@
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "content-announcements": {
+      "type": "object",
+      "description": "Announcements: Explain a temporary change and the next useful action.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "content-booking": {
+      "type": "object",
+      "description": "Booking and next steps: Explain how to request, confirm, and prepare for an appointment.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "content-delivery": {
+      "type": "object",
+      "description": "Delivery and collection: Explain fulfilment options and what to check before arranging them.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text",
+              "value"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              },
+              "value": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          }
+        }
+      }
+    },
+    "content-access": {
+      "type": "object",
+      "description": "Access and accommodations: Give concrete access information and a route to ask for an accommodation.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "content-eligibility": {
+      "type": "object",
+      "description": "Eligibility and requirements: Explain participation requirements and how to ask about exceptions.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "content-downloads": {
+      "type": "object",
+      "description": "Documents and downloads: Make supporting documents easy to identify before opening them.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text",
+              "url",
+              "link_label",
+              "value"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              },
+              "link_label": {
+                "$ref": "#/$defs/text"
+              },
+              "value": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          }
+        }
+      }
+    },
+    "content-specifications": {
+      "type": "object",
+      "description": "Specifications and details: Present concrete attributes with units and relevant limitations.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text",
+              "value"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              },
+              "value": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          }
+        }
+      }
+    },
+    "content-updates": {
+      "type": "object",
+      "description": "Updates and changelog: Show dated changes with enough context to understand their effect.",
+      "required": [
+        "title",
+        "intro",
+        "items",
+        "notice"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "intro": {
+          "$ref": "#/$defs/text"
+        },
+        "body": {
+          "$ref": "#/$defs/text"
+        },
+        "notice": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "aside": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        },
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "secondary": {
+          "$ref": "#/$defs/action"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text",
+              "when"
+            ],
+            "properties": {
+              "title": {
+                "$ref": "#/$defs/text"
+              },
+              "text": {
+                "$ref": "#/$defs/text"
+              },
+              "url": {
+                "$ref": "#/$defs/link"
+              },
+              "image": {
+                "type": "string"
+              },
+              "imageAlt": {
+                "type": "string"
+              },
+              "when": {
+                "$ref": "#/$defs/text"
+              }
+            }
           }
         }
       }

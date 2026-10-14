@@ -617,5 +617,188 @@
       "Utility work"
     ],
     "notice": "This browser-only draft is not a quote or booking. Do not include private information you do not want in an email."
+  },
+  "announcements": {
+    "label": "Updates and notices",
+    "title": "Announcements",
+    "intro": "Explain a temporary change and the next useful action.",
+    "items": [
+      {
+        "title": "Before you travel",
+        "text": "Check the visit information for any changes to arrival arrangements.",
+        "url": "/contact/",
+        "link_label": "Read the contact information"
+      },
+      {
+        "title": "Preparing a question",
+        "text": "Review the service information and note what you need clarified.",
+        "url": "/services/",
+        "link_label": "Review the services"
+      },
+      {
+        "title": "Example notice archive",
+        "text": "Keep dated changes easy to find and remove notices when they no longer apply."
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "booking": {
+    "label": "Taking action",
+    "title": "Booking and next steps",
+    "intro": "Explain how to request, confirm, and prepare for an appointment.",
+    "items": [
+      {
+        "title": "Review the service",
+        "text": "Choose the service you want to discuss and gather your questions.",
+        "url": "/services/",
+        "link_label": "Read service details"
+      },
+      {
+        "title": "Request a conversation",
+        "text": "Use the stated contact route and share your preferred way to communicate.",
+        "url": "/contact/",
+        "link_label": "See contact options"
+      },
+      {
+        "title": "Wait for confirmation",
+        "text": "Agree the time, location, and access arrangements before travelling."
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "delivery": {
+    "label": "Visiting and availability",
+    "title": "Delivery and collection",
+    "intro": "Explain fulfilment options and what to check before arranging them.",
+    "items": [
+      {
+        "title": "Collection",
+        "text": "Agree a collection point and arrival instructions before setting out.",
+        "value": "Location and time by arrangement"
+      },
+      {
+        "title": "Local delivery",
+        "text": "Check whether the intended destination is covered and how delivery is arranged.",
+        "value": "Coverage and charges need confirmation"
+      },
+      {
+        "title": "Another arrangement",
+        "text": "Discuss access needs or an alternative handoff with the business.",
+        "value": "Agreement required before dispatch"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "access": {
+    "label": "Visiting and availability",
+    "title": "Access and accommodations",
+    "intro": "Give concrete access information and a route to ask for an accommodation.",
+    "items": [
+      {
+        "title": "Arrival and entrance",
+        "text": "Describe the actual entrance, route, steps, and any assistance available after an access review."
+      },
+      {
+        "title": "Communication preferences",
+        "text": "State the available written and spoken contact routes so visitors can choose.",
+        "url": "/contact/",
+        "link_label": "View communication options"
+      },
+      {
+        "title": "Planning an accommodation",
+        "text": "Explain whom to contact about seating, sensory needs, or another arrangement before the visit."
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "eligibility": {
+    "label": "Decision support",
+    "title": "Eligibility and requirements",
+    "intro": "Explain participation requirements and how to ask about exceptions.",
+    "items": [
+      {
+        "title": "Check the criteria",
+        "text": "Read the approved participation criteria and ask about anything that is unclear."
+      },
+      {
+        "title": "Gather available information",
+        "text": "List the information needed and explain alternatives when a document is unavailable."
+      },
+      {
+        "title": "Discuss your circumstances",
+        "text": "Use the contact route for questions about requirements or possible exceptions.",
+        "url": "/contact/",
+        "link_label": "Ask about requirements"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "downloads": {
+    "label": "Trust and support",
+    "title": "Documents and downloads",
+    "intro": "Make supporting documents easy to identify before opening them.",
+    "items": [
+      {
+        "title": "Service information",
+        "text": "This sample links to an existing HTML page rather than an example file.",
+        "value": "HTML page · Service overview",
+        "url": "/services/",
+        "link_label": "Read the service overview"
+      },
+      {
+        "title": "Contact information",
+        "text": "This HTML reference explains the example contact route.",
+        "value": "HTML page · Contact options",
+        "url": "/contact/",
+        "link_label": "Read the contact options"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "specifications": {
+    "label": "Decision support",
+    "title": "Specifications and details",
+    "intro": "Present concrete attributes with units and relevant limitations.",
+    "items": [
+      {
+        "title": "Output format",
+        "text": "The example describes the kind of deliverable rather than a performance claim.",
+        "value": "Static HTML pages"
+      },
+      {
+        "title": "Required materials",
+        "text": "Confirm the supplied copy, images, and approvals before assembly.",
+        "value": "Agreed source content"
+      },
+      {
+        "title": "Review conditions",
+        "text": "Record the devices and access needs that the agreed review covers.",
+        "value": "Scope agreed before review"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
+  },
+  "updates": {
+    "label": "Updates and notices",
+    "title": "Updates and changelog",
+    "intro": "Show dated changes with enough context to understand their effect.",
+    "items": [
+      {
+        "title": "Example content review",
+        "text": "An illustrative record of a content review, with its scope and unresolved questions.",
+        "when": "Example date: 8 October 2026"
+      },
+      {
+        "title": "Example layout review",
+        "text": "An illustrative record of checking page layouts at the agreed screen sizes.",
+        "when": "Example date: 6 October 2026"
+      },
+      {
+        "title": "Example first draft",
+        "text": "An illustrative record of preparing the initial page structure for review.",
+        "when": "Example date: 1 October 2026"
+      }
+    ],
+    "notice": "Illustrative content for a fictional business. Confirm all business details before use."
   }
 }
