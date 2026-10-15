@@ -4,7 +4,7 @@ import json
 
 def write(destination, name, preset):
     capabilities = dict(version=1, name=name, preset=preset, workshop=False, standalone=True,
-                        commands=['status', 'open', 'check', 'backup', 'handover'],
+                        commands=['status', 'open', 'check', 'backup', 'handover', 'eject'],
                         publication='owner-controlled', approval_inherited=False)
     (destination / 'factory-capabilities.json').write_text(json.dumps(capabilities, indent=2) + '\n')
     intro = f'''# {name}
@@ -47,6 +47,12 @@ machine-loss recovery. `./wf restore ARCHIVE DESTINATION` restores into a new fo
 The master workshop, specialist adapters and evaluation fixtures are not included.
 `factory-capabilities.json` lists this copy's supported scope. A client copy can
 create another independent copy of its retained preset with `scripts/new_site.py`.
+
+## Final delivery
+
+`./wf eject ../delivery` writes a plain Hugo copy with none of these tools attached, and
+proves it builds the same site. Use it for the last handover; the new folder then becomes the source.
+It refuses while claims or "To be confirmed" text remain (`--draft` overrides).
 
 ## Release and recovery
 

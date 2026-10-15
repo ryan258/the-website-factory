@@ -72,13 +72,15 @@ def restore(archive_path, destination):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', nargs='?', default='status',
-                        choices=['status', 'new', 'open', 'check', 'backup', 'restore', 'handover', 'approve', 'preview-plan'])
+                        choices=['status', 'new', 'open', 'check', 'backup', 'restore', 'handover', 'approve', 'preview-plan', 'eject'])
     args, rest = parser.parse_known_args(argv)
     try:
         if args.command == 'new':
             return call('new_site.py', *(rest or ['--guided']))
         if args.command == 'open':
             return call('build.py', '--serve', *rest)
+        if args.command == 'eject':
+            return call('eject.py', *rest)
         if args.command == 'handover':
             return call('handover.py', '--build', *rest)
         if args.command == 'preview-plan':
