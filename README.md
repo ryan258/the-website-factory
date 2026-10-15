@@ -143,6 +143,7 @@ Client copies must start without inherited approvals, historical performance gua
 | Accent tone colors (mirrored by Sass `$tones`) | `data/tones.json` |
 | Cloudflare setup and deployment runbook | `docs/cloudflare-setup.md` |
 | Agency process: client's own Cloudflare account, domain, email, handover outline | `docs/guide-to-hosting-on-cloudflare-on-the-cheap.md` |
+| Final delivery: plain Hugo copy with no factory attached | `scripts/eject.py` (`./wf eject`), `scripts/test_eject.py` |
 | Moving a client's domain from GoDaddy to Cloudflare | `docs/migrating-domains-from-godaddy-to-cloudflare.md` |
 | Contact form Pages Function endpoint | `functions/api/contact.js` |
 | Internal inventory and dotfile protection middleware | `functions/_middleware.js` |

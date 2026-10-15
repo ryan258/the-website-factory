@@ -231,6 +231,8 @@ One short document per client, in the client's own copy as `docs/handover.md`, w
 language. It extends what `./wf handover` already generates (build evidence, claims status, content
 review). The sections below are what is still missing.
 
+0. **Before writing it:** run `./wf eject ../<client>-delivery` and hand over that folder, not the factory copy
+   (see the operator guide). Its README and `docs/cloudflare-setup.md` already say how to build and deploy.
 1. **What you have.** One paragraph: the site address, what the pages are, what the form does.
 2. **Who owns what.** A table: Cloudflare account, domain, mailbox, GitHub repo (if any), design files.
    Each row says owner, login email, and where the renewal date is.

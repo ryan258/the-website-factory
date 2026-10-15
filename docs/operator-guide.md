@@ -75,6 +75,24 @@ that differ from the most recent owner content review. Unchanged field evidence
 is retained. Pattern-based claims checking covers only recognized categories;
 zero matches does not establish that every assertion is true.
 
+### Final delivery without the factory
+
+When the client takes the code and may not be in touch again, hand over an ejected copy:
+
+```sh
+./wf eject ../client-delivery        # --draft allows open claims; for previews only
+```
+
+It writes a new folder that needs only Hugo Extended and Dart Sass (`hugo --minify`). The registry,
+schemas, scripts, planner, `wf`, MCP and agent files are left out; the README and
+`docs/cloudflare-setup.md` are rewritten for plain Hugo. Before keeping it, eject builds the copy with
+plain Hugo and compares every generated file with this project's build. Any difference deletes the copy.
+Copy still lives in `data/presets/<name>.json`; `layouts/partials/factory/module.html` still draws it.
+The unused workshop branches in `head.html`, `compose.html`, `nav.html` and `footer.html` stay, inert.
+
+After ejecting, the new folder is the source of truth: edits here never reach it, and it cannot be
+regenerated from plans. For a care-plan client, keep working here and eject again each time instead.
+
 After actually reviewing the changed facts, destinations and retained asset rights,
 the owner can record that decision:
 
