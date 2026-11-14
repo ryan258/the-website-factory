@@ -1,4 +1,4 @@
-baseURL = 'https://example.invalid/'
+baseURL = 'https://258webco.com/'
 locale = 'en'
 enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term', 'RSS']

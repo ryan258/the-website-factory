@@ -5,8 +5,8 @@
   "description": "High-performance, accessible websites for small businesses. Handcrafted, lightweight, and engineered for speed.",
   "approved_claims": [
     "$450 website",
-    "$450 website + $50/month retainer",
-    "$450 website + 12-month retainer for $500 (save $100)"
+    "$450 website + $50/month care plan",
+    "$450 website + 12-month care plan for $500"
   ],
   "pages": {
     "home": {
@@ -268,7 +268,7 @@
       "items": [
         {
           "title": "Based in",
-          "text": "Chicago, IL · Remote nationwide"
+          "text": "Bentonville, AR · Serving Northwest Arkansas"
         },
         {
           "title": "A useful first message",
