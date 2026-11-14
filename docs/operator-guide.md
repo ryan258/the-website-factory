@@ -113,7 +113,7 @@ for inquiry mode (an indexable release with the form off is refused in inquiry m
 because visitors would see a disabled form and no contact path). The internal
 workshop cannot become an indexable release. When the built-in form is rendered on,
 the deployment file must also enable intake; an external form destination uses its
-separate owner-configured path. Release authorization remains separate from content review.
+separate owner-configured path. Set the `RATE_LIMIT_SALT` secret (`npx wrangler pages secret put RATE_LIMIT_SALT --project-name <slug>`) to prevent reversal of stored IP hashes. Release authorization remains separate from content review. See `docs/brand/README.md` for studio positioning, sales proposals, agreements, and client delivery templates.
 
 `.factory-receipt.json` binds source hashes, settings, tool pins and output hashes.
 `factory-release.json` exposes only a version and opaque release ID. Cloudflare

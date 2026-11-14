@@ -79,6 +79,8 @@ The project brief forms use unique IDs and label/help references for each instan
 
 At `/site-kit/catalog/`, open a family and choose **Full width** or **Compare layouts**. All variants remain visible in both views. Comparison uses two columns at viewport widths of 1200px and above, then stacks on smaller screens. Native radio controls work without JavaScript and support keyboard selection. The added layouts use container queries where appropriate so their inner layouts adapt to the available comparison width. The existing families retain their layouts and selected preset content.
 
+For design tokens, atomic UI primitives (buttons, badges, marks), and interactive variant inspection with toggleable preset configuration JSON and rendered HTML code snippets, see the Living Style Guide at `/site-kit/style-guide/`.
+
 ## Contracts and reuse
 
 `data/modules.json` defines variants, required fields, optional per-item required fields and allowed choices. Delivery and specification items require a value; document items require a value, URL, and link label; update items require a date label. Menu items require a price/scope value; events require when/where; support routes require a valid local URL and meaningful link label; service-fit and inclusion entries require a supported group. `scripts/factory.py` rejects missing or invalid structured values before building. The project brief module is a human-selected feature and is excluded from AI-drafted plans.
