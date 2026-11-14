@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>The Website Factory brand board</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-padding-top: var(--wf-space-4); }
+    body { margin: 0; background: var(--wf-paper); color: var(--wf-ink); font: 400 var(--wf-body)/var(--wf-body-leading) var(--wf-font); }
+    a { color: var(--wf-pine); text-decoration-thickness: .1em; text-underline-offset: .18em; }
+    a:focus-visible { outline: 3px solid var(--wf-pine); outline-offset: 4px; }
+    a:hover { text-decoration-thickness: .16em; }
+    img { display: block; max-width: 100%; height: auto; }
+    h1, h2, h3, p, figure { margin: 0; }
+    h1 {
+      font-size: var(--wf-display);
+      line-height: var(--wf-display-leading);
+      letter-spacing: var(--wf-display-tracking);
+      font-weight: var(--wf-display-weight);
+      max-width: 14ch;
+      text-wrap: balance;
+    }
+    h2 {
+      font-size: var(--wf-heading);
+      line-height: var(--wf-heading-leading);
+      letter-spacing: var(--wf-heading-tracking);
+      font-weight: var(--wf-heading-weight);
+    }
+    p { max-width: var(--wf-reading-max); }
+    code { font-family: var(--wf-mono); }
+    .wrap { max-width: var(--wf-content-max); width: calc(100% - 2 * clamp(1rem, 4vw, 3rem)); margin-inline: auto; }
+    .top { border-bottom: 1px solid var(--wf-divider); }
+    .top .wrap {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+      gap: var(--wf-space-2) var(--wf-space-4); padding-block: var(--wf-space-3);
+    }
+    .top img { width: 14rem; }
+    .top ul { display: flex; flex-wrap: wrap; gap: 0 var(--wf-space-3); margin: 0; padding: 0; list-style: none; }
+    .top a { display: inline-flex; min-height: var(--wf-target); align-items: center; padding-inline: .25rem; font-size: var(--wf-label); font-weight: var(--wf-label-weight); }
+    .skip { position: absolute; left: 1rem; top: -10rem; background: var(--wf-paper); padding: var(--wf-space-2) var(--wf-space-3); z-index: 1; }
+    .skip:focus { top: 1rem; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 23rem);
+      align-items: center;
+      gap: clamp(1.5rem, 6vw, 6rem);
+      padding-block: clamp(2.5rem, 7vw, 6rem);
+    }
+    .context { font-size: var(--wf-label); font-weight: var(--wf-label-weight); color: var(--wf-pine); margin-bottom: var(--wf-space-3); }
+    .lead { color: var(--wf-muted); margin-block: var(--wf-space-4); max-width: 43ch; font-size: clamp(1.125rem, 2vw, 1.375rem); line-height: 1.5; }
+    .art { padding: var(--wf-space-4); border-radius: var(--wf-radius); background: var(--wf-sage); }
+    .art img { margin-inline: auto; }
+    .button {
+      display: inline-flex; align-items: center; min-height: var(--wf-target);
+      width: max-content; max-width: 100%;
+      padding: var(--wf-space-2) var(--wf-space-3); border: 2px solid var(--wf-ink);
+      border-radius: var(--wf-radius); background: var(--wf-lime); color: var(--wf-ink);
+      font-size: var(--wf-label); font-weight: var(--wf-label-weight);
+    }
+    .button:hover { background: var(--wf-sage); }
+    .process {
+      display: flex; flex-wrap: wrap; gap: var(--wf-space-2) var(--wf-space-3);
+      margin: 0; padding-block: var(--wf-space-3); padding-inline-start: 1.6rem;
+      border-top: 1px solid var(--wf-divider); font-weight: 600;
+    }
+    .process li { padding-inline-end: var(--wf-space-4); }
+    .process li::marker { color: var(--wf-pine); }
+    .section { border-top: 1px solid var(--wf-divider); padding-block: var(--wf-space-6); }
+    .section > p { margin-top: var(--wf-space-3); color: var(--wf-muted); }
+    .grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--wf-space-4); margin-top: var(--wf-space-5);
+    }
+    .logo-tile { display: grid; min-height: 8rem; align-content: center; border-radius: var(--wf-radius); background: var(--wf-sage); padding: var(--wf-space-4); }
+    .logo-tile.dark { background: var(--wf-ink); }
+    .logo-tile.plain { background: var(--wf-white); border: 1px solid var(--wf-divider); }
+    .logo-tile.mark img { margin-inline: auto; }
+    figcaption { margin-top: var(--wf-space-2); font-size: var(--wf-label); }
+    figcaption a { display: inline-flex; align-items: center; min-height: var(--wf-target); margin-inline-end: var(--wf-space-3); }
+    .palette {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--wf-space-3); list-style: none; padding: 0; margin: var(--wf-space-5) 0;
+    }
+    .palette li { border: 1px solid var(--wf-divider); background: var(--wf-white); border-radius: var(--wf-radius); overflow: hidden; min-width: 0; }
+    .swatch { min-height: 3rem; background: var(--swatch); border-bottom: 1px solid var(--wf-divider); }
+    .color-label { display: block; padding: var(--wf-space-2) var(--wf-space-3); font-size: var(--wf-label); }
+    .color-label strong, .color-label code { display: block; }
+    .color-label code { color: var(--wf-muted); }
+    .type-sample { margin-top: var(--wf-space-5); padding: var(--wf-space-4); background: var(--wf-sage); border-radius: var(--wf-radius); }
+    .type-sample p + p { margin-top: var(--wf-space-3); }
+    .type-display { font-weight: 720; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.08; letter-spacing: -.045em; }
+    .share { border: 1px solid var(--wf-divider); border-radius: var(--wf-radius); }
+    .image-grid { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: var(--wf-space-4); margin-top: var(--wf-space-5); }
+    .footer { border-top: 1px solid var(--wf-divider); padding-block: var(--wf-space-5); color: var(--wf-muted); }
+    .footer p + p { margin-top: var(--wf-space-2); }
+    @media (min-width: 68rem) {
+      .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (max-width: 50rem) {
+      .hero, .image-grid { grid-template-columns: minmax(0, 1fr); }
+      .art { max-width: 25rem; }
+    }
+    @media (max-width: 36rem) {
+      .grid { grid-template-columns: minmax(0, 1fr); }
+      .palette { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media print {
+      :root { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .top nav, .skip, .button { display: none; }
+      .hero { padding-block: var(--wf-space-5); }
+      figure, .palette li { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <div class="wrap">
+      <img src="wordmark.svg" width="344" height="56" alt="The Website Factory">
+      <nav aria-label="Brand board">
+        <ul>
+          <li><a href="#logos">Logos</a></li>
+          <li><a href="#colors">Colors</a></li>
+          <li><a href="#type">Type</a></li>
+          <li><a href="#share">Share images</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap" id="main" tabindex="-1">
+    <div class="hero">
+      <div>
+        <p class="context">Proposed identity · Brand board</p>
+        <h1>From reviewed brief to Hugo site.</h1>
+        <p class="lead">A Hugo production toolkit for independent web builders.</p>
+        <a class="button" href="#share">Get share images</a>
+      </div>
+      <div class="art"><img src="page-illustration.svg" width="326" height="326" alt=""></div>
+    </div>
+    <ol class="process" aria-label="Production workflow">
+      <li>Review the brief</li>
+      <li>Validate the page plan</li>
+      <li>Build the Hugo site</li>
+    </ol>
+    <section class="section" aria-labelledby="logos">
+      <h2 id="logos">Logos</h2>
+      <p>Use the full lockup for introductions. Use the compact mark for avatars, favicons, and places where the name already appears.</p>
+      <div class="grid">
+        <figure>
+          <div class="logo-tile"><img src="wordmark.svg" width="344" height="56" alt="The Website Factory logo for light backgrounds"></div>
+          <figcaption><strong>Primary</strong><br><a href="wordmark.svg" download>Primary SVG</a><a href="wordmark.png" download>Primary PNG</a></figcaption>
+        </figure>
+        <figure>
+          <div class="logo-tile dark"><img src="wordmark-reversed.svg" width="344" height="56" alt="The Website Factory logo for dark backgrounds"></div>
+          <figcaption><strong>Reversed</strong><br><a href="wordmark-reversed.svg" download>Reversed SVG</a><a href="wordmark-reversed.png" download>Reversed PNG</a></figcaption>
+        </figure>
+        <figure>
+          <div class="logo-tile plain"><img src="wordmark-monochrome.svg" width="344" height="56" alt="The Website Factory one-color logo"></div>
+          <figcaption><strong>One color</strong><br><a href="wordmark-monochrome.svg" download>One-color SVG</a><a href="wordmark-monochrome.png" download>One-color PNG</a></figcaption>
+        </figure>
+        <figure>
+          <div class="logo-tile mark"><img src="mark.svg" width="64" height="64" alt="The Website Factory overlapping-page mark"></div>
+          <figcaption><strong>Compact</strong><br><a href="mark.svg" download>Mark SVG</a><a href="mark.png" download>Mark PNG</a></figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="colors">
+      <h2 id="colors">Colors</h2>
+      <p>Paper and Ink carry the message. Lime marks one next action or a focal point. Use Ink on Lime and Pine for links on light surfaces.</p>
+      <ul class="palette">
+        <li><div class="swatch" style="--swatch:var(--wf-paper)"></div><span class="color-label"><strong>Paper</strong><code>#F8F6EF</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-ink)"></div><span class="color-label"><strong>Ink</strong><code>#172522</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-sage)"></div><span class="color-label"><strong>Sage</strong><code>#E6EEE6</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-lime)"></div><span class="color-label"><strong>Lime</strong><code>#D9F46C</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-pine)"></div><span class="color-label"><strong>Pine</strong><code>#245C4C</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-muted)"></div><span class="color-label"><strong>Muted</strong><code>#4B6259</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-border)"></div><span class="color-label"><strong>Border</strong><code>#6F817A</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-divider)"></div><span class="color-label"><strong>Divider</strong><code>#C9D4CB</code></span></li>
+        <li><div class="swatch" style="--swatch:var(--wf-white)"></div><span class="color-label"><strong>White</strong><code>#FFFFFF</code></span></li>
+      </ul>
+      <p><a href="tokens.json" download>Download JSON tokens</a> · <a href="tokens.css" download>Download CSS tokens</a></p>
+    </section>
+    <section class="section" aria-labelledby="type">
+      <h2 id="type">Typography</h2>
+      <p>Inter keeps headings, instructions, and labels in one family. Reserve system monospace for commands, code, and file names.</p>
+      <div class="type-sample">
+        <p class="type-display">Choose a starter. Shape the site.</p>
+        <p>Review the pages, confirm the facts, and build a separate Hugo project for handoff.</p>
+        <p><code>./wf new</code></p>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="share">
+      <h2 id="share">Share images</h2>
+      <p>Use the wide card for link previews and the square card for a social post. The SVG sources keep the logo and diagram sharp at larger sizes.</p>
+      <div class="image-grid">
+        <figure>
+          <img class="share" src="social-share.png" width="1200" height="630" alt="The Website Factory. From reviewed brief to Hugo site. A Hugo production toolkit for independent web builders.">
+          <figcaption><strong>Wide card · 1200 × 630</strong><br><a href="social-share.png" download>Wide PNG</a><a href="social-share.svg" download>Wide SVG source</a></figcaption>
+        </figure>
+        <figure>
+          <img class="share" src="social-square.png" width="1080" height="1080" alt="The Website Factory. From reviewed brief to Hugo site. A Hugo production toolkit for independent web builders.">
+          <figcaption><strong>Square card · 1080 × 1080</strong><br><a href="social-square.png" download>Square PNG</a><a href="social-square.svg" download>Square SVG source</a></figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="wrap">
+      <p>The Factory identity is for the toolkit. Client websites and 258 Web Co. use their own identity.</p>
+      <p><a href="../03-visual-identity.md">Read the visual identity guide</a> · <a href="../../../static/fonts/OFL.txt">Inter font license</a></p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>258 Web Co. campaign card</title>
+  <style>
+    @font-face {
+      font-family: Inter;
+      src: url("../../../static/fonts/inter-latin-variable.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    @page { size: 1200px 630px; margin: 0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #14181f; color: #fff; font-family: Inter, system-ui, sans-serif; }
+    main { max-width: 1200px; min-height: 630px; margin: auto; padding: 62px 64px; border-top: 14px solid #ffc400; }
+    header { display: flex; align-items: center; gap: 16px; font-size: 26px; font-weight: 700; }
+    header svg { flex: none; }
+    h1 { margin: 60px 0 28px; max-width: 1050px; font-size: 81px; line-height: 1.04; letter-spacing: -.055em; }
+    p { margin: 0; color: #b7c0ca; font-size: 24px; line-height: 1.42; }
+    hr { border: 0; border-top: 1px solid #434c59; margin: 46px 0 24px; }
+    .category { color: #ffc400; font-weight: 600; font-size: 19px; }
+    @media screen and (max-width: 740px) {
+      main { padding: 32px 24px; min-height: auto; }
+      h1 { font-size: clamp(38px, 10vw, 62px); }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <svg aria-hidden="true" width="46" height="46" viewBox="0 0 32 32">
+        <rect width="32" height="32" rx="4" fill="#ffc400"/>
+        <path d="M7 24V13l6 4v-7l6 4V7h6v17H7Z" fill="#14181f"/>
+        <path d="M11 21h2m4 0h2m4 0h2" stroke="#ffc400" stroke-width="2"/>
+      </svg>
+      258 Web Co.
+    </header>
+    <h1>A clearer website for your service business.</h1>
+    <p>Plan the pages. Review the copy. Get a documented handoff.</p>
+    <hr>
+    <p class="category">Independent web development studio</p>
+  </main>
+</body>
+</html>

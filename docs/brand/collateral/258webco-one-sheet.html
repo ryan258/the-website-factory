@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="258 Web Co.">
+  <meta name="description" content="A one-page overview of website development for service businesses.">
+  <title>Websites for service businesses | 258 Web Co.</title>
+  <style>
+    @font-face {
+      font-family: Inter;
+      src: url("../../../static/fonts/inter-latin-variable.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    :root { --ink: #14181f; --accent: #ffc400; --mist: #f3f5f7; --line: #d8dde3; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--mist);
+      font: 1rem/1.55 Inter, system-ui, sans-serif;
+    }
+    article {
+      max-width: 52rem;
+      margin: 1.5rem auto;
+      padding: clamp(1rem, 5vw, 3rem);
+      background: #fff;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: .65rem 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .wordmark { display: flex; align-items: center; gap: .625rem; font-size: 1.125rem; font-weight: 700; }
+    .wordmark svg { flex: none; }
+    .wordmark span { white-space: nowrap; }
+    .descriptor { font-size: .875rem; color: #555d68; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(2.2rem, 7vw, 3.45rem); font-weight: 800; line-height: 1.06; letter-spacing: -.055em; }
+    h2 { font-size: 1.5rem; line-height: 1.15; letter-spacing: -.035em; }
+    h3 { font-size: 1rem; line-height: 1.3; }
+    .hero { padding: 2rem 0 1.6rem; }
+    .hero p { max-width: 37rem; margin-top: .9rem; font-size: 1.09rem; }
+    .scope { border-left: .45rem solid var(--accent); background: var(--mist); padding: .95rem 1.25rem; }
+    .scope p { margin-top: .45rem; }
+    .process { margin-block: 1.65rem; }
+    .process ol {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: .8rem 0 0;
+    }
+    .process li { border-top: 2px solid var(--ink); padding-top: .65rem; }
+    .process p { margin-top: .35rem; }
+    .prompt {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--accent);
+    }
+    .prompt p { margin-top: .35rem; }
+    @media screen and (max-width: 38rem) {
+      article { margin: 0; }
+      .process ol { grid-template-columns: 1fr; }
+    }
+    @page { size: letter; margin: .55in; }
+    @media print {
+      body { background: #fff; font-size: 12pt; }
+      article { max-width: none; margin: 0; padding: 0; }
+      h1 { font-size: 35pt; max-width: 32rem; }
+      .hero { padding: 2.5rem 0 2.1rem; }
+      .scope, .prompt { padding-block: 1.35rem; }
+      .process { margin-block: 2.1rem; }
+      .hero p { font-size: 12pt; }
+      header, section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <article>
+      <header>
+        <div class="wordmark">
+          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 32 32">
+            <rect width="32" height="32" rx="4" fill="#ffc400"/>
+            <path d="M7 24V13l6 4v-7l6 4V7h6v17H7Z" fill="#14181f"/>
+            <path d="M11 21h2m4 0h2m4 0h2" stroke="#ffc400" stroke-width="2"/>
+          </svg>
+          <span>258 Web Co.</span>
+        </div>
+        <p class="descriptor">Independent web development studio</p>
+      </header>
+      <section class="hero">
+        <h1>A clearer website for your service business.</h1>
+        <p>We plan and build websites that show what you do, where you work, and how a customer can reach you.</p>
+      </section>
+      <section class="scope">
+        <h2>Start with the work you need</h2>
+        <p>We can scope a new business site, a landing page for one offer, or a redesign. We’ll agree on the pages, who supplies content, and what you’ll receive before work starts.</p>
+      </section>
+      <section class="process">
+        <h2>How we work</h2>
+        <ol>
+          <li>
+            <h3>Plan the pages</h3>
+            <p>We agree on what customers need to know and what each page should help them do.</p>
+          </li>
+          <li>
+            <h3>Review the draft</h3>
+            <p>You review the draft pages and confirm the business details before we prepare the site for launch.</p>
+          </li>
+          <li>
+            <h3>Get a clear handoff</h3>
+            <p>We document what’s delivered, who handles updates, and what’s involved in keeping the site running.</p>
+          </li>
+        </ol>
+      </section>
+      <section class="prompt">
+        <h2>What should your website help customers do?</h2>
+        <p>Reply to the person who shared this and tell us what matters most.</p>
+      </section>
+    </article>
+  </main>
+</body>
+</html>

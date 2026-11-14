@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="326" height="326" viewBox="0 0 326 326" role="img" aria-labelledby="title desc">
+<title id="title">A plan and a page</title>
+<desc id="desc">An abstract document with a web page layered in front.</desc>
+<g>
+  <rect x="1" y="1" width="244" height="262" rx="12" fill="#172522"/>
+  <rect x="3" y="3" width="240" height="258" rx="10" fill="#E6EEE6"/>
+  <rect x="3" y="45" width="240" height="2" fill="#172522"/>
+  <circle cx="25" cy="23" r="3" fill="#245C4C"/>
+  <circle cx="40" cy="23" r="3" fill="#245C4C"/>
+  <circle cx="55" cy="23" r="3" fill="#245C4C"/>
+  <rect x="24" y="73" width="98" height="5" rx="2.5" fill="#245C4C"/>
+  <rect x="24" y="98" width="60" height="5" rx="2.5" fill="#245C4C"/>
+  <rect x="24" y="135" width="29" height="5" rx="2.5" fill="#245C4C"/>
+  <rect x="24" y="160" width="29" height="5" rx="2.5" fill="#245C4C"/>
+  <rect x="24" y="185" width="29" height="5" rx="2.5" fill="#245C4C"/>
+  <rect x="80" y="63" width="244" height="262" rx="12" fill="#172522"/>
+  <rect x="82" y="65" width="240" height="258" rx="10" fill="#D9F46C"/>
+  <rect x="82" y="107" width="240" height="2" fill="#172522"/>
+  <circle cx="104" cy="85" r="3" fill="#172522"/>
+  <circle cx="119" cy="85" r="3" fill="#172522"/>
+  <circle cx="134" cy="85" r="3" fill="#172522"/>
+  <rect x="105" y="132" width="194" height="58" rx="4" fill="#172522"/>
+  <rect x="123" y="150" width="92" height="5" rx="2.5" fill="#D9F46C"/>
+  <rect x="123" y="168" width="52" height="5" rx="2.5" fill="#D9F46C"/>
+  <rect x="105" y="209" width="90" height="88" rx="4" fill="#172522"/>
+  <rect x="107" y="211" width="86" height="84" rx="2" fill="#D9F46C"/>
+  <rect x="209" y="209" width="90" height="88" rx="4" fill="#172522"/>
+  <rect x="211" y="211" width="86" height="84" rx="2" fill="#D9F46C"/>
+  <rect x="119" y="225" width="51" height="4" rx="2" fill="#172522"/>
+  <rect x="119" y="240" width="34" height="4" rx="2" fill="#172522"/>
+  <rect x="223" y="225" width="47" height="4" rx="2" fill="#172522"/>
+  <rect x="223" y="240" width="31" height="4" rx="2" fill="#172522"/>
+</g>
+</svg>

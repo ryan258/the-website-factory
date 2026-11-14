@@ -1,0 +1,47 @@
+/* The Website Factory brand tokens. See tokens.json for the handoff values. */
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../../../static/fonts/inter-latin-variable.woff2") format("woff2");
+}
+
+:root {
+  --wf-ink: #172522;
+  --wf-paper: #F8F6EF;
+  --wf-sage: #E6EEE6;
+  --wf-lime: #D9F46C;
+  --wf-pine: #245C4C;
+  --wf-muted: #4B6259;
+  --wf-border: #6F817A;
+  --wf-divider: #C9D4CB;
+  --wf-white: #FFFFFF;
+  --wf-space-1: 0.25rem;
+  --wf-space-2: 0.5rem;
+  --wf-space-3: 1rem;
+  --wf-space-4: 1.5rem;
+  --wf-space-5: 2rem;
+  --wf-space-6: 3rem;
+  --wf-space-7: 4rem;
+  --wf-space-8: 6rem;
+  --wf-font: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --wf-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --wf-body: 1.125rem;
+  --wf-body-leading: 1.6;
+  --wf-display: clamp(2.5rem, 6vw, 5rem);
+  --wf-display-leading: 1.04;
+  --wf-display-weight: 720;
+  --wf-display-tracking: -.045em;
+  --wf-heading: clamp(1.75rem, 3vw, 2.625rem);
+  --wf-heading-leading: 1.12;
+  --wf-heading-weight: 700;
+  --wf-heading-tracking: -.03em;
+  --wf-label: 0.9375rem;
+  --wf-label-leading: 1.45;
+  --wf-label-weight: 600;
+  --wf-content-max: 70rem;
+  --wf-reading-max: 65ch;
+  --wf-radius: 0.5rem;
+  --wf-target: 2.75rem;
+}
