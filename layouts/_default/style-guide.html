@@ -2,15 +2,16 @@
 <div class="preview-bar"><div class="container"><span><strong>The Website Factory</strong> · Living Style Guide</span><a href="{{ "site-kit/" | relURL }}">← Return to Site Kit</a></div></div>
 <div class="container sg-page">
   <section class="sg-intro">
-    <p class="eyebrow">Design System & Foundation</p>
-    <h1>Living Style Guide</h1>
-    <p>Foundational design tokens, fluid typography specimens, spacing systems, and reusable atomic UI primitives that power the kitchen-sink website factory.</p>
+    <h1 id="guide-title">Living Style Guide</h1>
+    <p>Choose a client theme, compare live sections, and reuse the preset configuration. The samples in this workshop are fictional.</p>
+    <p>Client sites use the colors and fonts of their own brand. The Factory’s product identity and marketing assets are maintained separately in <code>docs/brand/</code>.</p>
   </section>
 
   <nav class="sg-nav" aria-label="Style guide sections">
     <a href="#tokens-palette">Colors & Tokens</a>
     <a href="#tokens-type">Typography</a>
     <a href="#tokens-space">Spacing & Layout</a>
+    <a href="#page-assembly">Page Assembly</a>
     <a href="#components-buttons">Buttons & Links</a>
     <a href="#components-badges">Badges & Indicators</a>
     <a href="#components-cards">Cards</a>
@@ -22,111 +23,104 @@
   <!-- 1. Color Palettes & Tokens -->
   <section id="tokens-palette" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">01 / Foundation</p>
       <h2>Colors & Design Tokens</h2>
-      <p>Semantic CSS custom properties adapting dynamically between light and dark color schemes.</p>
+      <p>These semantic tokens show the active workshop theme from <code>data/site.yaml</code>. Swatches follow the device’s color scheme. Check both values before pairing text with a surface.</p>
     </div>
 
-    <h3 class="sg-subhead">Core Semantic Palette</h3>
+    <h3 class="sg-subhead">Active theme</h3>
+    {{ $theme := hugo.Data.site.theme }}
+    {{ $roles := dict "paper" "Canvas background" "ink" "Primary text" "mist" "Secondary surface" "line" "Structural dividers" "accent" "Action and focus accent" "accent_text" "Text on the accent" "link" "Link color" "muted" "Secondary text" }}
     <div class="sg-swatches">
+      {{ range $key := slice "paper" "ink" "mist" "line" "accent" "accent_text" "link" "muted" }}
+      {{ $token := replace $key "_" "-" }}
       <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-paper"></div>
-        <span class="sg-swatch__name">--paper</span>
-        <span class="sg-swatch__role">Canvas background</span>
+        <div class="sg-swatch__preview sg-bg-{{ $token }}"></div>
+        <code class="sg-swatch__name">--{{ $token }}</code>
+        <span class="sg-swatch__role">{{ index $roles $key }}</span>
+        {{ $light := index $theme $key }}
+        {{ with index $theme (printf "dark_%s" $key) }}
+          <span class="sg-swatch__role">Light <code>{{ $light }}</code></span>
+          <span class="sg-swatch__role">Dark <code>{{ . }}</code></span>
+        {{ else }}
+          <span class="sg-swatch__role">Both schemes <code>{{ $light }}</code></span>
+        {{ end }}
       </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-ink"></div>
-        <span class="sg-swatch__name">--ink</span>
-        <span class="sg-swatch__role">Primary high-contrast text</span>
-      </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-mist"></div>
-        <span class="sg-swatch__name">--mist</span>
-        <span class="sg-swatch__role">Secondary tint surface</span>
-      </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-line"></div>
-        <span class="sg-swatch__name">--line</span>
-        <span class="sg-swatch__role">Structural borders & dividers</span>
-      </div>
-      <div class="sg-swatch">
+      {{ end }}
+    </div>
+
+    <h3 class="sg-subhead">Preset accent tones</h3>
+    <div class="sg-swatches">
+      {{ range $name, $accent := hugo.Data.tones }}
+      <div class="sg-swatch tone-{{ $name }}">
         <div class="sg-swatch__preview sg-bg-accent"></div>
-        <span class="sg-swatch__name">--accent</span>
-        <span class="sg-swatch__role">Brand focus highlight</span>
+        <code class="sg-swatch__name">tone-{{ $name }}</code>
+        <code class="sg-swatch__role">{{ $accent }}</code>
       </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-link"></div>
-        <span class="sg-swatch__name">--link</span>
-        <span class="sg-swatch__role">Interactive text link</span>
-      </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-muted"></div>
-        <span class="sg-swatch__name">--muted</span>
-        <span class="sg-swatch__role">Secondary & metadata text</span>
-      </div>
+      {{ end }}
     </div>
-
-    <h3 class="sg-subhead">Archetype Preset Accents</h3>
-    <div class="sg-swatches">
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-yellow"></div>
-        <span class="sg-swatch__name">tone-yellow</span>
-        <span class="sg-swatch__role">Agency default (#ffc400)</span>
-      </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-clay"></div>
-        <span class="sg-swatch__name">tone-clay</span>
-        <span class="sg-swatch__role">Contractor (#edb08e)</span>
-      </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-sage"></div>
-        <span class="sg-swatch__name">tone-sage</span>
-        <span class="sg-swatch__role">Consultant (#b9d7bb)</span>
-      </div>
-      <div class="sg-swatch">
-        <div class="sg-swatch__preview sg-bg-blue"></div>
-        <span class="sg-swatch__name">tone-blue</span>
-        <span class="sg-swatch__role">Local service (#a6cef7)</span>
-      </div>
-    </div>
+    <details class="sg-details">
+      <summary>Client palette options</summary>
+      <p>Use a palette key with <code>--palette</code> when creating a client copy. The complete light and dark pairings live in <code>data/palettes.json</code>.</p>
+      <dl class="sg-options">
+        {{ range $key, $palette := hugo.Data.palettes }}
+        <div>
+          <dt>{{ $palette.label }} <code>{{ $key }}</code></dt>
+          <dd>{{ $palette.use }}. Accent <code>{{ $palette.colors.accent }}</code></dd>
+        </div>
+        {{ end }}
+      </dl>
+    </details>
   </section>
 
   <!-- 2. Typography Specimen -->
   <section id="tokens-type" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">02 / Typography</p>
       <h2>Type Scale & Hierarchy</h2>
-      <p>Self-hosted variable Inter Latin subset font with fluid scaling, responsive heading line heights, and optimal reading measures.</p>
+      {{ $font := hugo.Data.site.font }}
+      <p>The current theme uses {{ $font.family }} for body text and {{ $font.heading_family | default $font.family }} for headings. Keep one descriptive H1 on each page and use H2 for sections. Base rules live in <code>assets/scss/base/_typography.scss</code>.</p>
     </div>
+    <details class="sg-details">
+      <summary>Client font options</summary>
+      <p>Use a font key with <code>--fonts</code> when creating a client copy. Pairings and self-hosted font files are defined in <code>data/fonts.json</code>.</p>
+      <dl class="sg-options">
+        {{ range $key, $pair := hugo.Data.fonts }}
+        {{ $heading := $pair.heading | default $pair.body }}
+        <div>
+          <dt>{{ $pair.label }} <code>{{ $key }}</code></dt>
+          <dd>{{ $heading.family }} headings and {{ $pair.body.family }} body. {{ $pair.use }}.</dd>
+        </div>
+        {{ end }}
+      </dl>
+    </details>
 
     <div class="sg-specimens">
       <div class="sg-specimen-row">
-        <div class="sg-specimen-meta"><span>Level: H1 (Hero / Base)</span><span>Size: clamp(2.6rem, 5.8vw, 4.5rem) / clamp(2.75rem, 5.2vw, 4.35rem)</span><span>Line height: 1.15</span><span>Weight: 650</span><span>Tracking: -0.045em</span></div>
-        <p class="h1-specimen sg-type-h1">Good ideas deserve a better website.</p>
+        <p class="sg-specimen-meta">H1 · Page title</p>
+        <p>See <a href="#guide-title">the title of this guide</a> for the base H1.</p>
       </div>
       <div class="sg-specimen-row">
-        <div class="sg-specimen-meta"><span>Level: H2</span><span>Size: clamp(1.8rem, 3.2vw, 2.65rem)</span><span>Line height: 1.15</span><span>Weight: 650</span><span>Tracking: -0.045em</span></div>
-        <h2 class="sg-type-h2">Different businesses. Considered solutions.</h2>
+        <p class="sg-specimen-meta">H2 · Section heading</p>
+        <h2>Different businesses. Considered solutions.</h2>
       </div>
       <div class="sg-specimen-row">
-        <div class="sg-specimen-meta"><span>Level: H3 (Base 1.4rem / Card 1.2rem)</span><span>Line height: 1.15</span><span>Weight: 650</span><span>Tracking: -0.045em / -0.03em</span></div>
-        <h3 class="sg-type-h3">Websites built for real visitor utility.</h3>
+        <p class="sg-specimen-meta">H3 · Subsection heading</p>
+        <h3>Websites built around visitors’ questions.</h3>
       </div>
       <div class="sg-specimen-row">
-        <div class="sg-specimen-meta"><span>Style: Lead intro (.fm-intro)</span><span>Size: 1rem</span><span>Line height: 1.6</span><span>Measure: max 48ch</span></div>
-        <p class="fm-intro sg-type-intro">Clear words, considered design, and a useful next step. A small-business website with room to grow.</p>
+        <p class="sg-specimen-meta">Lead introduction <code>.fm-intro</code></p>
+        <p class="fm-intro sg-flush">Clear words, considered design, and a useful next step. A small-business website with room to grow.</p>
       </div>
       <div class="sg-specimen-row">
-        <div class="sg-specimen-meta"><span>Style: Body text (body / p)</span><span>Size: 1.125rem (18px)</span><span>Line height: 1.6</span><span>Measure: max 65ch</span></div>
-        <p class="sg-type-body">Every page declares its ordered section selection and variants through validated JSON configuration. Business identity, editorial content, visual theme, and page composition have separate configuration surfaces.</p>
+        <p class="sg-specimen-meta">Body copy <code>.prose</code></p>
+        <p class="prose">A good service page tells visitors what you do, who you work with, and how to ask about their project.</p>
       </div>
       <div class="sg-specimen-row">
-        <div class="sg-specimen-meta"><span>Style: Eyebrow (.eyebrow)</span><span>Size: 0.68rem</span><span>Weight: 650</span><span>Tracking: 0.12em uppercase</span></div>
-        <p class="eyebrow sg-type-eyebrow"><span class="factory-dot" aria-hidden="true"></span> Proven Capabilities</p>
+        <p class="sg-specimen-meta">Eyebrow <code>.eyebrow</code></p>
+        <p class="eyebrow"><span class="factory-dot" aria-hidden="true"></span> Services</p>
       </div>
       <div class="sg-specimen-row">
-        <div class="sg-specimen-meta"><span>Style: Notice (.fm-notice)</span><span>Size: 0.75rem</span><span>Measure: max 85ch</span><span>Border: 3px solid var(--accent)</span></div>
-        <p class="fm-notice sg-type-notice">Demonstration content only. Real business facts and delivery settings require explicit review.</p>
+        <p class="sg-specimen-meta">Notice <code>.fm-notice</code></p>
+        <p class="fm-notice sg-flush">Demonstration content only. Confirm business details before using them on a client site.</p>
       </div>
     </div>
   </section>
@@ -134,69 +128,74 @@
   <!-- 3. Spacing & Layout -->
   <section id="tokens-space" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">03 / Layout</p>
       <h2>Spacing Tokens & Grid</h2>
-      <p>8-step geometric spacing scale paired with standard responsive layout containers.</p>
+      <p>Use the spacing scale to group related elements, then rely on the module’s own responsive layout. The bars use the same CSS spacing properties as the built site.</p>
     </div>
 
     <div class="sg-demo-box">
-      <p class="sg-demo-label">8-Step Spacing Scale (--s1 to --s8)</p>
+      <p class="sg-demo-label">Spacing scale</p>
       <div class="sg-spacing-grid">
-        <div class="sg-spacing-item"><span>--s1</span><span>4px</span><div class="sg-spacing-bar sg-w-4"></div></div>
-        <div class="sg-spacing-item"><span>--s2</span><span>8px</span><div class="sg-spacing-bar sg-w-8"></div></div>
-        <div class="sg-spacing-item"><span>--s3</span><span>16px</span><div class="sg-spacing-bar sg-w-16"></div></div>
-        <div class="sg-spacing-item"><span>--s4</span><span>24px</span><div class="sg-spacing-bar sg-w-24"></div></div>
-        <div class="sg-spacing-item"><span>--s5</span><span>32px</span><div class="sg-spacing-bar sg-w-32"></div></div>
-        <div class="sg-spacing-item"><span>--s6</span><span>48px</span><div class="sg-spacing-bar sg-w-48"></div></div>
-        <div class="sg-spacing-item"><span>--s7</span><span>64px</span><div class="sg-spacing-bar sg-w-64"></div></div>
-        <div class="sg-spacing-item"><span>--s8</span><span>96px</span><div class="sg-spacing-bar sg-w-96"></div></div>
+        {{ range seq 8 }}
+        <div class="sg-spacing-item"><code>--s{{ . }}</code><div class="sg-spacing-bar sg-space-{{ . }}" aria-hidden="true"></div></div>
+        {{ end }}
       </div>
     </div>
 
     <div class="sg-demo-box">
       <p class="sg-demo-label">Responsive Breakpoints & Widths</p>
       <div class="sg-breakpoints">
-        <div class="sg-breakpoint"><strong>Small Viewport</strong><p class="sg-breakpoint__note">min-width: 600px (2-col grid)</p></div>
-        <div class="sg-breakpoint"><strong>Medium Viewport</strong><p class="sg-breakpoint__note">min-width: 900px (3-col cards / split hero)</p></div>
-        <div class="sg-breakpoint"><strong>Large Viewport</strong><p class="sg-breakpoint__note">min-width: 1200px (desktop comfort)</p></div>
-        <div class="sg-breakpoint"><strong>Max Width</strong><p class="sg-breakpoint__note">--width: 1120px</p></div>
+        <div class="sg-breakpoint"><strong>Small screens</strong><p class="sg-breakpoint__note">Start with the reading order and one clear next action.</p></div>
+        <div class="sg-breakpoint"><strong>Wide screens</strong><p class="sg-breakpoint__note">Use columns where the content benefits from comparison.</p></div>
+        <div class="sg-breakpoint"><strong>Reading width</strong><p class="sg-breakpoint__note">Use <code>--width</code> for the page container and <code>--reading</code> for long prose. See <code>assets/scss/abstracts/_variables.scss</code>.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 4. Buttons & Actions -->
+  <section id="page-assembly" class="sg-section">
+    <div class="sg-heading">
+      <h2>Page Assembly</h2>
+      <p>Choose the closest starter composition, then keep the sections that help the visitor make a decision. Use the <a href="{{ "site-kit/catalog/#compositions" | relURL }}">starter previews</a> to see how the pieces work together.</p>
+    </div>
+    <dl class="sg-options">
+      <div>
+        <dt>Homepage</dt>
+        <dd>Lead with who the business helps, follow with <a href="#components-cards">services</a> and approved work, and give visitors one useful <a href="#components-buttons">next step</a>.</dd>
+      </div>
+      <div>
+        <dt>Service page</dt>
+        <dd>Explain fit, scope, and the process. Use a <a href="#components-tables">comparison</a> when differences matter and answer genuine objections in <a href="#components-disclosures">questions</a>.</dd>
+      </div>
+      <div>
+        <dt>Contact page</dt>
+        <dd>Show the confirmed contact route and say what happens after someone acts. Match the explanation to the real delivery configuration.</dd>
+      </div>
+    </dl>
+    <p class="sg-source">Section order and variant keys live under <code>pages</code> in the preset. Each page section points to a content object under the top-level <code>sections</code> key. Use one lead heading and give each destination a stable anchor.</p>
+  </section>
+
   <section id="components-buttons" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">04 / Interaction</p>
       <h2>Buttons & Action Links</h2>
-      <p>Keyboard-accessible interactive actions with clear focus rings and responsive hit targets.</p>
+      <p>Use the primary style for the next action and the outline style for a useful second path. Write labels that name the destination or action.</p>
     </div>
 
     <div class="sg-demo-box">
       <p class="sg-demo-label">Button Variants</p>
       <div class="sg-cluster">
-        <a class="button" href="#components-buttons">Primary Button <span aria-hidden="true">↗</span></a>
-        <a class="button button--outline" href="#components-buttons">Outline Button <span aria-hidden="true">↗</span></a>
+        {{ partial "factory/action.html" (dict "action" (dict "label" "Start a conversation" "url" "/contact/") "preview" true "targets" (dict "/contact/" "#components-forms")) }}
+        {{ partial "factory/action.html" (dict "action" (dict "label" "Explore services" "url" "/services/") "secondary" true "preview" true "targets" (dict "/services/" "#components-cards")) }}
         <a class="button button--small" href="#components-buttons">Small Action <span aria-hidden="true">↗</span></a>
         <a class="text-link" href="#components-buttons">Inline Text Link <span aria-hidden="true">↗</span></a>
       </div>
     </div>
-
-    <div class="sg-demo-box">
-      <p class="sg-demo-label">Paired Button Group</p>
-      <div class="button-group">
-        <a class="button" href="#components-buttons">Start a conversation <span aria-hidden="true">↗</span></a>
-        <a class="button button--outline" href="#components-buttons">Explore our services <span aria-hidden="true">↗</span></a>
-      </div>
-    </div>
+    <p class="sg-source">The primary and outline examples call <code>layouts/partials/factory/action.html</code>. In a preset, supply <code>label</code> and <code>url</code> for each action. Use a native button for an in-place action or submission.</p>
   </section>
 
   <!-- 5. Badges & Indicators -->
   <section id="components-badges" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">05 / Atoms</p>
       <h2>Badges, Marks & Status Indicators</h2>
-      <p>Subtle micro-visual elements communicating hierarchy, section roles, and sequence.</p>
+      <p>Use a badge when it communicates an actual distinction. Put any important status or sequence in text or document structure as well.</p>
     </div>
 
     <div class="sg-demo-box">
@@ -213,62 +212,42 @@
   <!-- 6. Cards -->
   <section id="components-cards" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">06 / Surfaces</p>
-      <h2>Card Primitives</h2>
-      <p>Flexible surface containers for service descriptions, features, client proof, and bento clusters.</p>
+      <h2>Cards & Rows</h2>
+      <p>Use cards for a few services with comparable descriptions. Use rows when descriptions are longer or when readers need to scan an ordered set.</p>
     </div>
-
-    <div class="fm-grid sg-gap-24">
-      <article class="fm-card">
-        <span class="fm-index" aria-hidden="true">01</span>
-        <h3>Standard Surface Card</h3>
-        <p>A structured container with high-contrast text and deliberate internal padding on a clean canvas.</p>
-        <a class="text-link sg-card-link" href="#components-cards">Learn more <span aria-hidden="true">↗</span></a>
-      </article>
-
-      <article class="fm-card fm-bento-card">
-        <span class="fm-badge">Bento Style</span>
-        <h3>Showcase Card</h3>
-        <p>A versatile card format with flexible metadata badges, headline contrast, and responsive spacing.</p>
-      </article>
-    </div>
+    {{ template "factory-style-guide-variants" (dict "page" . "key" "services" "variants" (slice "cards" "rows")) }}
   </section>
 
   <!-- 7. Form Controls -->
   <section id="components-forms" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">07 / Forms</p>
       <h2>Form Controls & States</h2>
-      <p>Accessible form controls with explicit labels, focus outlines, and honest disabled state presentation.</p>
+      <p>Give fields explicit labels and associate instructions with their fields. This specimen accepts typing for demonstration and has no submission path. The delivery form is defined in <code>layouts/partials/contact-form.html</code>.</p>
     </div>
 
     <div class="sg-demo-box">
-      <div class="factory-form">
-        <div class="form-grid sg-form-stack">
-          <div class="form-field">
-            <label class="sg-form-label" for="demo-name">Your name</label>
-            <input class="sg-form-control" id="demo-name" type="text" aria-describedby="demo-name-help" placeholder="e.g. Alex Morgan">
-            <small class="sg-note" id="demo-name-help">Enter the name the business should use when replying.</small>
-          </div>
-          <div class="form-field">
-            <label class="sg-form-label" for="demo-service">Service of interest</label>
-            <select class="sg-form-control" id="demo-service" aria-describedby="demo-service-help">
-              <option>New website build</option>
-              <option>Brand refresh & redesign</option>
-              <option>Content & performance optimization</option>
-            </select>
-            <small class="sg-note" id="demo-service-help">Choose the service closest to what you need. Use the project details field for anything else.</small>
-          </div>
-          <div class="form-field">
-            <label class="sg-form-label" for="demo-message">Project details</label>
-            <textarea class="sg-form-control" id="demo-message" rows="3" aria-describedby="demo-message-help" placeholder="Briefly describe what your business needs..."></textarea>
-            <small class="sg-note" id="demo-message-help">Describe the result you need and any known timing or constraints. The demo does not send this text.</small>
+      <div class="contact-form sg-form-stack">
+        <div class="form-grid">
+          <div>
+            <label for="demo-name">Your name</label>
+            <input id="demo-name" type="text" aria-describedby="demo-name-help">
+            <small id="demo-name-help">Enter the name the business should use when replying.</small>
           </div>
           <div>
-            <button type="button" class="button sg-disabled" disabled>Submit message (disabled in demo)</button>
-            <p class="caption sg-note">Delivery remains disabled until real credentials and form handler are authorized.</p>
+            <label for="demo-service">Service of interest</label>
+            <select id="demo-service" aria-describedby="demo-service-help">
+              <option>Select a service</option>
+              <option>New website build</option>
+              <option>Redesign</option>
+              <option>Content updates</option>
+            </select>
+            <small id="demo-service-help">Choose the service closest to what you need.</small>
           </div>
         </div>
+        <label for="demo-message">Project details</label>
+        <textarea id="demo-message" rows="3" aria-describedby="demo-message-help"></textarea>
+        <small id="demo-message-help">Describe the result you need and any known timing.</small>
+        <button type="button" class="button" disabled>Send message (disabled in demo)</button>
       </div>
     </div>
   </section>
@@ -276,58 +255,46 @@
   <!-- 8. Tables -->
   <section id="components-tables" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">08 / Tables</p>
-      <h2>Data Tables & Regional Scrollers</h2>
-      <p>Accessible table regions equipped with keyboard focus boundaries and column/row scope semantics.</p>
+      <h2>Comparing Scope</h2>
+      <p>Use a table when options share the same comparison criteria. A table needs a meaningful caption, column and row headings, and a keyboard-focusable region if it scrolls. Choose cards if each option needs its own narrative.</p>
     </div>
-
-    <div class="table-scroll" tabindex="0" role="region" aria-label="Style guide example comparison table">
-      <table>
-        <caption>Demonstration scope comparison matrix</caption>
-        <thead>
-          <tr>
-            <th scope="col">Tier</th>
-            <th scope="col">Emitted Pages</th>
-            <th scope="col">Target Audience</th>
-            <th scope="col">Delivery Mechanism</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">Starter Site</th>
-            <td>Home, Services, About, Contact</td>
-            <td>Local business / trades</td>
-            <td>Static hosting + Cloudflare Pages Functions</td>
-          </tr>
-          <tr>
-            <th scope="row">Expanded Practice</th>
-            <td>Full 6 pages + 4 case studies</td>
-            <td>Agencies & consultants</td>
-            <td>Automated CI/CD + custom subpaths</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    {{ template "factory-style-guide-variants" (dict "page" . "key" "pricing" "variants" (slice "table" "cards")) }}
   </section>
 
   <!-- 9. Native Disclosures -->
   <section id="components-disclosures" class="sg-section">
     <div class="sg-heading">
-      <p class="eyebrow">09 / Disclosure</p>
-      <h2>Native Accordions & Disclosures</h2>
-      <p>Semantic <code>&lt;details&gt;</code> and <code>&lt;summary&gt;</code> controls operating without client-side JavaScript.</p>
+      <h2>Questions & Disclosures</h2>
+      <p>Use open answers for information everyone needs. Use native disclosures for optional detail or a longer list of questions. A descriptive question makes the disclosure easy to identify and open with a keyboard.</p>
     </div>
-
-    <div class="fm-faq sg-gap-32">
-      <details open>
-        <summary>How do native disclosures work without JavaScript?</summary>
-        <p>The browser natively manages the open/closed state, toggles visibility, updates accessible aria properties, and handles Enter and Space keypresses without executing a single line of client script.</p>
-      </details>
-      <details>
-        <summary>Can disclosures be customized with the brand accent?</summary>
-        <p>Yes. Summary indicators, focus rings, hover backgrounds, and border rules are bound to the root CSS custom properties and adapt automatically to light and dark color schemes.</p>
-      </details>
-    </div>
+    {{ template "factory-style-guide-variants" (dict "page" . "key" "faq" "variants" (slice "accordion" "open")) }}
   </section>
 </div>
+{{ end }}
+
+{{ define "factory-style-guide-variants" }}
+  {{ $key := .key }}
+  {{ $module := index hugo.Data.modules $key }}
+  {{ $example := index hugo.Data.examples $key }}
+  <p class="sg-source">{{ $module.purpose }} Required fields: <code>{{ delimit $module.required ", " }}</code>. <a href="{{ printf "site-kit/catalog/#catalog-%s" $key | relURL }}">All {{ $module.name | lower }} variants</a></p>
+  {{ range $index, $variant := .variants }}
+    {{ $id := printf "specimen-%s-%s" $key $variant }}
+    {{ $rendered := partial "factory/module.html" (dict "page" $.page "module" $key "variant" $variant "data" $example "id" $id "hero" false "preview" true) }}
+    {{ $contentKey := printf "example-%s" $key }}
+    {{ $section := dict "module" $key "variant" $variant "content" $contentKey "anchor" $id }}
+    {{ $preset := dict "pages" (dict "home" (dict "sections" (slice $section))) "sections" (dict $contentKey $example) }}
+    <details class="sg-details"{{ if eq $index 0 }} open{{ end }}>
+      <summary>{{ $module.name }} · {{ $variant | humanize }}</summary>
+      <div class="sg-variant">{{ $rendered }}</div>
+      <details class="sg-details sg-snippet">
+        <summary>Preset configuration</summary>
+        <p>Append the example section to an existing page’s ordered sections and add the matching content object. Replace the example copy with approved details.</p>
+        <pre class="sg-code"><code>{{ $preset | jsonify (dict "indent" "  ") | string }}</code></pre>
+      </details>
+      <details class="sg-details sg-snippet">
+        <summary>Rendered HTML</summary>
+        <pre class="sg-code"><code>{{ $rendered | string }}</code></pre>
+      </details>
+    </details>
+  {{ end }}
 {{ end }}

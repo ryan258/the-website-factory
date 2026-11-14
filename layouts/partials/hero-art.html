@@ -1,30 +1,29 @@
 <div class="factory" aria-hidden="true">
 <div class="factory__label">
-<span>THE BUILD FLOOR</span>
-<span>EST. 2026</span>
+<span>{{ upper hugo.Data.site.wordmark }}</span>
 </div>
 <div class="factory__orbit">
 </div>
 <div class="browser-card">
 <div class="browser-card__chrome">
 <span>● ● ●</span>
-<span>Built for what’s next ↗</span>
+<span>{{ hugo.Data.site.wordmark }} ↗</span>
 </div>
 <div class="browser-card__canvas">
-<div class="browser-card__brand">YOUR NEXT CHAPTER.</div>
-<div class="browser-card__headline">Less waiting.<br>More doing.</div>
+<div class="browser-card__brand">{{ hugo.Data.site.tagline }}</div>
+<div class="browser-card__headline">{{ hugo.Data.site.wordmark }}</div>
 <div class="browser-card__line">
 </div>
 <div class="browser-card__line browser-card__line--short">
 </div>
-<div class="browser-card__button">Let’s get started ↗</div>
+<div class="browser-card__button">{{ hugo.Data.site.primary_cta.label }} ↗</div>
 <div class="browser-card__shape">
 </div>
 </div>
 </div>
 <div class="factory__stamp">
 <span aria-hidden="true">↗</span>
-<strong>Made to<br>move you.</strong>
+<strong>{{ hugo.Data.site.footer_cta | default hugo.Data.site.wordmark }}</strong>
 </div>
 <div class="factory__rail">
 <span>01 BRIEF</span>

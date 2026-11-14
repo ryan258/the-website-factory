@@ -1,10 +1,9 @@
-/* Living Style Guide Styles — The Website Factory */ .sg-intro {
+.sg-intro {
   padding-block: clamp(48px, 7vw, 96px);
   border-bottom: 1px solid var(--line);
 }
 
 .sg-intro h1 {
-  font-size: clamp(2.5rem, 5.5vw, 4rem);
   margin-block: 16px 24px;
 }
 
@@ -140,7 +139,7 @@
 
 .sg-spacing-item {
   display: grid;
-  grid-template-columns: 80px 70px 1fr;
+  grid-template-columns: 5rem minmax(0, 1fr);
   align-items: center;
   gap: 16px;
   font-size: .8rem;
@@ -177,11 +176,68 @@
   align-items: center;
 }
 
-/* Responsive adjustments */ @media (max-width: 599px) {
-  .sg-spacing-item {
-    grid-template-columns: 60px 50px 1fr;
-    font-size: .7rem;
-  }
+.sg-details {
+  margin-block: var(--s3);
+  border: 1px solid var(--line);
+  padding: var(--s3);
+  min-width: 0;
+}
+
+.sg-details > summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.sg-details > p {
+  margin-top: var(--s3);
+}
+
+.sg-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--s3);
+  margin-block: var(--s3);
+}
+
+.sg-options > div {
+  background: var(--mist);
+  padding: var(--s3);
+}
+
+.sg-options dt {
+  font-weight: 650;
+}
+
+.sg-options dd {
+  margin-inline-start: 0;
+  margin-block-start: var(--s2);
+  color: var(--muted);
+}
+
+.sg-variant {
+  margin-block: var(--s3);
+  border: 1px solid var(--line);
+}
+
+.sg-snippet {
+  background: var(--mist);
+}
+
+.sg-code {
+  margin-block-start: var(--s3);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: .85rem;
+}
+
+.sg-source {
+  margin-block: var(--s3);
+}
+
+.sg-source code,
+.sg-breakpoint code,
+.sg-heading code {
+  overflow-wrap: anywhere;
 }
 
 // Specimen presentation. These lived in style="" attributes, which the site's
@@ -193,39 +249,17 @@
   .sg-bg-mist { background: var(--mist); }
   .sg-bg-line { background: var(--line); }
   .sg-bg-accent { background: var(--accent); }
+  .sg-bg-accent-text { background: var(--accent-text); }
   .sg-bg-link { background: var(--link); }
   .sg-bg-muted { background: var(--muted); }
-  .sg-bg-yellow { background: #ffc400; }
-  .sg-bg-clay { background: #edb08e; }
-  .sg-bg-sage { background: #b9d7bb; }
-  .sg-bg-blue { background: #a6cef7; }
-  .sg-w-4 { width: 4px; }
-  .sg-w-8 { width: 8px; }
-  .sg-w-16 { width: 16px; }
-  .sg-w-24 { width: 24px; }
-  .sg-w-32 { width: 32px; }
-  .sg-w-48 { width: 48px; }
-  .sg-w-64 { width: 64px; }
-  .sg-w-96 { width: 96px; }
+  @for $step from 1 through 8 {
+    .sg-space-#{$step} { width: var(--s#{$step}); }
+  }
   .sg-subhead { margin-bottom: 16px; font-size: 1.1rem; }
-  .sg-type-h1 { font-family: var(--heading-font); font-size: clamp(2.6rem, 5.8vw, 4.5rem); margin: 0; line-height: 1.15; font-weight: 650; letter-spacing: var(--heading-tracking); }
-  .sg-type-h2 { font-family: var(--heading-font); margin: 0; font-size: clamp(1.8rem, 3.2vw, 2.65rem); line-height: 1.15; font-weight: 650; letter-spacing: var(--heading-tracking); }
-  .sg-type-h3 { font-family: var(--heading-font); margin: 0; font-size: 1.4rem; line-height: 1.15; font-weight: 650; letter-spacing: var(--heading-tracking); }
-  .sg-type-intro { margin: 0; font-size: 1rem; line-height: 1.6; max-width: 48ch; }
-  .sg-type-body { margin: 0; font-size: 1.125rem; line-height: 1.6; max-width: 65ch; }
-  .sg-type-eyebrow { margin: 0; font-size: 0.68rem; font-weight: 650; letter-spacing: 0.12em; }
-  .sg-type-notice { margin: 0; font-size: 0.75rem; max-width: 85ch; }
-  .sg-breakpoints { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; font-size: .85rem; }
+  .sg-breakpoints { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; font-size: .85rem; }
   .sg-breakpoint { border: 1px solid var(--line); padding: 16px; }
   .sg-breakpoint__note { margin-top: 6px; color: var(--muted); }
   .sg-flush { margin: 0; }
   .sg-avatar { margin: 0; width: 44px; height: 44px; font-size: 0.9rem; }
-  .sg-gap-24 { margin-bottom: 24px; }
-  .sg-card-link { margin-top: 16px; display: inline-block; }
-  .sg-form-stack { display: grid; gap: 20px; max-width: 600px; }
-  .sg-form-label { display: block; font-weight: 600; margin-bottom: 8px; }
-  .sg-form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
-  .sg-disabled { opacity: 0.5; cursor: not-allowed; }
-  .sg-note { margin-top: 8px; }
-  .sg-gap-32 { margin-bottom: 32px; }
+  .sg-form-stack { max-width: 600px; }
 }
