@@ -20,9 +20,10 @@ on:
         type: boolean
         default: false
 
+# Checks on a newer push replace older checks, but never a release in flight: dispatch runs have their own group.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
   verify:

@@ -145,7 +145,7 @@ In `wrangler.toml`, this stays `"false"` in source control. Without `"true"` eve
 - **From GitHub (recommended):** run the deploy workflow with **Accept enquiries** ticked. It sets both in its own copy of the project and checks they agree before publishing. Nothing is committed.
 - **From your own machine:** change `ENQUIRY_ENABLED` to `"true"`, build with `HUGO_PARAMS_FORMENABLED=true` (step 7), deploy (step 8), then change it back to `"false"` before you commit.
 
-**The dashboard cannot turn this on.** When a Pages project has a `wrangler.toml`, Cloudflare treats that file as the only source of its variables and bindings. A value typed into **Settings → Variables and Secrets** does not override it. Whatever `wrangler.toml` says at deploy time is what the live site uses. Secrets, such as `NOTIFICATION_WEBHOOK`, are the exception: add them with `npx wrangler pages secret put NOTIFICATION_WEBHOOK --project-name 258webco`.
+**The dashboard cannot turn this on.** When a Pages project has a `wrangler.toml`, Cloudflare treats that file as the only source of its variables and bindings. A value typed into **Settings → Variables and Secrets** does not override it. Whatever `wrangler.toml` says at deploy time is what the live site uses. Secrets, such as `NOTIFICATION_WEBHOOK`, are the exception: add them with `npx wrangler pages secret put NOTIFICATION_WEBHOOK --project-name 258webco`. Also set `RATE_LIMIT_SALT` the same way, to any long random string: the rate limiter stores a hash of each visitor's IP address, and without a secret salt that hash can be reversed by trying every address.
 
 After deploying, check the live endpoint answers: a form submission should return a success page, not "could not confirm delivery". A 503 means intake is still off.
 

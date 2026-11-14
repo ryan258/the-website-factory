@@ -17,7 +17,8 @@ FILES = ('hugo.toml', '.hugo-version', '.sass-version', '.gitignore', 'README.md
 MASTER_ONLY_TESTS = ('test_factory.py', 'test_starter.py', 'test_from_plan.py', 'test_schemas.py', 'test_claims.py',
                      'test_ai.py', 'test_mcp.py', 'test_evals.py', 'test_handover.py', 'test_library.py', 'test_enquiries.py',
                      'test_links.py', 'test_doctor.py', 'test_smoke.py', 'test_plan_fidelity.py', 'test_scaffold_core.py',
-                     'test_review_fixes.py', 'check_planner_fidelity.cjs', 'verify.py', 'verify_review.py')
+                     'test_review_fixes.py', 'test_three_layouts.py', 'test_component_expansion.py', 'check_planner_fidelity.cjs',
+                     'check_workshop.cjs', 'check_components.cjs', 'check_workflow.cjs', 'verify.py', 'verify_review.py')
 CLIENT_TEST = ('python3 scripts/factory.py && python3 scripts/check_site.py && python3 scripts/claims.py --strict '
                '&& python3 scripts/contrast.py && node scripts/test_contact_endpoint.mjs')
 
@@ -111,7 +112,8 @@ The contact form is inert until all three are done, in this order:
 Then build with the form rendered: `HUGO_PARAMS_FORMENABLED=true python3 scripts/build.py`,
 and confirm receipt end to end (`scripts/check_contact.sh`, or a real submission read back
 with `npx wrangler kv key list --binding ENQUIRY --remote`) before telling the client the
-form works. Agree who monitors enquiries, and how often, before launch.
+form works. Set a secret salt for the rate limiter (`npx wrangler pages secret put RATE_LIMIT_SALT --project-name {slug}`, any long random
+string), or the stored IP hashes can be reversed. Agree who monitors enquiries, and how often, before launch.
 
 ## 4. Publishing decisions that remain open
 

@@ -14,18 +14,20 @@ owner-only step (step 5).
 2. **Create the Pages project** — `npx wrangler pages project create 258webco --production-branch main` ([guide step 3](docs/cloudflare-setup.md#step-3--make-the-website-project)).
 3. **Check the enquiry store** — the `ENQUIRY` KV namespace id is already in `wrangler.toml`. Do not add it in the dashboard: `wrangler.toml` is the only place Cloudflare reads it from ([guide step 4](docs/cloudflare-setup.md#step-4--make-the-box-that-enquiries-get-stored-in)).
 4. **Set up domain email forwarding** (optional, for mail sent to `@258webco.com`) ([guide step 5](docs/cloudflare-setup.md#step-5--set-up-mail-on-the-domain)). This is separate from the contact form.
-5. **Add GitHub secrets** — in the repository, **Settings → Secrets and variables → Actions**, add `CLOUDFLARE_API_TOKEN` (with **Cloudflare Pages: Edit**) and `CLOUDFLARE_ACCOUNT_ID`.
+5. **Set the rate-limit secret** — `npx wrangler pages secret put RATE_LIMIT_SALT --project-name 258webco`, and paste any long random string. Without it the stored IP hashes use a public default salt and can be reversed.
+6. **Add GitHub secrets** — in the repository, **Settings → Secrets and variables → Actions**, add `CLOUDFLARE_API_TOKEN` (with **Cloudflare Pages: Edit**) and `CLOUDFLARE_ACCOUNT_ID`.
 
 ## Every release
 
 1. **Run the checks locally** — `sh scripts/check_contact.sh` should end with `Contact endpoint checks passed`.
-2. **Push to `main`.** The **Verify Quality Gates** job must pass.
-3. **Deploy** — in GitHub, open **Actions → CI Quality Gates & Pages Deployment → Run workflow**:
+2. **Record the content review** (owner decision) — `./wf status` lists the fields that changed. Read them, then `./wf approve --by YOUR_NAME`. Commit `data/content-review.json`. Without it the production build is refused ("Content review is missing or stale"), and so is any edit to reviewed content after it.
+3. **Push to `main`.** The **Verify Quality Gates** job must pass.
+4. **Deploy** — in GitHub, open **Actions → CI Quality Gates & Pages Deployment → Run workflow**:
    - Tick **Authorize production release**.
    - Tick **Accept enquiries** to switch the contact form on. This turns on both the form and the endpoint together. An indexable release with the form off is refused by the build, because visitors would see a disabled form and no other way to get in touch.
-4. **Check the live site** — `python3 scripts/smoke.py https://258webco.com --form on`. It only reads (it never sends the form) and fails loudly if what is live is not the release you just built.
-5. **Attach the domain** (first release only) ([guide step 9](docs/cloudflare-setup.md#step-9--put-your-real-domain-on-it)).
-6. **Send a real test enquiry** and confirm it is stored:
+5. **Check the live site** — `python3 scripts/smoke.py https://258webco.com --form on`. It only reads (it never sends the form) and fails loudly if what is live is not the release you just built.
+6. **Attach the domain** (first release only) ([guide step 9](docs/cloudflare-setup.md#step-9--put-your-real-domain-on-it)).
+7. **Send a real test enquiry** and confirm it is stored:
    ```sh
    npx wrangler kv key list --binding ENQUIRY --remote --prefix enquiry:
    ```
