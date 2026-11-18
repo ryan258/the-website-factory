@@ -79,7 +79,7 @@ Lime on Paper is 1.14:1. Pair Lime controls with Ink text and outlines. Use Divi
 | Label and navigation | Inter 600, `0.9375rem`, 1.45 line height |
 | Code and commands | `ui-monospace, SFMono-Regular, Consolas, monospace` at the surrounding text size |
 
-Use the bundled [Inter variable WOFF2](../../static/fonts/inter-latin-variable.woff2) with `font-display: swap` and a system sans-serif fallback. The bundled file covers the Latin subset and weights 400–800. When extending language coverage, confirm the glyphs in use and include a compatible licensed font or appropriate fallback. Include the [SIL Open Font License](../../static/fonts/OFL.txt) when distributing the font file.
+Use the bundled [Inter variable WOFF2](../../static/fonts/inter-latin-variable.woff2) with `font-display: swap` and a system sans-serif fallback. The bundled file covers the Latin subset and weights 400–800. When extending language coverage, confirm the glyphs in use and include a compatible licensed font or appropriate fallback. Include the [SIL Open Font License](../../static/fonts/OFL-inter.txt) when distributing the font file.
 
 - Design around the `4, 8, 16, 24, 32, 48, 64, 96 px` spacing scale. Use 16–24 px gaps within a group and 48–96 px between major sections.
 - Use a `70rem` maximum content frame and `65ch` prose measure. Pair the headline and an image in wide layouts and stack them in reading order on narrow screens.

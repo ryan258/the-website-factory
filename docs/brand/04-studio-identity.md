@@ -26,7 +26,7 @@ Use Ink for text on yellow. Draw focus and required control boundaries with a co
 
 ## Type, spacing, and layout
 
-Use the repository’s [self-hosted Inter](../../static/fonts/inter-latin-variable.woff2) with a system sans-serif fallback. Keep its [font license](../../static/fonts/OFL.txt) with redistributed font files. Use weights 700–800 for headlines and wordmarks, 550–650 for labels, and 400–500 for reading text. The recommendations below apply to new studio collateral. The workshop’s living guide documents exact storefront CSS values and usage.
+Use the repository’s [self-hosted Inter](../../static/fonts/inter-latin-variable.woff2) with a system sans-serif fallback. Keep its [font license](../../static/fonts/OFL-inter.txt) with redistributed font files. Use weights 700–800 for headlines and wordmarks, 550–650 for labels, and 400–500 for reading text. The recommendations below apply to new studio collateral. The workshop’s living guide documents exact storefront CSS values and usage.
 
 | Element | Digital size | Layout |
 | --- | --- | --- |

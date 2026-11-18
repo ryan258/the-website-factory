@@ -1,3 +1,9 @@
 # Lint for real mistakes only (pyflakes errors and syntax errors). Style is not enforced.
+# `ruff format FILE` is available for dense files; it keeps the existing quote style.
+line-length = 120
+
+[format]
+quote-style = "preserve"
+
 [lint]
 select = ["F", "E9"]

@@ -73,7 +73,7 @@ class FontTests(unittest.TestCase):
                 path = ROOT / 'static' / font['file']
                 self.assertTrue(path.is_file(), f'{name}: {font["file"]}')
                 stem = path.name.replace('-latin-variable.woff2', '')
-                license_file = ROOT / 'static/fonts' / ('OFL.txt' if stem == 'inter' else f'OFL-{stem}.txt')
+                license_file = ROOT / 'static/fonts' / f'OFL-{stem}.txt'
                 self.assertIn('SIL Open Font License', license_file.read_text(), name)
 
     def test_copy_with_a_pairing_keeps_only_its_fonts(self):
@@ -81,7 +81,7 @@ class FontTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             dest = new_site.create(Path(tmp) / 'c', 'Font Co', 'consultant', fonts='editorial')
             self.assertEqual(sorted(p.name for p in (dest / 'static/fonts').iterdir()),
-                             ['OFL-source-serif-4.txt', 'OFL.txt', 'inter-latin-variable.woff2', 'source-serif-4-latin-variable.woff2'])
+                             ['OFL-inter.txt', 'OFL-source-serif-4.txt', 'inter-latin-variable.woff2', 'source-serif-4-latin-variable.woff2'])
             settings = factory.font_settings(dest)
             self.assertEqual((settings['family'], settings['heading_family']), ('Inter', 'Source Serif 4'))
             self.assertEqual(factory.validate(dest), [])

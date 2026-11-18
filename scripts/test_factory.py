@@ -21,6 +21,12 @@ class FactoryTests(unittest.TestCase):
         result=subprocess.run(['python3',str(root/'scripts/build.py'),*args],env=build.environment(),capture_output=True,text=True)
         self.assertEqual(result.returncode==0,ok,result.stdout+result.stderr)
         return result
+    def test_preview_sends_the_site_wide_headers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp)/'_headers').write_text("/*\n  X-Frame-Options: DENY\n  Content-Security-Policy: default-src 'self'; form-action 'self' https://forms.example\n/css/*\n  Cache-Control: immutable\n")
+            self.assertEqual(build.site_headers(tmp),{'X-Frame-Options':'DENY','Content-Security-Policy':"default-src 'self'; form-action 'self' https://forms.example"})
+            self.assertEqual(build.site_headers(Path(tmp)/'missing'),{})
+        self.assertIn('Content-Security-Policy',build.site_headers(ROOT/'static'))
     def test_tone_colors_have_one_source(self):
         import re
         tones=json.loads((ROOT/'data/tones.json').read_text())
@@ -100,7 +106,7 @@ class FactoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='factory-workshop-') as tmp:
             source=Path(tmp)/'source'
             import shutil
-            shutil.copytree(ROOT,source,ignore=shutil.ignore_patterns('public','public-workshop','resources','reports','__pycache__','.tools','node_modules'))
+            shutil.copytree(ROOT,source,ignore=shutil.ignore_patterns('public','public-workshop','resources','reports','__pycache__','.tools','node_modules','.venv'))
             self.command(source)
             storefront=(source/'public/index.html').read_bytes()
             configuration=(source/'data/factory.json').read_bytes()
@@ -283,7 +289,7 @@ class FactoryTests(unittest.TestCase):
         import shutil
         dest=Path(tmp)/'copy'
         shutil.copytree(ROOT,dest,ignore=shutil.ignore_patterns('public','public-workshop','resources','reports',
-                                                                '__pycache__','.tools','node_modules','.git'))
+                                                                '__pycache__','.tools','node_modules','.venv','.git'))
         if edit:
             source=dest/'data/presets/construction.json'
             profile=json.loads(source.read_text());edit(profile)
