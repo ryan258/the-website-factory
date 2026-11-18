@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build from any cwd using system tools or the project's private Dart Sass."""
+"""Build from any cwd using the project's private pinned Hugo and Dart Sass (scripts/setup.py), or system ones."""
 import argparse
 import os
 from pathlib import Path
@@ -16,12 +16,26 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def environment():
     env = os.environ.copy()
-    local = ROOT / '.tools/dart-sass'
-    if local.is_dir():
-        env['PATH'] = str(local) + os.pathsep + env.get('PATH', '')
+    # Private pinned tools from scripts/setup.py win over system ones (a Homebrew Hugo upgrade, say).
+    for local in (ROOT / '.tools/dart-sass', ROOT / '.tools/hugo'):
+        if local.is_dir():
+            env['PATH'] = str(local) + os.pathsep + env.get('PATH', '')
     env.setdefault('HUGO_CACHEDIR', str(Path(tempfile.gettempdir()) / 'website-starter-hugo-cache'))
     return env
 
+
+def site_headers(output):
+    """The /* block of the built _headers: what Cloudflare Pages sends with every page
+    (scripts/qa-paths.cjs reads the same block for the browser checks)."""
+    headers, inside = {}, False
+    path = Path(output) / '_headers'
+    for line in path.read_text().splitlines() if path.is_file() else []:
+        if line.strip() and not line[0].isspace():
+            inside = line.strip() == '/*'
+        elif inside and ':' in line:
+            name, value = line.split(':', 1)
+            headers[name.strip()] = value.strip()
+    return headers
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -197,12 +211,13 @@ def main():
     for binary, pin in [('hugo', '.hugo-version'), ('sass', '.sass-version')]:
         exe = shutil.which(binary, path=env['PATH'])
         if not exe:
-            fail(f'{binary} is missing. See README.md; run scripts/setup.py for Dart Sass.')
+            fail(f'{binary} is missing. Run python3 scripts/setup.py; it installs the pinned Hugo and Dart Sass.')
         command = [exe, 'version' if binary == 'hugo' else '--version']
         result = subprocess.run(command, env=env, cwd=ROOT, capture_output=True, text=True)
         version = (ROOT / pin).read_text().strip()
         if result.returncode or not re.search(r'(?<![\d.])' + re.escape(version) + r'(?![\d.])', result.stdout):
-            fail(f'{binary}: expected {version}; found {result.stdout.strip() or result.stderr.strip()}')
+            fail(f'{binary}: expected {version}; found {result.stdout.strip() or result.stderr.strip()}. '
+                 'Run python3 scripts/setup.py to install the pinned version privately.')
         if binary == 'hugo' and '+extended' not in result.stdout:
             fail('Hugo Extended is required.')
     cmd = ['hugo', '--minify', '--gc']
@@ -256,7 +271,28 @@ def main():
     if args.serve:
         from functools import partial
         from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
-        handler = partial(SimpleHTTPRequestHandler, directory=str(destination))
+        headers = site_headers(destination)
+
+        class Preview(SimpleHTTPRequestHandler):
+            # Same security headers as the live site, so a CSP problem shows up in the local preview too.
+            def end_headers(self):
+                for name, value in headers.items():
+                    self.send_header(name, value)
+                super().end_headers()
+
+            def send_error(self, code, message=None, explain=None):
+                # Like Cloudflare Pages: an unknown address gets the site's own 404 page.
+                page = destination / '404.html'
+                if code != 404 or not page.is_file():
+                    return super().send_error(code, message, explain)
+                body = page.read_bytes()
+                self.send_response(404)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.send_header('Content-Length', str(len(body)))
+                self.end_headers()
+                if self.command != 'HEAD':
+                    self.wfile.write(body)
+        handler = partial(Preview, directory=str(destination))
         with ThreadingHTTPServer(('127.0.0.1', args.port), handler) as server:
             print(f'Preview: http://127.0.0.1:{args.port}/ — serving verified output; rebuild after edits.', flush=True)
             try:

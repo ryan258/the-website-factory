@@ -99,6 +99,9 @@ class MCPTests(unittest.TestCase):
         result = self.session.call('compile_plan', plan=plan)['structuredContent']
         self.assertTrue(result['ok'], result['errors'])
         self.assertEqual(result['slug'], 'rise-crumb-bakery')
+        renamed = self.session.call('compile_plan', plan=plan, name='Oven Door Co')['structuredContent']
+        self.assertEqual((renamed['slug'], renamed['preset']['name']), ('oven-door-co', 'Oven Door Co'))
+        self.assertTrue(renamed['ok'], renamed['errors'])
         self.assertTrue(self.session.call('check_claims', slug='258webco')['structuredContent']['ok'])
 
     def test_bad_input_is_a_tool_error_not_a_crash(self):
@@ -113,9 +116,14 @@ class MCPTests(unittest.TestCase):
             self.assertFalse(result.get('isError'), result)
             self.assertTrue((Path(tmp) / 'copy/data/presets/contractor.json').is_file())
 
-    def test_mcp_config_points_at_the_server(self):
+    def test_mcp_config_starts_the_server(self):
+        # The configured command (which prefers the project .venv) must start this server and answer.
         config = json.loads((ROOT / '.mcp.json').read_text())['mcpServers']['website-factory']
-        self.assertEqual(config['args'], ['scripts/mcp_server.py'])
+        self.assertIn('scripts/mcp_server.py', ' '.join(config['args']))
+        hello = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'initialize', 'params': {'protocolVersion': '2025-06-18'}})
+        done = subprocess.run([config['command'], *config['args']], cwd=ROOT, input=hello + '\n', capture_output=True, text=True, timeout=60)
+        answer = json.loads(done.stdout.splitlines()[0])
+        self.assertEqual(answer['result']['serverInfo']['name'], 'website-factory', done.stderr)
 
 if __name__ == '__main__':
     unittest.main()

@@ -89,8 +89,9 @@ def check_claims(slug=None, preset=None):
 
 def compile_plan(plan, name=None):
     slug, preset = from_plan.convert_plan_to_preset(plan, registry())
-    if name:
-        slug = from_plan.slugify(name)
+    if name and name.strip():
+        # The business name sets both the address-safe slug and the name the site shows.
+        slug, preset = from_plan.slugify(name), {**preset, 'name': name.strip()}
     result = validate_preset(preset, slug)
     return {**result, 'slug': slug, 'preset': preset}
 

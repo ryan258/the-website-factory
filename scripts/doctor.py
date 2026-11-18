@@ -11,6 +11,7 @@ import re
 import shutil
 import subprocess
 import sys
+import sysconfig
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,8 +28,9 @@ def pin(name):
     return path.read_text().strip() if path.is_file() else ''
 
 def hugo_ok(text, want):
-    """True for the Extended build at the pinned version: "hugo v0.166.0+extended+withdeploy darwin/arm64"."""
-    found = re.search(r'v(\d+\.\d+\.\d+)\+extended', text)
+    """True for the Extended build at the pinned version. Homebrew prints "hugo v0.166.0+extended+withdeploy";
+    official release binaries add the commit: "hugo v0.166.0-78400b4de8ad+extended"."""
+    found = re.search(r'v(\d+\.\d+\.\d+)(?:-[0-9a-f]+)?\+extended', text)
     return bool(found) and found.group(1) == want
 
 def check_python():
@@ -40,9 +42,11 @@ def check_git():
 
 def check_hugo():
     want = pin('.hugo-version')
-    if hugo_ok(run('hugo', 'version'), want):
+    private = ROOT / '.tools/hugo/hugo'
+    found = str(private) if private.is_file() else 'hugo'
+    if hugo_ok(run(found, 'version'), want):
         return 'ok', f'Hugo Extended {want}', ''
-    return 'FIX', f'Hugo Extended {want}', f'install the Extended build v{want} from https://github.com/gohugoio/hugo/releases/tag/v{want}'
+    return 'FIX', f'Hugo Extended {want}', 'run: python3 scripts/setup.py (installs the pinned Hugo privately in .tools/hugo)'
 
 def check_sass():
     want = pin('.sass-version')
@@ -66,20 +70,29 @@ def check_browser():
         return 'ok', 'Playwright browser', ''
     return 'warn', 'Playwright browser', 'run: npx playwright install chromium'
 
+def pip_fix():
+    """How to install requirements-dev.txt here. Homebrew's Python refuses pip installs (PEP 668),
+    and a Python upgrade leaves earlier installs behind, so a project .venv is the durable fix there."""
+    managed = (Path(sysconfig.get_path('stdlib')) / 'EXTERNALLY-MANAGED').is_file() and sys.prefix == sys.base_prefix
+    if managed:
+        return ('this Python refuses pip installs. Run: python3 -m venv .venv && .venv/bin/pip install '
+                '-r requirements-dev.txt, then source .venv/bin/activate before running checks')
+    return 'run: pip install -r requirements-dev.txt'
+
 def check_anthropic():
     want = (re.search(r'anthropic==([\d.]+)', pin('requirements-dev.txt')) or [None, ''])[1]
     try:
         have = importlib.metadata.version('anthropic')
     except importlib.metadata.PackageNotFoundError:
-        return 'warn', 'anthropic SDK (AI drafting)', 'run: pip install -r requirements-dev.txt (needs Python 3.10+)'
+        return 'warn', 'anthropic SDK (AI drafting and npm test)', pip_fix()
     if have != want:
-        return 'warn', f'anthropic {have}', f'requirements-dev.txt pins {want}; older SDKs fail on `fallbacks`. Run: pip install -r requirements-dev.txt'
+        return 'warn', f'anthropic {have}', f'requirements-dev.txt pins {want}; older SDKs fail on `fallbacks`. {pip_fix()}'
     return 'ok', f'anthropic {have}', ''
 
 def check_ruff():
     if shutil.which('ruff') or run(sys.executable, '-m', 'ruff', '--version').startswith('ruff'):
         return 'ok', 'ruff (lint)', ''
-    return 'warn', 'ruff (npm run lint)', 'run: pip install -r requirements-dev.txt'
+    return 'warn', 'ruff (npm run lint)', pip_fix()
 
 def main():
     problems = 0

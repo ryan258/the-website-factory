@@ -4,6 +4,7 @@ resources/
 .factory-build-*.lock
 .tools/
 node_modules/
+.venv/
 .DS_Store
 reports/
 
@@ -12,3 +13,5 @@ __pycache__/
 public-workshop/
 enquiries*.csv
 enquiries*.json
+# Care-plan client list (./wf care); kept in ./wf backup
+care-sites.txt

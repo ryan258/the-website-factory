@@ -10,6 +10,8 @@ import doctor  # noqa: E402
 class DoctorTests(unittest.TestCase):
     def test_hugo_must_be_extended_and_pinned(self):
         self.assertTrue(doctor.hugo_ok('hugo v0.166.0+extended+withdeploy darwin/arm64 BuildDate=x', '0.166.0'))
+        self.assertTrue(doctor.hugo_ok('hugo v0.166.0-78400b4de8adc99273d3e674ed6c4d14c3bdf669+extended darwin/arm64', '0.166.0'),
+                        'official release binaries print the commit hash')
         self.assertFalse(doctor.hugo_ok('hugo v0.166.0 darwin/arm64', '0.166.0'), 'the standard build cannot compile the styles')
         self.assertFalse(doctor.hugo_ok('hugo v0.165.0+extended darwin/arm64', '0.166.0'))
         self.assertFalse(doctor.hugo_ok('', '0.166.0'), 'a missing hugo is not ok')

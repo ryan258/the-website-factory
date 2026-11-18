@@ -1,2 +1,6 @@
 #!/bin/sh
-exec python3 "$(dirname "$0")/scripts/wf.py" "$@"
+# The project's .venv (development tools, the anthropic SDK) is used when it exists.
+root="$(dirname "$0")"
+python="$root/.venv/bin/python3"
+[ -x "$python" ] || python=python3
+exec "$python" "$root/scripts/wf.py" "$@"

@@ -1,8 +1,11 @@
 {
   "mcpServers": {
     "website-factory": {
-      "command": "python3",
-      "args": ["scripts/mcp_server.py"]
+      "command": "sh",
+      "args": [
+        "-c",
+        "p=.venv/bin/python3; [ -x \"$p\" ] || p=python3; exec \"$p\" scripts/mcp_server.py"
+      ]
     }
   }
 }
