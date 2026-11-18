@@ -25,6 +25,20 @@ class StarterTests(unittest.TestCase):
             with self.assertRaises(ValueError):scaffold.create(dest,'Bad\nname')
             self.assertFalse(dest.exists())
         with self.assertRaises(ValueError):scaffold.create(ROOT/'forbidden-copy','Test')
+    def test_long_name_needs_a_short_title_name(self):
+        long='Northside Family Dental and Orthodontic Care Group'
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(ValueError,'short name'):scaffold.create(Path(tmp)/'long',long,'clinic')
+            self.assertFalse((Path(tmp)/'long').exists(),'a refused copy leaves nothing behind')
+            dest=scaffold.create(Path(tmp)/'short',long,'clinic',short_name='Northside Dental')
+            self.assertIn('short_name: "Northside Dental"',(dest/'data/site.yaml').read_text())
+            self.assertEqual(sorted(p.name for p in (dest/'static/fonts').iterdir()),['OFL-inter.txt','inter-latin-variable.woff2'],
+                             'a copy keeps only the fonts it uses')
+            result=subprocess.run(['python3',str(dest/'scripts/build.py')],cwd=dest,env=build.environment(),capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            page=(dest/'public/contact/index.html').read_text()
+            self.assertRegex(page,r'<title>Contact — Northside Dental</title>')
+            self.assertIn(long,page,'the header and search data keep the full name')
     def test_compiled_preset_can_start_a_client_copy(self):
         # A preset written by from_plan.py is not in any fixed list; the scaffold must accept it.
         compiled=ROOT/'data/presets/zz-compiled-fixture.json'
@@ -39,7 +53,7 @@ class StarterTests(unittest.TestCase):
     def test_new_instance_build_and_edited_content(self):
         with tempfile.TemporaryDirectory(prefix='starter-fixture-') as tmp:
             dest=scaffold.create(Path(tmp)/'client','Cedar & Stone')
-            for excluded in ['.tools','node_modules','public','resources','reports','.git']:
+            for excluded in ['.tools','node_modules','.venv','public','resources','reports','.git']:
                 self.assertFalse((dest/excluded).exists(),excluded)
             self.assertFalse(list(dest.rglob('__pycache__')))
             self.assertNotIn('97', (dest/'docs/acceptance.md').read_text())
@@ -107,6 +121,13 @@ class StarterTests(unittest.TestCase):
                     self.assertTrue((dest/'scripts'/name).is_file(),f'npm script needs missing scripts/{name}')
             for kept in ('.mcp.json','requirements-dev.txt','ruff.toml','scripts/mcp_server.py','scripts/handover.py'):
                 self.assertTrue((dest/kept).is_file(),kept)
+            ci=(dest/'.github/workflows/check.yml').read_text()
+            uses=re.findall(r'uses: (\S+)',ci)
+            self.assertEqual(len(uses),3)
+            self.assertTrue(all(re.fullmatch(r'[\w.-]+/[\w.-]+@[0-9a-f]{40}',u) for u in uses),uses)
+            self.assertNotRegex(ci,r'(?i)deploy |wrangler|secrets\.','the client check workflow publishes nothing')
+            for name in re.findall(r'scripts/([\w.-]+)',ci):
+                self.assertTrue((dest/'scripts'/name).is_file(),f'the CI workflow needs missing scripts/{name}')
     def test_guided_setup_uses_letters_and_confirms_first(self):
         import json
         with tempfile.TemporaryDirectory() as tmp:
@@ -114,15 +135,30 @@ class StarterTests(unittest.TestCase):
                 queue=list(replies)
                 return lambda prompt: queue.pop(0)
             # A wrong letter is asked again; blank keeps the default; nothing exists before "Yes".
-            dest=scaffold.guided(answers('Guided Co',str(Path(tmp)/'g'),'Z','clinic','D','','A'))
+            dest=scaffold.guided(answers('Guided Co',str(Path(tmp)/'g'),'Z','clinic','','D','','A'))
             self.assertEqual(json.loads((dest/'data/factory.json').read_text())['preset'],'clinic')
             self.assertIn('link: "#0b5cb5"',(dest/'data/site.yaml').read_text(),'harbor palette')
             self.assertIn('family: "Inter"',(dest/'data/site.yaml').read_text())
-            self.assertIsNone(scaffold.guided(answers('Other Co',str(Path(tmp)/'h'),'','','','B')))
+            self.assertIsNone(scaffold.guided(answers('Other Co',str(Path(tmp)/'h'),'','','','','B')))
             self.assertFalse((Path(tmp)/'h').exists(),'cancel creates nothing')
             result=subprocess.run(['python3',str(ROOT/'scripts/new_site.py'),'--guided'],input='Half Co\n',text=True,capture_output=True)
             self.assertEqual(result.returncode,1)
             self.assertIn('Nothing was created',result.stderr)
+    def test_guided_setup_chooses_and_orders_pages(self):
+        import json
+        with tempfile.TemporaryDirectory() as tmp:
+            queue=['Paged Co',str(Path(tmp)/'p'),'agency',
+                   'home blog',               # not a page of this preset: asked again
+                   'home services work',      # drops the required contact page: asked again
+                   'home, work, services, contact',  # pricing left out, work moved up
+                   '','','A']
+            dest=scaffold.guided(lambda prompt: queue.pop(0))
+            self.assertEqual(queue,[],'every answer was used')
+            preset=json.loads((dest/'data/presets/agency.json').read_text())
+            self.assertEqual(list(preset['pages']),['home','work','services','contact'])
+            line=next(l for l in (dest/'data/site.yaml').read_text().splitlines() if l.startswith('navigation:'))
+            menu=[item['url'] for item in json.loads(line.split(':',1)[1])]
+            self.assertEqual(menu,['/','/work/','/services/','/contact/'],'the menu follows the chosen order')
     def test_empty_output_fails(self):
         with tempfile.TemporaryDirectory() as tmp:self.assertTrue(static.check(Path(tmp)))
 if __name__=='__main__':unittest.main()

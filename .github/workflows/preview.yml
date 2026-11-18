@@ -30,16 +30,16 @@ jobs:
       deployments: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
+        uses: peaceiris/actions-hugo@d1c81a15d4e6dca7086a17b9c2565cb70fd576bf # v3.3.0
         with:
           hugo-version: '0.166.0'
           extended: true
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.11'
 
@@ -70,10 +70,23 @@ jobs:
           fi
 
       - name: Publish to Preview Alias
-        uses: cloudflare/wrangler-action@v3
+        id: publish
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           # The Wrangler that scripts/check_contact.sh tests; keep the two in step. The action's own default is older.
           wranglerVersion: "4.136.2"
           command: pages deploy ${{ env.OUTPUT }} --project-name=258webco --branch=preview-${{ inputs.target }}
+
+      # Read-only checks of what was just published, including that static/_routes.json still
+      # sends the private build files through the middleware (404). The deployment's own URL is
+      # checked, not the alias, which can briefly serve the previous upload.
+      - name: Smoke Check Preview
+        env:
+          URL: ${{ steps.publish.outputs.deployment-url }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          if [ -z "$URL" ]; then echo "::error::wrangler-action reported no deployment URL."; exit 1; fi
+          if [ "$TARGET" = "workshop" ]; then FORM=any; else FORM=off; fi
+          python3 scripts/smoke.py "${URL%/}" --noindex --form "$FORM"

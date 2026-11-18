@@ -36,6 +36,9 @@ Composition metadata comes from the preset on every build.
 ./wf handover
 ```
 
+In the client's own Git repository, `.github/workflows/check.yml` builds the site and
+runs these checks on every push. It deploys nothing.
+
 Install optional quality tools with `npm ci` and `python3 -m pip install -r
 requirements-dev.txt`. `npm test` runs the client checks; it requires a current
 build. Claim checks are strict: unresolved samples remain drafts. Add an approval

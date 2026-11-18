@@ -3,7 +3,9 @@
 import contextlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
+import json
 from pathlib import Path
+import re
 import sys
 import threading
 import unittest
@@ -99,6 +101,53 @@ class SmokeTests(unittest.TestCase):
         self.assertEqual(code, 1)
         code, out = self.run_smoke(routes, (404, SECURE, ''), '--form', 'on', '--no-endpoint')
         self.assertEqual(code, 0, out)
+
+def routed(path, rule):
+    """Cloudflare's documented _routes.json matching: * matches anything, across slashes; "/x/*" also matches "/x"."""
+    if rule.endswith('/*') and path == rule[:-2]:
+        return True
+    return re.fullmatch('.*'.join(re.escape(part) for part in rule.split('*')), path) is not None
+
+class RoutesTests(unittest.TestCase):
+    """static/_routes.json runs Functions only for the endpoint and the dotfiles the middleware hides.
+    Cloudflare applies it on deploy; the preview workflow's smoke check proves the dotfile rule there."""
+    routes = json.loads((Path(__file__).resolve().parents[1] / 'static/_routes.json').read_text())
+
+    def runs_function(self, path):
+        return (any(routed(path, rule) for rule in self.routes['include'])
+                and not any(routed(path, rule) for rule in self.routes['exclude']))
+
+    def test_limits(self):
+        rules = self.routes['include'] + self.routes['exclude']
+        self.assertEqual(self.routes['version'], 1)
+        self.assertTrue(self.routes['include'], 'at least one include rule')
+        self.assertLessEqual(len(rules), 100)
+        self.assertTrue(all(len(rule) <= 100 for rule in rules))
+
+    def test_endpoint_and_private_files_reach_the_function(self):
+        for path in ('/api/contact', '/.factory-build.json', '/.factory-receipt.json', '/.env', '/.git/config'):
+            self.assertTrue(self.runs_function(path), path)
+
+    def test_every_function_file_is_routed(self):
+        functions = Path(__file__).resolve().parents[1] / 'functions'
+        for file in functions.rglob('*.js'):
+            if file.name == '_middleware.js':
+                continue
+            path = '/' + re.sub(r'\[[^/]+\]', 'x', file.relative_to(functions).with_suffix('').as_posix())
+            self.assertTrue(self.runs_function(path), f'{file.name} answers {path}; add it to static/_routes.json include')
+
+    def test_pages_and_assets_skip_it(self):
+        for path in ('/', '/contact/', '/contact/received/', '/css/main.css', '/fonts/inter-latin-variable.woff2',
+                     '/factory-release.json', '/.well-known/security.txt', '/apiary/', '/a/.hidden'):
+            self.assertFalse(self.runs_function(path), path)
+
+class WorkflowTests(unittest.TestCase):
+    def test_actions_are_pinned_to_commits(self):
+        """The deploy workflows hold the Cloudflare token, so each action is an exact commit, not a movable tag."""
+        for workflow in (Path(__file__).resolve().parents[1] / '.github/workflows').glob('*.yml'):
+            for line in workflow.read_text().splitlines():
+                if line.strip().startswith(('uses:', '- uses:')):
+                    self.assertRegex(line, r'uses: [\w.-]+/[\w./-]+@[0-9a-f]{40} # v\d', f'{workflow.name}: {line.strip()}')
 
 if __name__ == '__main__':
     unittest.main()

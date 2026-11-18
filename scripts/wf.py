@@ -23,8 +23,10 @@ def backup(root):
     files.update(p.relative_to(root).as_posix() for p in (root / 'docs').rglob('*') if p.is_file())
     files.update(p.relative_to(root).as_posix() for p in (root / 'schemas').rglob('*') if p.is_file())
     files.update(p.relative_to(root).as_posix() for p in (root / 'evals').rglob('*') if p.is_file())
+    files.update(p.relative_to(root).as_posix() for p in (root / '.github').rglob('*') if p.is_file())
     files.update(name for name in ('README.md', 'AGENTS.md', 'wf', 'factory-capabilities.json', 'package.json',
-                                  'package-lock.json', 'requirements-dev.txt', 'requirements-vertical.txt', 'ruff.toml', '.mcp.json', '.gitignore')
+                                  'package-lock.json', 'requirements-dev.txt', 'requirements-vertical.txt', 'ruff.toml', '.mcp.json', '.gitignore',
+                                  'care-sites.txt')
                  if (root / name).is_file())
     files = {name for name in files if not any(part == '.env' or part.startswith('.env.') or part in
              ('.git', '.venv', 'node_modules', '__pycache__') for part in Path(name).parts)}
@@ -69,10 +71,24 @@ def restore(archive_path, destination):
     return destination
 
 
+COMMANDS = {
+    'status': 'build freshness, open claims and placeholders, and the next step (the default)',
+    'new': 'guided client copy, one lettered question at a time',
+    'open': 'build and serve the saved source on http://127.0.0.1:1313/',
+    'check': 'build, strict claims check, and palette contrast',
+    'backup': 'source archive under reports/backups/',
+    'restore': 'ARCHIVE NEW_FOLDER: unpack a backup into a new folder',
+    'handover': 'build and write the handover report',
+    'approve': '--by NAME: record owner review of the current content',
+    'preview-plan': 'PLAN_JSON NEW_FOLDER: build and serve a saved plan (no API call)',
+    'eject': 'NEW_FOLDER: plain Hugo copy with no factory attached',
+    'care': 'care-plan check of live sites in care-sites.txt (GET only)',
+}
+
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', nargs='?', default='status',
-                        choices=['status', 'new', 'open', 'check', 'backup', 'restore', 'handover', 'approve', 'preview-plan', 'eject'])
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     epilog='commands:\n' + '\n'.join(f'  {name:<13} {text}' for name, text in COMMANDS.items()))
+    parser.add_argument('command', nargs='?', default='status', choices=list(COMMANDS), metavar='command')
     args, rest = parser.parse_known_args(argv)
     try:
         if args.command == 'new':
@@ -81,6 +97,8 @@ def main(argv=None):
             return call('build.py', '--serve', *rest)
         if args.command == 'eject':
             return call('eject.py', *rest)
+        if args.command == 'care':
+            return call('care.py', *rest)
         if args.command == 'handover':
             return call('handover.py', '--build', *rest)
         if args.command == 'preview-plan':

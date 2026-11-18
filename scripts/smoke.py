@@ -84,17 +84,25 @@ def check_site(base, noindex=False, form='any', endpoint=True, expected_release=
         check(status == 200 and urls and all(u.startswith(base + '/') for u in urls), 'sitemap lists this site\'s pages', f'{len(urls)} address(es)')
     return results
 
-def main(argv=None):
+def parser():
+    """The command line, shared with scripts/care.py, whose site list uses these same options."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('url', help='Site address, e.g. https://258webco.com')
     parser.add_argument('--noindex', action='store_true', help='Expect a preview that keeps search engines out')
     parser.add_argument('--form', choices=('on', 'off', 'any'), default='any', help='Expected state of the contact form')
     parser.add_argument('--no-endpoint', action='store_true', help='Skip the /api/contact check')
     parser.add_argument('--expected-release-file', type=Path, help='Compare the deployed public ID with this local factory-release.json')
-    args = parser.parse_args(argv)
+    return parser
+
+def run(args):
+    """check_site for parsed arguments. Raises OSError, ValueError or KeyError when it cannot complete."""
+    expected = json.loads(args.expected_release_file.read_text())['release_id'] if args.expected_release_file else None
+    return check_site(args.url.rstrip('/'), noindex=args.noindex, form=args.form, endpoint=not args.no_endpoint, expected_release=expected)
+
+def main(argv=None):
+    args = parser().parse_args(argv)
     try:
-        expected = json.loads(args.expected_release_file.read_text())['release_id'] if args.expected_release_file else None
-        results = check_site(args.url.rstrip('/'), noindex=args.noindex, form=args.form, endpoint=not args.no_endpoint, expected_release=expected)
+        results = run(args)
     except (OSError, ValueError, KeyError) as error:
         print(f'Smoke check could not complete: {error}', file=sys.stderr)
         return 1
