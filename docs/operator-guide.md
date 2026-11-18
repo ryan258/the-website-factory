@@ -126,6 +126,28 @@ After an explicitly authorized deployment, a read-only identity check is:
 python3 scripts/smoke.py https://your-domain.example --expected-release-file public/factory-release.json
 ```
 
+## Care-plan check
+
+For each live client on a care plan, add one line to `care-sites.txt` in the
+project folder, written like the smoke check's options:
+
+```text
+https://258webco.com --form on
+https://client.example --no-endpoint   # uses an outside form service
+```
+
+Then run it weekly:
+
+```sh
+./wf care
+```
+
+It runs every smoke check, plus certificate expiry (WARN within 14 days), the
+http-to-https redirect, and home page response time (WARN over 2 seconds). It
+sends GET requests only and never submits a form. The report is plain Markdown
+saved under `reports/care/`, ready to send to the client. `care-sites.txt` stays
+out of Git and is included in `./wf backup`. Exit status 1 means a check FAILed.
+
 The check sends GET requests. It does not demonstrate form intake or send an
 enquiry. The production workflow now compares the uploaded release ID after its
 owner-authorized publish step. It still requires the owner-controlled workflow

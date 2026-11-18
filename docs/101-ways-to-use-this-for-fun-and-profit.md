@@ -154,7 +154,7 @@ Every item needs a `title` and `text`. The `hero` and `work` modules can show lo
 | `consultant` | home, services, about, contact | `hero/centered` → `services/cards` → `about/editorial` → `process/steps` → `resources/cards` → `cta/band` |
 | `local-service` | home, services, about, contact | `hero/split` → `services/cards` → `about/editorial` → `process/steps` → `areas/cards` → `cta/band` |
 | `clinic` | home, services, about, contact | `hero/split` → `services/cards` → `preparation/checklist` → `hours/table` → `cta/band` |
-| `restaurant` | home, services, about, contact | `hero/split` → `services/cards` → `menu/cards` → `hours/table` → `cta/band` |
+| `restaurant` | home, menu, about, contact | `hero/split` → `services/cards` → `menu/cards` → `hours/table` → `cta/band` |
 | `nonprofit` | home, services, about, contact | `hero/split` → `services/cards` → `support/routes` → `timeline/vertical` → `cta/band` |
 | `258webco` | home, services, contact, privacy | `hero/split` → `stats/strip` → `services/cards` → `process/steps` → `cta/band` |
 | `creator-portfolio` | home | `hero/centered` → `resources/cards` → `about/editorial` |
@@ -255,7 +255,7 @@ These turn one build into steady monthly income. Start here.
 
 **4. ★ Events calendar upkeep**
 - **Need:** Venues, churches, and clubs lose visitors when the events list is out of date.
-- **Build:** `events/agenda` (each item needs `when` and `place`). The `restaurant` preset already has one on Services.
+- **Build:** `events/agenda` (each item needs `when` and `place`). The `restaurant` preset already has one on its Menu page (`/menu/`).
 - **Charge:** Monthly plan. Include removing past events.
 - **Watch:** An old event left online looks like the business is closed. Remove expired items each month.
 

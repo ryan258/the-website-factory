@@ -184,6 +184,7 @@ Email Routing forwards all incoming mail sent to `ryan@258webco.com` (and the ca
 - **Privacy Notice:** `/privacy/` tells visitors what the form stores, for how long, and how to ask for deletion. Keep it in step with any change to the form or these settings.
 - **Webhook Delivery:** Setting the `NOTIFICATION_WEBHOOK` secret enables immediate POST notification forwarding for new submissions. A webhook that answers with an error status or takes more than 10 seconds counts as a failed delivery. Without a webhook, nobody is alerted: someone must check the KV store on a schedule.
 - **Internal Artifact & Dotfile Protection:** `functions/_middleware.js` intercepts and returns HTTP 404 for `/.factory-build.json` and hidden dotfiles (the public `/.well-known/` folder stays reachable), backed by `static/_headers` with `X-Robots-Tag: noindex, nofollow, noarchive` and `Cache-Control: no-store`.
+- **Functions only where needed:** `static/_routes.json` runs Functions only for `/api/*` and top-level dotfiles (not `/.well-known/`). Pages, styles, images and fonts are served without a Function call, so they cost no Functions quota and a busy day cannot use up the free daily allowance. The preview workflow's smoke check proves the dotfiles still answer 404 after each preview upload; the production workflow checks the same after release. If you add a Function at a new path, add that path to `include`.
 
 ---
 
@@ -259,10 +260,21 @@ To list or export every stored enquiry later (read-only; needs `npx wrangler log
 ```sh
 python3 scripts/enquiries.py list
 python3 scripts/enquiries.py export --format csv -o enquiries.csv
+python3 scripts/enquiries.py summary   # counts by month and project type, no personal data
 ```
 
 An export contains personal data. Keep it out of the repository (`.gitignore` covers
 `enquiries*.csv` and `enquiries*.json`) and delete it when you are done.
+
+When someone asks you to delete what they sent (the privacy page offers this):
+
+```sh
+python3 scripts/enquiries.py delete --email person@example.com
+```
+
+It shows every stored enquiry from that address and deletes them only after you type
+`delete`. This cannot be undone. Then delete any copy in your notification service and
+mailbox, and tell the person it is done.
 
 **Do not skip this test.** It is the only proof that a real customer's message reaches
 you. A form that looks fine and quietly drops enquiries is worse than no form.
@@ -327,7 +339,7 @@ adding a domain or changing how you get notified.
 | What you see | What it means | What to do |
 |---|---|---|
 | `Refusing to write generated output` | The `public/` folder contains files the build does not own | `rm -rf public` and build again |
-| `hugo: expected 0.166.0` | Wrong Hugo version installed | See README.md for the pinned install |
+| `hugo: expected 0.166.0` | Wrong Hugo version installed (often a Homebrew upgrade) | Run `python3 scripts/setup.py`; it installs the pinned Hugo in `.tools/hugo` |
 | `Configuration file for Pages projects does not support "send_email"` | Pages configuration does not support `send_email` in `wrangler.toml` (Workers-only) | Remove any `[[send_email]]` block; enquiries are stored in KV |
 | Every live form submission fails with 503 | The form was built on, but `ENQUIRY_ENABLED` was `"false"` at deploy time | Deploy with the workflow's **Accept enquiries** ticked, or see step 4 |
 | Form says "could not confirm delivery" | The endpoint refused the message | Run `sh scripts/check_contact.sh` to find out which check failed |

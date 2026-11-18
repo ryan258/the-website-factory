@@ -55,11 +55,13 @@ sections for a business. The live site is the `258webco` preset (258 Web Co.).
 
 ## Before pushing
 
-Tools: Hugo Extended 0.166.0 on PATH; `python3 scripts/setup.py` installs Dart Sass.
+Tools: `python3 scripts/setup.py` installs the pinned Hugo Extended 0.166.0 and Dart Sass into `.tools/`;
+the build prefers them over system copies, so a Homebrew upgrade cannot break the pin.
 
 ```sh
 python3 scripts/build.py && python3 scripts/check_site.py
-pip install -r requirements-dev.txt   # once: anthropic SDK (for tests) and ruff
+python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt   # once: anthropic SDK (for tests) and ruff
+source .venv/bin/activate   # each shell; Homebrew's Python refuses a plain pip install
 npm test            # all unit and contract tests
 npm run lint
 python3 scripts/claims.py --strict

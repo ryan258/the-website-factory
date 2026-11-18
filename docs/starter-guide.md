@@ -1,7 +1,7 @@
 # Client starter handover
 
-1. Create a fresh copy with `./wf new` (or `scripts/new_site.py --guided`), or pass options: `--preset` (any file in `data/presets/`: `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`, `creator-portfolio`, `creator-writer`, `creator-audio`), plus optional `--palette` and `--fonts`. Construction defaults to the earthworks palette and editorial fonts. It refuses existing paths and keeps delivery disabled and `noindex` on.
-2. Edit `data/site.yaml`: name/wordmark, email, address, hours, location, navigation, shared CTA, font, colors, social-card text. These are design inputs, not verified business facts.
+1. Create a fresh copy with `./wf new` (or `scripts/new_site.py --guided`, which walks through name, folder, preset, pages in menu order, colors, and fonts), or pass options: `--preset` (any file in `data/presets/`: `agency`, `contractor`, `construction`, `consultant`, `local-service`, `clinic`, `restaurant`, `nonprofit`, `258webco`, `creator-portfolio`, `creator-writer`, `creator-audio`), plus optional `--palette`, `--fonts`, and `--short-name` (when a long business name would push `<title>` tags past 60 characters). Construction defaults to the earthworks palette and editorial fonts. It refuses existing paths and keeps delivery disabled and `noindex` on.
+2. Edit `data/site.yaml`: name/wordmark (and optional `short_name` for `<title>` tags), email, address, hours, location, navigation, shared CTA, font, colors, social-card text. These are design inputs, not verified business facts.
 3. Edit ordered sections and visible copy in `data/presets/<preset>.json`. Replace page metadata and Markdown, contact service choices, and selected case studies. See `docs/factory-guide.md` for module contracts and removal behavior. All six case metrics live in each case's front matter. Remove unused case files and replace original artwork deliberately.
 4. Replace the default logo/favicon/touch icon and optional decorative hero artwork when the client has approved assets. Each font in `static/fonts/` needs its `OFL-<name>.txt` license beside it; validation fails without one.
 5. Run the pinned build and fast static checks. Run the browser checks after the layout/content pass. The default audit discovers all generated HTML routes; limit checks with CHECK_PATHS/AUDIT_PATHS for a bounded change.
@@ -11,7 +11,7 @@
 
 ## Boundaries
 
-This is a source-copy starter, not a CMS, a live commercial agency, or a promise of perfect Lighthouse scores. It holds no remote credentials. The master's GitHub deploy workflow is manual and owner-only; a client copy needs its own. Creating a copy does not replace all sample text with production copy. Historical test evidence is intentionally not inherited.
+This is a source-copy starter, not a CMS, a live commercial agency, or a promise of perfect Lighthouse scores. It holds no remote credentials. Each copy includes `.github/workflows/check.yml` to run pinned verification gates on push, while deployment remains manual and owner-configured. Creating a copy does not replace all sample text with production copy. Historical test evidence is intentionally not inherited.
 
 `data/site.yaml` controls the primary UI palette and typeface. Fixed colors inside decorative artwork, the social background, and the dark closing banner are intentional art direction; replace these assets/styles for a fully different design. Font paths are base-path aware; subpath builds are covered by a generated-output test. Form processing on a subpath is not accepted without a live test: Pages Functions are served from the deployment root, not the subpath.
 

@@ -1,6 +1,6 @@
 # The Website Factory
 
-Start with [the operator guide](docs/operator-guide.md). The October review changes
+Start with [the operator guide](docs/operator-guide.md). [The docs map](docs/index.md) lists every guide by job. The October review changes
 are committed (pushed to `main` on 2026-10-03; the live site has not been redeployed since) and passed review verification (all 21 default gates clean); the detailed status is
 in [the remediation record](docs/remediation-2026-10-03.md).
 
@@ -9,6 +9,7 @@ in [the remediation record](docs/remediation-2026-10-03.md).
 ./wf new          # guided creation, with lettered choices
 ./wf open         # build and serve the saved source locally
 ./wf backup       # source archive under reports/backups/
+./wf care         # care-plan check of live sites in care-sites.txt (GET only)
 ```
 
 All helper scripts now require **Python 3.11+** for shared TOML parsing. The optional
@@ -91,7 +92,7 @@ Every module has a stable identifier, a clear purpose, documented content inputs
 
 ### Visual workshop and Living Style Guide
 
-The `/site-kit/catalog/` catalog shows the available modules and their variants with fictional example content. The living style guide at `/site-kit/style-guide/` shows active color and typography tokens, client palettes and font pairings, and page assembly patterns. Compare live card, table, and disclosure variants, then open their matching preset configuration and rendered HTML. Native disclosures work with a keyboard and without JavaScript.
+The `/site-kit/catalog/` catalog shows the available modules and their variants with fictional example content. The living style guide at `/site-kit/style-guide/` shows active color and typography tokens, client palettes and font pairings, interactive tools (`assets/js/style-guide.js`: WCAG contrast checker, spacing playground, and preset homepage section composer), and page assembly patterns. Compare live card, table, and disclosure variants, then open their matching preset configuration and rendered HTML. Native disclosures work with a keyboard and without JavaScript.
 
 The workshop is an internal development surface, omitted from the default agency build. Client review focuses on the selected client site. Client copies exclude it from emitted pages, navigation, search, and sitemaps. Keep the reference homepage a deliberate composition that demonstrates the design.
 
@@ -140,15 +141,19 @@ Client copies must start without inherited approvals, historical performance gua
 | Planner browser-to-compiler round-trip and fidelity checks | `scripts/check_planner_fidelity.cjs` |
 | Cloudflare contact endpoint test harness | `scripts/check_contact.sh` |
 | Contact endpoint failure paths (no account needed) | `scripts/test_contact_endpoint.mjs` |
-| Read or export stored enquiries (read-only, via wrangler) | `scripts/enquiries.py` |
+| Read, export, summarize, or delete (on a visitor's request, after confirmation) stored enquiries, via wrangler | `scripts/enquiries.py` |
 | Enquiry reader tests (stand-in wrangler, no account) | `scripts/test_enquiries.py` |
 | Accent tone colors (mirrored by Sass `$tones`) | `data/tones.json` |
+| Task-oriented documentation index | `docs/index.md` |
 | Cloudflare setup and deployment runbook | `docs/cloudflare-setup.md` |
 | Agency process: client's own Cloudflare account, domain, email, handover outline | `docs/guide-to-hosting-on-cloudflare-on-the-cheap.md` |
 | Final delivery: plain Hugo copy with no factory attached | `scripts/eject.py` (`./wf eject`), `scripts/test_eject.py` |
+| Weekly care-plan check of live client sites (GET only) | `scripts/care.py` (`./wf care`), `scripts/test_care.py` |
+| Pinned Hugo and Dart Sass installer (`.tools/`) | `scripts/setup.py`, `scripts/test_setup.py` |
 | Moving a client's domain from GoDaddy to Cloudflare | `docs/migrating-domains-from-godaddy-to-cloudflare.md` |
 | Contact form Pages Function endpoint | `functions/api/contact.js` |
 | Internal inventory and dotfile protection middleware | `functions/_middleware.js` |
+| Which requests run Functions (`/api/*` and dotfiles only) | `static/_routes.json`, `scripts/test_smoke.py` |
 | Expanded workshop, keyboard, and no-JavaScript checks | `scripts/check_workshop.cjs` |
 | Practical component contract checks | `scripts/check_components.cjs` |
 | Planning workspace behavior and persistence checks | `scripts/check_workflow.cjs` |
@@ -190,7 +195,7 @@ These tools let an AI assistant, or a person, go from a client brief to a checke
 | Handover report | `python3 scripts/handover.py --build` |
 | Screenshot comparison | `node scripts/visual_check.cjs --update`, then `node scripts/visual_check.cjs` |
 
-- **Claude API:** `draft_plan.py` uses `claude-opus-5-5` with structured output that must match `schemas/plan.schema.json`. Install the SDK with `pip install -r requirements-dev.txt`. Set `ANTHROPIC_API_KEY`, or log in with `ant auth login`. A declined request retries on Anthropic's recommended fallback model (`fallbacks: "default"`). Each run prints the token counts and the model that answered; `eval_plans.py --live` saves them in its report.
+- **Claude API:** `draft_plan.py` uses `claude-opus-5-5` with structured output that must match `schemas/plan.schema.json`. Install the SDK into a project `.venv` (`python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt`, then `source .venv/bin/activate`); `scripts/doctor.py` says which install works on this machine. Set `ANTHROPIC_API_KEY`, or log in with `ant auth login`. A declined request retries on Anthropic's recommended fallback model (`fallbacks: "default"`). Each run prints the token counts and the model that answered; `eval_plans.py --live` saves them in its report.
 - **MCP:** Claude Code loads `scripts/mcp_server.py` from `.mcp.json`. Tools: `list_modules`, `list_presets`, `get_preset`, `get_schema`, `validate_preset`, `check_claims`, `compile_plan`, `build_site`, `check_site`, `create_client_site`, and `draft_plan`. The tool descriptions name any side effect. None of them commit, deploy, or turn on a form.
 - **Approving claims:** once the business confirms a claim, add its text to the preset's `approved_claims`. Client copies start with none.
 - **Schemas:** after editing `data/modules.json` or `data/tones.json`, run `python3 scripts/schemas.py`. CI fails when the schema files are out of date.
@@ -199,12 +204,12 @@ These tools let an AI assistant, or a person, go from a client brief to a checke
 
 Requires Python 3.11+ for helper scripts, **Hugo Extended 0.166.0**, and **Dart Sass 1.104.1**. Node is optional and used only for browser/Lighthouse checks.
 
-1. Install the pinned Hugo Extended binary from [official releases](https://github.com/gohugoio/hugo/releases/tag/v0.166.0) and place `hugo` on PATH.
-2. Install the pinned standalone Dart Sass from [official releases](https://github.com/sass/dart-sass/releases/tag/1.104.1), or run the installer below. Automatic setup supports macOS/Linux arm64/x64 and verifies the release's SHA-256 digest. Windows users should put the standalone `sass` command on PATH.
+1. Run `python3 scripts/setup.py`. It installs the pinned [Hugo Extended](https://github.com/gohugoio/hugo/releases/tag/v0.166.0) and [Dart Sass](https://github.com/sass/dart-sass/releases/tag/1.104.1) into the ignored `.tools/` folder, after checking each release's SHA-256 digest. On macOS it unpacks Hugo's official `.pkg` with `pkgutil` and never runs the installer. It skips a tool already in `.tools/`, and skips Hugo when the one on PATH is already the pinned Extended build. Each install is also kept in `~/.cache/website-factory` (hard-linked, so no extra disk), so setup in the next client copy takes seconds and needs no download.
+2. Automatic setup supports macOS/Linux arm64/x64. Windows users should put the pinned `hugo` (Extended) and standalone `sass` commands on PATH.
 3. Run these commands from the project folder:
 
 ```sh
-python3 scripts/setup.py       # Only if .tools/dart-sass is not already present
+python3 scripts/setup.py       # Pinned Hugo and Dart Sass into .tools/; skips what is already there
 python3 scripts/build.py       # Validates, builds, and checks isolated output before replacing generated files
 python3 scripts/check_site.py  # Fast generated-output checks
 python3 scripts/build.py --serve --port 1313
@@ -212,13 +217,13 @@ python3 scripts/build.py --serve --port 1313
 # Internal workshop: python3 scripts/build.py --workshop --serve --port 1314
 ```
 
-The helper scripts also work when called by absolute path from another directory. They find the project relative to their own location. The build helper uses a private Dart Sass installation if present and a writable temporary Hugo cache. It does not download tools or install anything implicitly.
+The helper scripts also work when called by absolute path from another directory. They find the project relative to their own location. The build helper prefers the private Hugo and Dart Sass in `.tools/` over system copies and a writable temporary Hugo cache. It does not download tools or install anything implicitly.
 
-`--serve` serves verified generated output on loopback. Rebuild after edits; it is not a live-reload server. Prefer the helper for client builds because it applies page selection, validates links, and reconciles removed routes. Direct Hugo commands bypass that selection and output-checking workflow. If using the private compiler, first run `export PATH="$PWD/.tools/dart-sass:$PATH"`. In restricted environments, also set `HUGO_CACHEDIR` to a writable absolute temporary directory.
+`--serve` serves verified generated output on loopback with the built `_headers` security block (including CSP) and the site's 404 page. Rebuild after edits; it is not a live-reload server. Prefer the helper for client builds because it applies page selection, validates links, and reconciles removed routes. Direct Hugo commands bypass that selection and output-checking workflow. If using the private tools, first run `export PATH="$PWD/.tools/hugo:$PWD/.tools/dart-sass:$PATH"`. In restricted environments, also set `HUGO_CACHEDIR` to a writable absolute temporary directory.
 
 ## Create a client copy
 
-The easiest way is guided setup. It asks for the name, the folder, the preset, the colors, and the fonts, one question at a time. Each choice is a lettered list, and nothing is created until you confirm the summary:
+The easiest way is guided setup. It asks for the name, the folder, the preset, the pages (which to keep, in menu order), the colors, and the fonts, one question at a time. Each choice is a lettered list or a short typed answer, a page set that would break a link is explained and asked again, and nothing is created until you confirm the summary:
 
 ```sh
 python3 scripts/new_site.py --guided
@@ -228,13 +233,15 @@ Or pass everything at once:
 
 ```sh
 python3 scripts/new_site.py ../cedar-studio --name "Cedar Studio" --preset contractor --palette terracotta --fonts warm
+# A long name that would push page titles past 60 characters needs a short one for titles:
+#   --name "Northside Family Dental and Orthodontic Care Group" --short-name "Northside Dental"
 cd ../cedar-studio
 python3 scripts/setup.py
 python3 scripts/build.py
 python3 scripts/check_site.py
 ```
 
-The destination parent must exist; the destination itself must not. Existing files are never overwritten. Copies inside the source project and source symlinks are rejected. Source templates, assets, content, data, scripts, pinned QA dependencies, and current starter instructions are copied. `.tools`, `node_modules`, generated output, historical reports, old acceptance claims, and `.git` are not copied.
+The destination parent must exist; the destination itself must not. Existing files are never overwritten. Copies inside the source project and source symlinks are rejected. Source templates, assets, content, data, scripts, pinned QA dependencies, a push verification workflow (`.github/workflows/check.yml`), and current starter instructions are copied. `.tools`, `node_modules`, generated output, historical reports, old acceptance claims, and `.git` are not copied.
 
 The new name appears in the header, footer, page titles, structured data, and generated social card. The default email becomes `hello@example.invalid`. The selected composition, service choices, and initial accent follow the preset. Remaining copy and sample details are fictional until you deliberately replace them. The CLI does not invent real business facts or claim a client-ready content rewrite. Each copy starts at `example.invalid`, with form delivery disabled and `noindex` retained.
 
@@ -242,7 +249,7 @@ The new name appears in the header, footer, page titles, structured data, and ge
 
 | Edit | File |
 | --- | --- |
-| Business name, wordmark, contact details, navigation, footer, CTA, font, light/dark palette, social-card text | `data/site.yaml` |
+| Business name, optional `short_name` (for `<title>` tags under 60 chars), wordmark, contact details, navigation, footer, CTA, font, light/dark palette, social-card text | `data/site.yaml` |
 | Visible headings, introductions, section content and order | `data/presets/<preset>.json` |
 | Browser titles and meta descriptions | Each section's `content/*/_index.md` |
 | Contact budget choices and currency hint | `data/contact.yaml` |
@@ -285,8 +292,8 @@ python3 scripts/test_links.py      # anchors, deep links, mailto/tel links
 python3 scripts/contrast.py
 node scripts/test_contact_endpoint.mjs
 sh scripts/check_contact.sh
-# Or run all unit/contract tests at once:
-pip install -r requirements-dev.txt
+# Or run all unit/contract tests at once (once: python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt):
+source .venv/bin/activate   # ./wf and the MCP server use .venv on their own
 npm test
 # Lint for real mistakes:
 npm run lint
