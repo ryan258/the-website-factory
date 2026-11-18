@@ -70,6 +70,17 @@
         {{ end }}
       </dl>
     </details>
+
+    <div class="sg-demo-box">
+      <p class="sg-demo-label">Contrast checker</p>
+      <div class="sg-tool">
+        <label>Text <input id="sg-fg" type="color" value="{{ $theme.ink }}" data-theme="{{ $theme.ink }}"></label>
+        <label>Background <input id="sg-bg" type="color" value="{{ $theme.paper }}" data-theme="{{ $theme.paper }}"></label>
+        <button type="button" class="button button--small" id="sg-contrast-reset">Reset to theme</button>
+      </div>
+      <p id="sg-contrast-sample" class="sg-contrast__sample">Clear words, considered design, and a useful next step.</p>
+      <p id="sg-contrast-result" class="sg-readout" aria-live="polite"></p>
+    </div>
   </section>
 
   <!-- 2. Typography Specimen -->
@@ -149,6 +160,15 @@
         <div class="sg-breakpoint"><strong>Reading width</strong><p class="sg-breakpoint__note">Use <code>--width</code> for the page container and <code>--reading</code> for long prose. See <code>assets/scss/abstracts/_variables.scss</code>.</p></div>
       </div>
     </div>
+
+    <div class="sg-demo-box">
+      <p class="sg-demo-label">Spacing playground</p>
+      <div class="sg-tool">
+        <label>Step <input id="sg-space" type="range" min="1" max="8" value="4"></label>
+      </div>
+      <div id="sg-space-box" class="sg-space-box"><span class="sg-space-chip">Padding</span><span class="sg-space-chip">and gap</span><span class="sg-space-chip">move together</span></div>
+      <p id="sg-space-result" class="sg-readout" aria-live="polite"></p>
+    </div>
   </section>
 
   <section id="page-assembly" class="sg-section">
@@ -171,6 +191,21 @@
       </div>
     </dl>
     <p class="sg-source">Section order and variant keys live under <code>pages</code> in the preset. Each page section points to a content object under the top-level <code>sections</code> key. Use one lead heading and give each destination a stable anchor.</p>
+
+    <div class="sg-demo-box">
+      <p class="sg-demo-label">Preset composer</p>
+      <form id="sg-composer" class="sg-composer" aria-label="Choose homepage sections">
+        <label><input type="checkbox" value="hero" checked> Hero</label>
+        <label><input type="checkbox" value="services" checked> Services</label>
+        <label><input type="checkbox" value="work" checked> Work</label>
+        <label><input type="checkbox" value="process"> Process</label>
+        <label><input type="checkbox" value="faq"> FAQ</label>
+        <label><input type="checkbox" value="contact" checked> Contact</label>
+      </form>
+      <p id="sg-composer-note" class="sg-readout" aria-live="polite"></p>
+      <p class="sg-source">Sketch of the homepage order. Add a variant and content for each section in the preset.</p>
+      <pre class="sg-code"><code id="sg-composer-json"></code></pre>
+    </div>
   </section>
 
   <section id="components-buttons" class="sg-section">

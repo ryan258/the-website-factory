@@ -21,7 +21,7 @@ def load(name):
 new_site, build = load('new_site'), load('build')
 GONE = ('scripts', 'schemas', 'wf', '.mcp.json', 'AGENTS.md', 'factory-capabilities.json', 'package.json',
         'data/modules.json', 'data/examples.json', 'data/tones.json', 'layouts/_default/catalog.html',
-        'layouts/_default/kit.html', 'assets/js/workflow.js')
+        'layouts/_default/kit.html', 'assets/js/workflow')
 
 
 class EjectTests(unittest.TestCase):

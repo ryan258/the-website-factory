@@ -25,7 +25,7 @@ from from_plan import PLANNER_LABELS, TBC  # noqa: E402
 from schemas import plan_schema, validate  # noqa: E402
 
 MODEL = 'claude-opus-5-5'
-# Planner limits (assets/js/workflow.js valid()): a draft beyond them could not be imported.
+# Planner limits (assets/js/workflow/model.js valid()): a draft beyond them could not be imported.
 MAX_PAGES, MAX_SECTIONS, MAX_TEXT = 30, 40, 12000
 
 SYSTEM = f"""You plan small-business websites for a web studio. Read the client brief and

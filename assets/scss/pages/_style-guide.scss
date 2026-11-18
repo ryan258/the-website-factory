@@ -59,6 +59,72 @@
   border-bottom: 0;
 }
 
+/* Interactive demos */
+.sg-tool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sg-tool label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: .9rem;
+}
+
+.sg-tool input[type="color"] {
+  width: 48px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: none;
+  cursor: pointer;
+}
+
+.sg-contrast__sample {
+  font-size: 1.25rem;
+  padding: 20px;
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.sg-readout {
+  font-family: monospace;
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+.sg-space-box {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px dashed var(--line);
+  background: var(--mist);
+  transition: padding .2s, gap .2s;
+}
+
+.sg-space-chip {
+  background: var(--accent);
+  color: var(--accent-text);
+  padding: 6px 12px;
+  font-size: .8rem;
+}
+
+.sg-composer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 16px;
+}
+
+.sg-composer label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .sg-heading {
   margin-bottom: 36px;
   max-width: 720px;

@@ -16,8 +16,8 @@ from factory import validate
 # it is easy to find and replace before anything is published.
 TBC = 'To be confirmed'
 
-# The planner (assets/js/workflow.js) labels eight core modules with these names and every
-# other module with its registry name. Keep this map identical to `legacy` in workflow.js;
+# The planner (assets/js/workflow/data.js) labels eight core modules with these names and every
+# other module with its registry name. Keep this map identical to `legacy` in data.js;
 # scripts/test_from_plan.py checks that it is.
 PLANNER_LABELS = {'hero': 'Introduction', 'services': 'Services', 'about': 'About', 'work': 'Proof',
                   'process': 'Process', 'faq': 'FAQ', 'contact': 'Contact', 'cta': 'Call to action'}

@@ -1,5 +1,7 @@
 {{ partial "validate-site.html" . }}
-{{ $title := printf "%s — %s" .Title hugo.Data.site.name }}
+{{/* A long business name can set short_name for titles; the header, footer and search data keep the full name. */}}
+{{ $brand := hugo.Data.site.short_name | default hugo.Data.site.name }}
+{{ $title := printf "%s — %s" .Title $brand }}
 {{/* One resolved description for search, social tags and the page itself. Hugo's error page has
      no content file to carry front matter, so its own wording is set here; the page body is
      layouts/404.html. */}}
@@ -8,7 +10,7 @@
 {{ if or .IsHome (eq .Kind "section") }}
   {{ $profile := index hugo.Data.presets (.Params.preset | default hugo.Data.factory.preset) }}
   {{ with index $profile.pages (cond .IsHome "home" .Section) }}
-    {{ $title = printf "%s — %s" (.seo_title | default .title) hugo.Data.site.name }}
+    {{ $title = printf "%s — %s" (.seo_title | default .title) $brand }}
     {{ $description = .description }}
   {{ end }}
 {{ end }}
@@ -61,6 +63,10 @@
 {{ if eq .Section "contact" }}
   {{ $js := resources.Get "js/contact.js" | minify | fingerprint "sha384" }}
   <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{ end }}
+{{ if eq .Layout "style-guide" }}
+  {{ $sgJS := resources.Get "js/style-guide.js" | minify | fingerprint "sha384" }}
+  <script src="{{ $sgJS.RelPermalink }}" integrity="{{ $sgJS.Data.Integrity }}" defer></script>
 {{ end }}
 {{ $presetSlug := .Params.preset | default hugo.Data.factory.preset }}
 {{ $profile := index hugo.Data.presets $presetSlug }}

@@ -135,9 +135,9 @@ class FromPlanTests(unittest.TestCase):
 
     def test_planner_labels_match_workflow(self):
         import re
-        source = (ROOT / 'assets/js/workflow.js').read_text()
+        source = (ROOT / 'assets/js/workflow/data.js').read_text()
         found = re.search(r'const legacy=\{([^}]*)\}', source)
-        self.assertIsNotNone(found, 'workflow.js legacy label map not found')
+        self.assertIsNotNone(found, 'planner legacy label map not found in assets/js/workflow/data.js')
         labels = dict(re.findall(r"(\w+):'([^']*)'", found.group(1)))
         self.assertEqual(labels, PLANNER_LABELS)
 

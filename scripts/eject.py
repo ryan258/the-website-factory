@@ -27,7 +27,7 @@ KEEP_DOCS = ('acceptance.md', 'handover.md')
 # Factory-only files, removed from the copy. The workshop templates and styles are unused by a client site.
 DROP = ('data/modules.json', 'data/examples.json', 'data/tones.json', 'content/site-kit',
         'layouts/_default/kit.html', 'layouts/_default/catalog.html', 'layouts/_default/style-guide.html',
-        'layouts/_default/composition.html', 'assets/js/workflow.js', 'assets/css/workflow.css',
+        'layouts/_default/composition.html', 'assets/js/workflow', 'assets/js/style-guide.js', 'assets/css/workflow.css',
         'assets/scss/workshop.scss', 'assets/scss/pages/_workshop.scss', 'assets/scss/pages/_style-guide.scss')
 RECEIPTS = ('.factory-build.json', '.factory-receipt.json', 'factory-release.json')
 REGISTRY_VAR = '{{ $registry := index hugo.Data.modules $m }}'

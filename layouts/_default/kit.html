@@ -26,6 +26,7 @@
      the original JSON in the planner preserves authored navigation order and safely escapes HTML. */}}
 {{ range $slug, $profile := hugo.Data.presets }}{{ if ne $slug "258webco" }}{{ $starterProfiles = merge $starterProfiles (dict $slug (readFile (printf "data/presets/%s.json" $slug))) }}{{ end }}{{ end }}
 <script id="workflow-starters" type="application/json">{{ $starterProfiles | jsonify | safeJS }}</script>
-{{ $js := resources.Get "js/workflow.js" | minify | fingerprint }}
+{{/* assets/js/workflow/*.js are ES modules; Hugo's built-in esbuild bundles them into one script. */}}
+{{ $js := resources.Get "js/workflow/main.js" | js.Build (dict "targetPath" "js/workflow.js" "minify" true) | fingerprint }}
 <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
 {{ end }}
