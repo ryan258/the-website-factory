@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def planner_export(slug):
     source = json.loads((ROOT / 'data/presets' / f'{slug}.json').read_text())
-    # Match the metadata carried by workflow.js createStarter, including creator modes.
+    # Match the metadata carried by the planner's createStarter (assets/js/workflow/main.js), including creator modes.
     project = {key: deepcopy(source[key]) for key in
                ('name', 'label', 'tone', 'palette', 'font_pairing', 'site_type', 'contact_mode') if key in source}
     project.update(goal=source.get('description', ''), starterPreset=slug, pages=[])

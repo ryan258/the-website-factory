@@ -35,7 +35,7 @@
         }
       ]
     },
-    "services": {
+    "menu": {
       "title": "Menu",
       "description": "Fictional restaurant menu, private dining, and upcoming events.",
       "sections": [
@@ -53,6 +53,11 @@
           "module": "services",
           "variant": "rows",
           "content": "services"
+        },
+        {
+          "module": "delivery",
+          "variant": "definitions",
+          "content": "delivery"
         },
         {
           "module": "events",
@@ -130,7 +135,7 @@
       },
       "secondary": {
         "label": "See the menu",
-        "url": "/services/"
+        "url": "/menu/"
       },
       "note": "Fictional business \u00b7 Sample composition",
       "art": "arch"
@@ -344,6 +349,29 @@
         }
       ],
       "notice": "Fictional contact information. Message delivery is disabled."
+    },
+    "delivery": {
+      "label": "To go",
+      "title": "Takeaway and delivery.",
+      "intro": "Explain how guests can get food to go. Replace each answer with the restaurant\u2019s real arrangements.",
+      "items": [
+        {
+          "title": "Takeaway",
+          "text": "How to order and where to collect.",
+          "value": "To be confirmed"
+        },
+        {
+          "title": "Delivery",
+          "text": "Delivery partners or area, if any.",
+          "value": "To be confirmed"
+        },
+        {
+          "title": "Large orders",
+          "text": "Notice needed for group or catering orders.",
+          "value": "To be confirmed"
+        }
+      ],
+      "notice": "Placeholder arrangements. Confirm each option before publishing."
     }
   }
 }

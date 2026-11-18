@@ -29,6 +29,11 @@
           "content": "work-featured"
         },
         {
+          "module": "bento",
+          "variant": "mosaic",
+          "content": "bento"
+        },
+        {
           "module": "process",
           "variant": "steps",
           "content": "process"
@@ -105,6 +110,16 @@
           "module": "before-after",
           "variant": "panels",
           "content": "before-after"
+        },
+        {
+          "module": "logos",
+          "variant": "list",
+          "content": "logos"
+        },
+        {
+          "module": "testimonials",
+          "variant": "quotes",
+          "content": "testimonials"
         },
         {
           "module": "cta",
@@ -378,18 +393,14 @@
     },
     "testimonials": {
       "label": "Client voices",
-      "title": "Make room for real feedback.",
+      "title": "In their words.",
       "items": [
         {
-          "title": "Sample client · fictional",
-          "text": "“We knew what was happening, what was needed from us, and what came next.”"
-        },
-        {
-          "title": "Sample client · fictional",
-          "text": "“The finished site finally felt like the business we had built.”"
+          "title": "Client name to be confirmed",
+          "text": "To be confirmed: a quote the client approved in writing."
         }
       ],
-      "notice": "Illustrative quotations, not endorsements. Replace with approved, attributable feedback or omit this module."
+      "notice": "Placeholder. Use attributed feedback only with written permission, or remove this section."
     },
     "stats": {
       "label": "Proof, not adjectives",
@@ -622,6 +633,43 @@
           "text": "Domain registration, hosting, ongoing care, and new work outside the agreed scope. We would list each separately before you proceed."
         }
       ]
+    },
+    "bento": {
+      "label": "At a glance",
+      "title": "What every site gets.",
+      "items": [
+        {
+          "title": "Light pages",
+          "text": "Describe how pages stay fast. Measured figures to be confirmed.",
+          "badge": "Speed",
+          "span": "large"
+        },
+        {
+          "title": "Checked for access",
+          "text": "Describe the accessibility checks each page passes.",
+          "badge": "Inclusion"
+        },
+        {
+          "title": "Yours to keep",
+          "text": "Describe what the client owns at handover.",
+          "badge": "Handover"
+        }
+      ]
+    },
+    "logos": {
+      "label": "Partners",
+      "title": "Partners and memberships.",
+      "items": [
+        {
+          "title": "Partner to be confirmed",
+          "text": "Show a partner only with their written permission."
+        },
+        {
+          "title": "Membership to be confirmed",
+          "text": "Name the association and link to its public listing."
+        }
+      ],
+      "notice": "Placeholder entries. Show only real relationships, with permission."
     }
   }
 }

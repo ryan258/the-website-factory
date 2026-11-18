@@ -60,6 +60,11 @@
           "content": "process"
         },
         {
+          "module": "inclusions",
+          "variant": "columns",
+          "content": "inclusions"
+        },
+        {
           "module": "faq",
           "variant": "accordion",
           "content": "faq"
@@ -424,6 +429,34 @@
       },
       "note": "Fictional business · Demonstration only",
       "art": "arch"
+    },
+    "inclusions": {
+      "label": "Scope",
+      "title": "What is included.",
+      "intro": "Separate what every job includes from work agreed separately. Replace each item with the business’s real terms.",
+      "items": [
+        {
+          "title": "The work in the written estimate",
+          "text": "Scope to be confirmed for each job.",
+          "group": "included"
+        },
+        {
+          "title": "Cleanup at the end of the job",
+          "text": "What cleanup covers: to be confirmed.",
+          "group": "included"
+        },
+        {
+          "title": "Permit and inspection fees",
+          "text": "Whether these are separate: to be confirmed.",
+          "group": "excluded"
+        },
+        {
+          "title": "Changes after approval",
+          "text": "How changes are agreed: to be confirmed.",
+          "group": "excluded"
+        }
+      ],
+      "notice": "Placeholder scope. Confirm what is and is not included before publishing."
     }
   }
 }

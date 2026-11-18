@@ -34,6 +34,11 @@
           "content": "areas"
         },
         {
+          "module": "updates",
+          "variant": "rows",
+          "content": "updates"
+        },
+        {
           "module": "cta",
           "variant": "band",
           "content": "cta"
@@ -424,6 +429,24 @@
       },
       "note": "Fictional business · Demonstration only",
       "art": "tiles"
+    },
+    "updates": {
+      "label": "News",
+      "title": "Recent updates.",
+      "intro": "Record dated changes visitors care about, such as a new service area or seasonal hours.",
+      "items": [
+        {
+          "title": "Update to be confirmed",
+          "text": "Describe the change and who it affects.",
+          "when": "Date to be confirmed"
+        },
+        {
+          "title": "Earlier update to be confirmed",
+          "text": "Keep older entries while they still help visitors.",
+          "when": "Date to be confirmed"
+        }
+      ],
+      "notice": "Placeholder updates. Add only real, dated changes."
     }
   }
 }

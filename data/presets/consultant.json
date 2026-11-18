@@ -60,6 +60,11 @@
           "content": "process"
         },
         {
+          "module": "glossary",
+          "variant": "definitions",
+          "content": "glossary"
+        },
+        {
           "module": "faq",
           "variant": "accordion",
           "content": "faq"
@@ -424,6 +429,26 @@
       },
       "note": "Fictional business · Demonstration only",
       "art": "orbit"
+    },
+    "glossary": {
+      "label": "Plain words",
+      "title": "Terms we use.",
+      "intro": "Explain words visitors meet in proposals. Replace these with the terms this practice really uses.",
+      "items": [
+        {
+          "title": "Discovery",
+          "text": "The first conversations that define the problem and agree the scope."
+        },
+        {
+          "title": "Deliverable",
+          "text": "Something handed over at the end of a stage, such as a report or a plan."
+        },
+        {
+          "title": "Scope",
+          "text": "What the engagement covers. Anything outside it is agreed separately."
+        }
+      ],
+      "notice": "Sample definitions. Edit them to match the wording in your proposals."
     }
   }
 }

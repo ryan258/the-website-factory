@@ -14,6 +14,11 @@
           "content": "hero"
         },
         {
+          "module": "announcements",
+          "variant": "spotlight",
+          "content": "announcement"
+        },
+        {
           "module": "services",
           "variant": "cards",
           "content": "services"
@@ -53,6 +58,11 @@
           "module": "process",
           "variant": "steps",
           "content": "process"
+        },
+        {
+          "module": "eligibility",
+          "variant": "checklist",
+          "content": "eligibility"
         },
         {
           "module": "faq",
@@ -315,6 +325,38 @@
         }
       ],
       "notice": "Fictional contact information. Message delivery is disabled."
+    },
+    "eligibility": {
+      "label": "Taking part",
+      "title": "Who can take part.",
+      "intro": "Replace this list with the program\u2019s real requirements, and say how to ask about exceptions.",
+      "items": [
+        {
+          "title": "Where you live",
+          "text": "Service area: to be confirmed."
+        },
+        {
+          "title": "Your circumstances",
+          "text": "Requirements: to be confirmed."
+        },
+        {
+          "title": "Not sure?",
+          "text": "Explain how to ask whether you qualify before applying."
+        }
+      ],
+      "notice": "Placeholder requirements. Confirm every rule with the organization before publishing."
+    },
+    "announcement": {
+      "label": "Notice",
+      "title": "Current notice.",
+      "intro": "Use this space for a temporary change, such as new opening times or a paused program.",
+      "items": [
+        {
+          "title": "Notice to be confirmed",
+          "text": "Say what changed, when it applies, and what visitors should do instead."
+        }
+      ],
+      "notice": "Remove this section when there is no current notice."
     }
   }
 }

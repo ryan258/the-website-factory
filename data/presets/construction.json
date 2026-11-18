@@ -82,6 +82,16 @@
           "content": "preparation"
         },
         {
+          "module": "specifications",
+          "variant": "table",
+          "content": "specifications"
+        },
+        {
+          "module": "downloads",
+          "variant": "rows",
+          "content": "downloads"
+        },
+        {
           "module": "faq",
           "variant": "accordion",
           "content": "faq",
@@ -606,6 +616,51 @@
         }
       ],
       "notice": "Sample privacy wording. Review the actual site and applicable requirements before publication."
+    },
+    "specifications": {
+      "label": "Project details",
+      "title": "What a typical job needs.",
+      "intro": "List the details clients ask about. Replace each value with confirmed figures and units.",
+      "items": [
+        {
+          "title": "Site access",
+          "text": "Room needed for equipment and vehicles.",
+          "value": "To be confirmed"
+        },
+        {
+          "title": "Working hours",
+          "text": "When crews work on site.",
+          "value": "To be confirmed"
+        },
+        {
+          "title": "Permits",
+          "text": "Who arranges permits and inspections.",
+          "value": "To be confirmed"
+        }
+      ],
+      "notice": "Placeholder values. Confirm each with the business before publishing."
+    },
+    "downloads": {
+      "label": "Documents",
+      "title": "Read before a site visit.",
+      "intro": "Link real, reviewed documents here. Until then, each item asks for the document instead.",
+      "items": [
+        {
+          "title": "Service overview",
+          "text": "A summary of the work offered.",
+          "value": "Document to be confirmed",
+          "url": "/contact/",
+          "link_label": "Ask for the service overview"
+        },
+        {
+          "title": "Site preparation checklist",
+          "text": "What to check before work starts.",
+          "value": "Document to be confirmed",
+          "url": "/contact/",
+          "link_label": "Ask for the checklist"
+        }
+      ],
+      "notice": "No files are attached yet. Link each item to a real document before publishing."
     }
   }
 }

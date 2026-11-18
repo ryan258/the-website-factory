@@ -55,6 +55,11 @@
           "content": "process"
         },
         {
+          "module": "booking",
+          "variant": "steps",
+          "content": "booking"
+        },
+        {
           "module": "faq",
           "variant": "accordion",
           "content": "faq"
@@ -110,6 +115,11 @@
           "module": "visit",
           "variant": "details",
           "content": "visit"
+        },
+        {
+          "module": "access",
+          "variant": "definitions",
+          "content": "access"
         },
         {
           "module": "hours",
@@ -333,6 +343,46 @@
         }
       ],
       "notice": "Fictional contact information. Message delivery is disabled."
+    },
+    "booking": {
+      "label": "Appointments",
+      "title": "How to book.",
+      "intro": "Replace these steps with how the clinic really takes, confirms, and prepares for appointments.",
+      "items": [
+        {
+          "title": "Ask for a time",
+          "text": "Use the contact page to request an appointment. Booking hours: to be confirmed."
+        },
+        {
+          "title": "Wait for confirmation",
+          "text": "Say how and when the clinic confirms. Method: to be confirmed."
+        },
+        {
+          "title": "Prepare",
+          "text": "List any forms to complete before the visit. Details to be confirmed."
+        }
+      ],
+      "notice": "Sample steps. Confirm the clinic\u2019s real booking process before publishing."
+    },
+    "access": {
+      "label": "Access",
+      "title": "Getting in and getting around.",
+      "intro": "Describe step-free routes, parking, and help on arrival after checking the building.",
+      "items": [
+        {
+          "title": "Entrance",
+          "text": "Step-free access: to be confirmed."
+        },
+        {
+          "title": "Parking",
+          "text": "Accessible parking: to be confirmed."
+        },
+        {
+          "title": "Help on arrival",
+          "text": "Ask for any adjustment when you book, and say how to ask."
+        }
+      ],
+      "notice": "Placeholder access details. Check each one on site before publishing."
     }
   }
 }
